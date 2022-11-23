@@ -1,11 +1,9 @@
-import { Skill } from "../Components/Skill";
+import SkillsGrid from "../Components/skills/SkillsGrid";
 
-export const SkillGrid: React.FC<{ skills: any }> = ({ skills }) => {
+export const Home = (skills: any) => {
   return (
     <div className="skill-grid">
-      {skills.map((skill: any) => (
-        <Skill key={skill.id} skill={skill} />
-      ))}
+      <SkillsGrid />
     </div>
   );
 };
