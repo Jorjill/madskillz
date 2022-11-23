@@ -1,10 +1,10 @@
 import "./App.css";
-import { Home } from './Screens/Home';
+import AppRouter from "./routers/AppRouter";
 
 function App({ store, persistor }: any) {
   return (
     <div className="App">
-      <Home/>
+      <AppRouter/>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { Card } from "../card/card";
 import "./card-list.css";
-import { useSelector } from "react-redux";
 
 const SkillsGrid = () => {
   //   const allSkills = useSelector((state) => state.employees.allEmployees);\

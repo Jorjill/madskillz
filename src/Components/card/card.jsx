@@ -1,6 +1,4 @@
 import './card.css';
-import javaimg from '../../images/1.png';
-
 
 export const Card = ({ skill }) => {
 
