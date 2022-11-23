@@ -1,5 +1,5 @@
 import './card.css';
-import javaimg from '../../java.png';
+import javaimg from '../../images/1.png';
 
 
 export const Card = ({ skill }) => {
@@ -9,7 +9,7 @@ export const Card = ({ skill }) => {
     return(
         <div className='card-container' key={id}>
             <div>
-                <img src={javaimg} alt="Lamp" width="32" height="50"/>
+                <img src={require(`../../images/${id}.png`)} alt="Lamp" width="150" height="80"/>
                 <h2>{name}</h2>
             </div>
         </div>
