@@ -1,0 +1,12 @@
+.top-nav {
+    display: flex;
+    height: 10em;
+    background-color: #87FFF1;
+    margin-bottom: 3%;
+    justify-content: center;
+  }
+  
+  .skills-text {
+    margin-top: 4em;
+    font-size: x-large;
+  }

@@ -5,3 +5,8 @@
     padding: 25px;
     border-radius: 5%;
 }
+
+.card-container:hover{
+    transition: 500ms;
+    transform: scale(1.05);
+}

@@ -5,7 +5,15 @@ const SkillsGrid = () => {
   //   const allSkills = useSelector((state) => state.employees.allEmployees);\
 
   const allSkills: any[] = [
-    { id: 1, name: "Language" },
+    {
+      id: 1,
+      name: "Language",
+      subskills: [
+        { id: 1, name: "Java" },
+        { id: 2, name: "Javascript" },
+        { id: 3, name: "Python" },
+      ],
+    },
     { id: 2, name: "Backend" },
     { id: 3, name: "Frontend" },
     { id: 4, name: "Cloud" },
