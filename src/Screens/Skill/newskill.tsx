@@ -12,7 +12,7 @@ export const NewSkill = () => {
 
   return (
     <div>
-      <div className="top-nav"><p className="skills-text">Subskills</p></div>
+
     </div>
   );
 };
