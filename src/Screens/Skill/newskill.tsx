@@ -14,9 +14,6 @@ export const NewSkill = () => {
     <div>
       <div className="top-nav"><p className="skills-text">Subskills</p></div>
       <div className="card-list">
-        {subskills.map((skill) => {
-          return <Card skill={skill} key={skill.id} />;
-        })}
       </div>
     </div>
   );
