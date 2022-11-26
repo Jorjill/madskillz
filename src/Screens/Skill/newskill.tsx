@@ -12,7 +12,7 @@ export const NewSkill = () => {
 
   return (
     <div>
-
+      <p>Hello</p>
     </div>
   );
 };
