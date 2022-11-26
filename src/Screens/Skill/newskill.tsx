@@ -14,6 +14,7 @@ export const NewSkill = () => {
     <div>
       <p>Hello</p>
       <p>World</p>
+      <p>!</p>
     </div>
   );
 };
