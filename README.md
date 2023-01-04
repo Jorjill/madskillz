@@ -1,9 +1,11 @@
+This is a web application for software developers, can be used to create personalized study materials
+
 Features:
-- reference text tutorial by topics
-- centralized notes of all topics used instead of documents
-- can read pdf materials
-- do quizes
-- exercises
-- warm ups
-- sample codes
-- search
+- Reference text tutorial by topics
+- Centralized note of all topics you study instead of using documents
+- Read pdf materials
+- Create and use quizes
+- Exercises
+- Warm ups
+- Sample codes
+- Search
