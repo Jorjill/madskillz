@@ -1,4 +1,22 @@
-This is a easy to use web application for software developers and other professionals or students, can be used to create a personalized study materials instead of using documents
+            @                                                       @           
+            @                                                       @           
+            @                                                       @           
+            @        @@@@   @@@@        @@@@        @@@@@@@         @           
+            @        @@@@@  @@@@        @@@@        @@@  @@@        @           
+            @        @@@@@ @@@@@       @@ @@@       @@@  @@@        @           
+            @        @@@@@ @@@@@       @@  @@       @@@  @@@        @           
+            @        @@@ @@@ @@@      @@@@@@@       @@@  @@@        @           
+            @        @@@ @@@ @@@      @@   @@@      @@@@@@@         @           
+            @                                                       @           
+            @        @@@@    @  @    @    @      @@     @@@@        @           
+            @        @@      @@@     @    @      @@       @         @           
+            @          @@    @ @     @    @      @@      @          @           
+            @        @@@@    @ @@    @    @@@@   @@@@   @@@@        @           
+            @                                                       @           
+            @                                                       @           
+            @                                                       @ 
+
+MadSkillz is easy to use web application for software developers and other professionals or students, it can be used to create a personalized study materials such as notes, quizes, pdf instead of using documents
 
 Features:
 
