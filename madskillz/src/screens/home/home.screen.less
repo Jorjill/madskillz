@@ -1,6 +1,34 @@
-.homescreen{
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.homescreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+
+  .input-box-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+
+    .input-box {
+      width: 401px;
+      height: 44px;
+      flex-shrink: 0;
+      border-radius: 40px;
+      background: rgba(45, 174, 128, 0.67);
+      border: none;
+      margin-bottom: 70px;
+    }
+
+    .input-box::placeholder {
+      color: white;
+      font-size: 20px;
+      text-indent: 10px;
+    }
+  }
 }

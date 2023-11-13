@@ -2,12 +2,13 @@
 
 import { Navbar } from "./components/navbar/Navbar";
 import { HomeScreen } from "./screens/home/home.screen";
+import { SkillScreen } from "./screens/skill/skill.screen";
 
 function App() {
   return (
     <div>
-      {/* <Navbar /> */}
-      <HomeScreen />
+      <Navbar />
+      <SkillScreen />
     </div>
   );
 }

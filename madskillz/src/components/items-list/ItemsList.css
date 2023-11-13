@@ -1,0 +1,10 @@
+.items-list {
+    display: flex;
+    flex-direction: column;
+
+    .list-box {
+        border: 0.5px solid #65877a;
+        margin: 20px;
+        padding: 20px;
+    }
+}
