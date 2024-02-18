@@ -1,20 +1,49 @@
-.items-list-container {
+.notes-component {
+  .add-button {
+    display: flex;
+    flex-direction: column;
+    .button {
+      margin-left: auto;
+      margin-bottom: 50px;
+      border: 0.5px solid #eeeeee;
+      background-color: #eeeeee;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .button:hover {
+      background-color: #c9c9c9;
+      cursor: pointer;
+    }
+  }
+
+  .items-list-container {
     display: flex;
     align-items: center;
     justify-content: center;
-  
+
     .items-list {
       display: flex;
       flex-direction: column;
       width: 80%;
-  
+
       .list-box {
-        border: 0.5px solid #b1b1b1;
-        margin: 5px;
+        border: 0.5px solid #eeeeee;
+        margin: 10px;
         padding: 20px;
         height: 200px;
-        border-radius: 5px;
+        border-radius: 8px;
+        background-color: #eeeeee;
+
+        h3{
+          margin-bottom: 20px;
+        }
+      }
+
+      .list-box:hover {
+        background-color: #c9c9c9;
+        cursor: pointer;
       }
     }
   }
-  
+}

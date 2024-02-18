@@ -3,14 +3,17 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   selectNote,
   selectNoteByTitle,
+  selectNoteMode,
   selectNotes,
+  selectNotesBySkill,
 } from "../../slices/notesSlice";
 import "./notes.less";
 import { Note } from "../note/note";
+import { AddNote } from "../add-note/addnote";
 
 const Notes: React.FC = () => {
-  const notes = useSelector(selectNotes);
   const [selectednotetitle, setSelectednotetitle] = useState("");
+  const addNoteMode = useSelector((state: any) => state.notes.isAddNoteMode);
   const selectednote = useSelector((state) =>
     selectNoteByTitle(state, selectednotetitle)
   );
@@ -18,17 +21,34 @@ const Notes: React.FC = () => {
     (state: any) => state.notes.isNoteSelected
   );
   const dispatch = useDispatch();
+  const selectedSkill = useSelector(
+    (state: any) => state.skills.selectedSkill.title
+  );
+  const reactNotes = useSelector((state) =>
+    selectNotesBySkill(state, selectedSkill)
+  );
 
   {
-    if (isNoteSelected) {
+    if (addNoteMode) {
+      return <AddNote />;
+    } else if (isNoteSelected) {
       return <Note note={selectednote} />;
     } else {
       return (
-        <div>
-          <button>add note</button>
+        <div className="notes-component">
+          <div className="add-button">
+            <div
+              className="button"
+              onClick={() => {
+                dispatch(selectNoteMode());
+              }}
+            >
+              Create Note
+            </div>
+          </div>
           <div className="items-list-container">
             <div className="items-list">
-              {notes.map((item, index) => (
+              {reactNotes.map((item, index) => (
                 <div
                   className="list-box"
                   key={index}
@@ -37,7 +57,7 @@ const Notes: React.FC = () => {
                     dispatch(selectNote());
                   }}
                 >
-                  <h2>{item.title}</h2>
+                  <h3>{item.title}</h3>
                   <p>{item.content}</p>
                 </div>
               ))}

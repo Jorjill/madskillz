@@ -9,7 +9,9 @@ import image7 from "../../assets/7.png";
 import image8 from "../../assets/8.png";
 import image9 from "../../assets/9.png";
 import image10 from "../../assets/10.png";
-import { skill } from "../../slices/skillsSlice";
+import { selectSkill, skill } from "../../slices/skillsSlice";
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const imageArray = [
   image1,
@@ -29,17 +31,28 @@ interface BoxGridProps {
 }
 
 export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
+  const dispatch = useDispatch();
+
   return (
     <div className="box-grid">
       {itemList.map((item, index) => (
-        <div className="box" key={index}>
-          <div className="box-image">
-            <img src={imageArray[index]} alt={`Image ${index}`} />
+        <Link to="/skills">
+          {" "}
+          <div
+            className="box"
+            key={index}
+            onClick={() => {
+              dispatch(selectSkill(item));
+            }}
+          >
+            <div className="box-image">
+              <img src={imageArray[index]} alt={`Image ${index}`} />
+            </div>
+            <div className="box-text">
+              <p>{item.title}</p>
+            </div>
           </div>
-          <div className="box-text">
-            <p>{item.title}</p>
-          </div>
-        </div>
+        </Link>
       ))}
     </div>
   );

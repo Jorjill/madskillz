@@ -1,13 +1,9 @@
-// import { AppRouter } from "./routers/AppRouter";
-
-import { Navbar } from "./components/navbar/Navbar";
-import { SkillScreen } from "./screens/skill/skill.screen";
+import { AppRouter } from "./routers/AppRouter";
 
 function App() {
   return (
     <div>
-      <Navbar />
-      <SkillScreen />
+      <AppRouter/>
     </div>
   );
 }
