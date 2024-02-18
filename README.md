@@ -2,6 +2,9 @@
 
 Welcome to **MadSkillz**! We've designed this platform with professionals, software developers, students, and enthusiastic learners in mind. MadSkillz is not just another web application; it's your one-stop hub for centralized, organized, and interactive study materials. Say goodbye to juggling multiple documents, and hello to a streamlined study experience.
 
+![Screenshot 2024-02-13 012401](https://github.com/Jorjill/madskillz/assets/48145722/dd7c42da-5b7a-4902-96cc-f6bbffa43708)
+
+
 ## 🌟 Key Features
 
 - **Reference Text Tutorials**: Dive deep into a wide array of topics. Each topic is curated and organized for optimal learning.
