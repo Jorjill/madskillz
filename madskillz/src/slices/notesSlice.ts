@@ -9,12 +9,14 @@ export interface note {
 export interface notesState {
   isNoteSelected: boolean;
   isAddNoteMode: boolean;
+  isEditNoteMode: boolean;
   notes: note[];
 }
 
 const initialState: notesState = {
   isNoteSelected: false,
   isAddNoteMode: false,
+  isEditNoteMode: false,
   notes: [
     {
       title: "Create Typescript React Vite App in NX",
@@ -38,17 +40,26 @@ const notesSlice = createSlice({
     addNote: (state, actions) => {
       state.notes.push(actions.payload);
     },
+    // deleteNote: (state, actions) => {
+    //   state.notes.
+    // },
     selectNote: (state) => {
       state.isNoteSelected = true;
     },
     deselectNote: (state) => {
       state.isNoteSelected = false;
     },
-    selectNoteMode: (state) => {
+    selectAddNoteMode: (state) => {
       state.isAddNoteMode = true;
     },
-    deselectNoteMode: (state) => {
+    deselectAddNoteMode: (state) => {
       state.isAddNoteMode = false;
+    },
+    selectEditNoteMode: (state) => {
+      state.isEditNoteMode = true;
+    },
+    deselectEditNoteMode: (state) => {
+      state.isEditNoteMode = false;
     },
   },
 });
@@ -66,7 +77,9 @@ export const {
   addNote,
   selectNote,
   deselectNote,
-  selectNoteMode,
-  deselectNoteMode,
+  selectAddNoteMode,
+  deselectAddNoteMode,
+  selectEditNoteMode,
+  deselectEditNoteMode
 } = notesSlice.actions;
 export default notesSlice.reducer;

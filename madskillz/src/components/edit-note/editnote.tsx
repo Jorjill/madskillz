@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addNote, deselectAddNoteMode } from "../../slices/notesSlice";
-import "./addnote.less";
+import "./editnote.less";
 import { useState } from "react";
 
-export const AddNote = () => {
+export const EditNote = () => {
   const dispatch = useDispatch();
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
@@ -14,6 +14,7 @@ export const AddNote = () => {
   return (
     <div className="addnote-component">
       <div className="addnote">
+        <p>edit mode</p>
         <input
           type="text"
           placeholder="Title"

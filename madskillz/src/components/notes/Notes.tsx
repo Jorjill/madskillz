@@ -3,23 +3,27 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   selectNote,
   selectNoteByTitle,
-  selectNoteMode,
-  selectNotes,
+  selectAddNoteMode,
   selectNotesBySkill,
+  selectEditNoteMode,
 } from "../../slices/notesSlice";
 import "./notes.less";
 import { Note } from "../note/note";
 import { AddNote } from "../add-note/addnote";
+import { EditNote } from "../edit-note/editnote";
 
 const Notes: React.FC = () => {
   const [selectednotetitle, setSelectednotetitle] = useState("");
-  const addNoteMode = useSelector((state: any) => state.notes.isAddNoteMode);
   const selectednote = useSelector((state) =>
     selectNoteByTitle(state, selectednotetitle)
+  );
+  const isEditNoteMode = useSelector(
+    (state: any) => state.notes.isEditNoteMode
   );
   const isNoteSelected = useSelector(
     (state: any) => state.notes.isNoteSelected
   );
+  const isAddNoteMode = useSelector((state: any) => state.notes.isAddNoteMode);
   const dispatch = useDispatch();
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
@@ -29,10 +33,12 @@ const Notes: React.FC = () => {
   );
 
   {
-    if (addNoteMode) {
+    if (isAddNoteMode) {
       return <AddNote />;
     } else if (isNoteSelected) {
       return <Note note={selectednote} />;
+    } else if (isEditNoteMode) {
+      return <EditNote />;
     } else {
       return (
         <div className="notes-component">
@@ -40,7 +46,7 @@ const Notes: React.FC = () => {
             <div
               className="button"
               onClick={() => {
-                dispatch(selectNoteMode());
+                dispatch(selectAddNoteMode());
               }}
             >
               Create Note
@@ -49,16 +55,32 @@ const Notes: React.FC = () => {
           <div className="items-list-container">
             <div className="items-list">
               {reactNotes.map((item, index) => (
-                <div
-                  className="list-box"
-                  key={index}
-                  onClick={() => {
-                    setSelectednotetitle(item.title);
-                    dispatch(selectNote());
-                  }}
-                >
-                  <h3>{item.title}</h3>
-                  <p>{item.content}</p>
+                <div className="list-box" key={index}>
+                  <div className="title-icons">
+                    <h3
+                      onClick={() => {
+                        setSelectednotetitle(item.title);
+                        dispatch(selectNote());
+                      }}
+                    >
+                      {item.title}
+                    </h3>
+                    <i
+                      className="ri-edit-line"
+                      onClick={() => {
+                        dispatch(selectEditNoteMode());
+                      }}
+                    ></i>
+                    <i className="ri-delete-bin-7-line"></i>
+                  </div>
+                  <p
+                    onClick={() => {
+                      setSelectednotetitle(item.title);
+                      dispatch(selectNote());
+                    }}
+                  >
+                    {item.content.slice(0, 1000)}
+                  </p>
                 </div>
               ))}
             </div>

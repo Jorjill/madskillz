@@ -2,7 +2,7 @@ import { ReactElement, useState } from "react";
 import Notes from "../../components/notes/Notes";
 import "./skill.screen.less";
 import { useDispatch, useSelector } from "react-redux";
-import { deselectNote, deselectNoteMode } from "../../slices/notesSlice";
+import { deselectNote, deselectAddNoteMode, deselectEditNoteMode } from "../../slices/notesSlice";
 
 export const SkillScreen = () => {
   const [activeComponent, setActiveComponent] = useState<ReactElement | null>(
@@ -29,7 +29,8 @@ export const SkillScreen = () => {
                   onClick={() => {
                     loadComponent(<Notes />);
                     dispatch(deselectNote());
-                    dispatch(deselectNoteMode());
+                    dispatch(deselectAddNoteMode());
+                    dispatch(deselectEditNoteMode());
                   }}
                 >
                   Notes
