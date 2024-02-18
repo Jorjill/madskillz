@@ -18,9 +18,9 @@ const initialState: skillsState = {
     { title: "REACT", imageurl: "" },
     { title: "REACT", imageurl: "" },
     { title: "REACT", imageurl: "" },
-    { title: "REACT", imageurl: "" }
+    { title: "REACT", imageurl: "" },
   ],
-  selectedSkill: {title:"", imageurl:""}
+  selectedSkill: { title: "", imageurl: "" },
 };
 
 const skillsSlice = createSlice({
@@ -32,7 +32,7 @@ const skillsSlice = createSlice({
     },
     selectSkill: (state, actions) => {
       state.selectedSkill = actions.payload;
-    }
+    },
   },
 });
 

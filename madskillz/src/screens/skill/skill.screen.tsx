@@ -1,17 +1,17 @@
 import { ReactElement, useState } from "react";
 import Notes from "../../components/notes/Notes";
 import "./skill.screen.less";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { deselectNote, deselectNoteMode } from "../../slices/notesSlice";
 
 export const SkillScreen = () => {
   const [activeComponent, setActiveComponent] = useState<ReactElement | null>(
     <Notes />
   );
-
+  const dispatch = useDispatch();
   const loadComponent = (component: ReactElement) => {
     setActiveComponent(component);
   };
-
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
@@ -26,7 +26,11 @@ export const SkillScreen = () => {
               <li>
                 <button
                   className="nav-button"
-                  onClick={() => loadComponent(<Notes />)}
+                  onClick={() => {
+                    loadComponent(<Notes />);
+                    dispatch(deselectNote());
+                    dispatch(deselectNoteMode());
+                  }}
                 >
                   Notes
                 </button>

@@ -1,28 +1,50 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addNote, deselectNoteMode } from "../../slices/notesSlice";
+import "./addnote.less";
+import { useState } from "react";
 
 export const AddNote = () => {
   const dispatch = useDispatch();
+  const selectedSkill = useSelector(
+    (state: any) => state.skills.selectedSkill.title
+  );
+  const [noteTitle, setNoteTitle] = useState("");
+  const [noteContent, setNoteContent] = useState("");
 
   return (
-    <div>
-      <button
-        onClick={() => {
-          dispatch(deselectNoteMode());
-        }}
-      >
-        back
-      </button>
-      <input type="text" name="" id="" />
-      <textarea />
-      <button
-        onClick={() => {
-          dispatch(addNote({ title: "xxx", content: "xxx" }));
-          dispatch(deselectNoteMode());
-        }}
-      >
-        Create note
-      </button>
+    <div className="addnote-component">
+      <div className="addnote">
+        <input
+          type="text"
+          placeholder="Title"
+          name=""
+          id=""
+          onChange={(t) => {
+            setNoteTitle(t.target.value);
+          }}
+        />
+        <textarea
+          placeholder="Write notes here"
+          onChange={(t) => {
+            setNoteContent(t.target.value);
+          }}
+        />
+        <div
+          className="create-note-button"
+          onClick={() => {
+            dispatch(
+              addNote({
+                title: noteTitle,
+                content: noteContent,
+                noteSkill: `${selectedSkill}`,
+              })
+            );
+            dispatch(deselectNoteMode());
+          }}
+        >
+          Create note
+        </div>
+      </div>
     </div>
   );
 };
