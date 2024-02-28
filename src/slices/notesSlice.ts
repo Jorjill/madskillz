@@ -1,4 +1,5 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { RootState } from "../state/store";
 
 export interface note {
   title: string;
@@ -64,7 +65,7 @@ const notesSlice = createSlice({
   },
 });
 
-export const selectNotes = (state: { notes: notesState }) => state.notes.notes;
+export const selectNotes = (state: RootState) => state.notes.notes;
 export const selectNoteByTitle = createSelector(
   [selectNotes, (state, title: string) => title],
   (notes, title) => notes.find((note) => note.title === title)
@@ -80,6 +81,6 @@ export const {
   selectAddNoteMode,
   deselectAddNoteMode,
   selectEditNoteMode,
-  deselectEditNoteMode
+  deselectEditNoteMode,
 } = notesSlice.actions;
 export default notesSlice.reducer;

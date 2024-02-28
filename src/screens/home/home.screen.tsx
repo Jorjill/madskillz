@@ -12,7 +12,7 @@ export const HomeScreen = () => {
         <div className="input-box-container">
           <input className="input-box" placeholder="Search..." />
         </div>
-        <BoxGrid itemList={itemsList} />
+        <BoxGrid itemList={itemsList || []} />
       </div>
     </div>
   );
