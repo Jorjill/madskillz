@@ -1,21 +1,35 @@
-import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from '../slices/counterSlice';
-import notesReducer from '../slices/notesSlice';
+import { combineSlices, configureStore } from "@reduxjs/toolkit";
 import skillsReducer from '../slices/skillsSlice';
+import storage from "redux-persist/lib/storage";
+import persistReducer from "redux-persist/es/persistReducer";
+import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistStore } from "redux-persist";
 
-// Define the RootState type to represent the overall shape of your Redux store state
-type RootState = ReturnType<typeof store.getState>;
+const persistConfig = {
+  key: 'root',
+  storage,
+}
+
+const reducer = combineSlices({
+  skills: skillsReducer
+});
+
+const persistedReducer = persistReducer(persistConfig, reducer);
 
 const store = configureStore({
-  reducer: {
-    counter: counterReducer,
-    notes: notesReducer,
-    skills: skillsReducer
-    // Add more slices/reducers as needed
-  },
+  devTools: true,
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: {
+      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+    }
+  })
 });
+
+export const persistor = persistStore(store);
+
+type RootState = ReturnType<typeof store.getState>;
 
 export default store;
 
-// Export the RootState type for use in your components
+export type AppDispatch = typeof store.dispatch;
 export type { RootState };
