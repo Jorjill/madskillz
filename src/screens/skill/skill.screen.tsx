@@ -1,20 +1,22 @@
-import { ReactElement, useState } from "react";
-import Notes from "../../components/notes/Notes";
 import "./skill.screen.less";
 import { useDispatch, useSelector } from "react-redux";
-import { deselectNote, deselectAddNoteMode, deselectEditNoteMode } from "../../slices/notesSlice";
+import {
+  deselectNote,
+  deselectAddNoteMode,
+  deselectEditNoteMode,
+} from "../../slices/notesSlice";
+import { choosePage } from "../../slices/pageSlice";
+import Notes from "../../components/notes/Notes";
 
 export const SkillScreen = () => {
-  const [activeComponent, setActiveComponent] = useState<ReactElement | null>(
-    <Notes />
-  );
+
   const dispatch = useDispatch();
-  const loadComponent = (component: ReactElement) => {
-    setActiveComponent(component);
-  };
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
+  const currentComponent = useSelector(
+    (state: any) => state.page.currentComponent
+  )
 
   return (
     <div className="homebox">
@@ -27,7 +29,7 @@ export const SkillScreen = () => {
                 <button
                   className="nav-button"
                   onClick={() => {
-                    loadComponent(<Notes />);
+                    dispatch(choosePage("notes"))
                     dispatch(deselectNote());
                     dispatch(deselectAddNoteMode());
                     dispatch(deselectEditNoteMode());
@@ -39,7 +41,9 @@ export const SkillScreen = () => {
             </ul>
           </nav>
         </header>
-        <main id="content">{activeComponent}</main>
+        <main id="content">
+          {currentComponent=="notes"?<Notes/>:<Notes/>}
+        </main>
         <div className="layout-line"></div>
       </div>
     </div>
