@@ -14,6 +14,7 @@ import { EditNote } from "../edit-note/editnote";
 
 const Notes: React.FC = () => {
   const [selectednotetitle, setSelectednotetitle] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const selectednote = useSelector((state) =>
     selectNoteByTitle(state, selectednotetitle)
   );
@@ -31,6 +32,10 @@ const Notes: React.FC = () => {
   const reactNotes = useSelector((state) =>
     selectNotesBySkill(state, selectedSkill)
   );
+
+  const filteredNotes = reactNotes.filter((item) =>
+    item.content.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   {
     if (isAddNoteMode) {
@@ -53,8 +58,13 @@ const Notes: React.FC = () => {
             </div>
           </div>
           <div className="items-list-container">
+            <input
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             <div className="items-list">
-              {reactNotes.map((item, index) => (
+              {filteredNotes.map((item, index) => (
                 <div className="list-box" key={index}>
                   <div className="title-icons">
                     <h3
