@@ -31,8 +31,6 @@ const Notes: React.FC = () => {
   const reactNotes = useSelector((state) =>
     selectNotesBySkill(state, selectedSkill)
   );
-  console.log(reactNotes);
-  
 
   {
     if (isAddNoteMode) {

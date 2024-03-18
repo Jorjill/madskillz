@@ -1,10 +1,17 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { BoxGrid } from "../../components/box-grid/BoxGrid";
 import "./home.screen.less";
 import { selectSkills } from "../../slices/skillsSlice";
+import { useEffect } from "react";
+import { deselectNote } from "../../slices/notesSlice";
 
 export const HomeScreen = () => {
   const itemsList = useSelector(selectSkills);
+  const dispatch = useDispatch();
+  
+  useEffect(() => {
+    dispatch(deselectNote());
+  }, []);
 
   return (
     <div className="homescreen">
