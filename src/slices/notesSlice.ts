@@ -1,7 +1,7 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 
 export interface note {
-  title: string;
+  notes_title: string;
   content: string;
   noteSkill: string;
 }
@@ -19,17 +19,11 @@ const initialState: notesState = {
   isEditNoteMode: false,
   notes: [
     {
-      title: "Create Typescript React Vite App in NX",
+      notes_title: "Create Typescript React Vite App in NX",
       content:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum .Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
       noteSkill: "REACT",
     },
-    { title: "node", content: "content2", noteSkill: "node" },
-    { title: "react", content: "content3", noteSkill: "REACT" },
-    { title: "react", content: "content4", noteSkill: "REACT" },
-    { title: "angular", content: "content5", noteSkill: "angular" },
-    { title: "react", content: "content3", noteSkill: "REACT" },
-    { title: "react", content: "content4", noteSkill: "REACT" },
   ],
 };
 
@@ -40,9 +34,6 @@ const notesSlice = createSlice({
     addNote: (state, actions) => {
       state.notes.push(actions.payload);
     },
-    // deleteNote: (state, actions) => {
-    //   state.notes.
-    // },
     selectNote: (state) => {
       state.isNoteSelected = true;
     },
@@ -67,7 +58,7 @@ const notesSlice = createSlice({
 export const selectNotes = (state: { notes: notesState }) => state.notes.notes;
 export const selectNoteByTitle = createSelector(
   [selectNotes, (state, title: string) => title],
-  (notes, title) => notes.find((note) => note.title === title)
+  (notes, title) => notes.find((note) => note.notes_title === title)
 );
 export const selectNotesBySkill = createSelector(
   [selectNotes, (state, noteSkill: string) => noteSkill],

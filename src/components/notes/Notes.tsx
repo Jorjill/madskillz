@@ -31,6 +31,8 @@ const Notes: React.FC = () => {
   const reactNotes = useSelector((state) =>
     selectNotesBySkill(state, selectedSkill)
   );
+  console.log(reactNotes);
+  
 
   {
     if (isAddNoteMode) {
@@ -59,11 +61,11 @@ const Notes: React.FC = () => {
                   <div className="title-icons">
                     <h3
                       onClick={() => {
-                        setSelectednotetitle(item.title);
+                        setSelectednotetitle(item.notes_title);
                         dispatch(selectNote());
                       }}
                     >
-                      {item.title}
+                      {item.notes_title}
                     </h3>
                     <i
                       className="ri-edit-line"
@@ -75,7 +77,7 @@ const Notes: React.FC = () => {
                   </div>
                   <p
                     onClick={() => {
-                      setSelectednotetitle(item.title);
+                      setSelectednotetitle(item.notes_title);
                       dispatch(selectNote());
                     }}
                   >

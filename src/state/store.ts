@@ -1,22 +1,22 @@
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import { combineReducers } from 'redux';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
-import notesReducer from '../slices/notesSlice';
-import skillsReducer from '../slices/skillsSlice';
-import pageReducer from '../slices/pageSlice';
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { combineReducers } from "redux";
+import { persistStore, persistReducer } from "redux-persist";
+import notesReducer from "../slices/notesSlice";
+import skillsReducer from "../slices/skillsSlice";
+import pageReducer from "../slices/pageSlice";
+import storageSession from "redux-persist/lib/storage/session";
 
 // Persist configuration
 const persistConfig = {
-    key: 'root',
-    storage,
+  key: "root",
+  storage: storageSession,
 };
 
 // Combined reducer before persisting
 const rootReducer = combineReducers({
-    notes: notesReducer,
-    skills: skillsReducer,
-    page: pageReducer
+  notes: notesReducer,
+  skills: skillsReducer,
+  page: pageReducer,
 });
 
 // Enhanced reducer with persistence capabilities
@@ -24,11 +24,19 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // Configure store with persisted reducer
 const store = configureStore({
-    reducer: persistedReducer,
-    middleware: getDefaultMiddleware({
-        serializableCheck: {
-            ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE', 'persist/PAUSE', 'persist/PERSIST', 'persist/PURGE', 'persist/REGISTER'],
-        },
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [
+          "persist/PERSIST",
+          "persist/REHYDRATE",
+          "persist/PAUSE",
+          "persist/PERSIST",
+          "persist/PURGE",
+          "persist/REGISTER",
+        ],
+      },
     }),
 });
 

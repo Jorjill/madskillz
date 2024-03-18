@@ -36,7 +36,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   return (
     <div className="box-grid">
       {itemList.map((item, index) => (
-        <Link to="/skills">
+        <Link to="/skills" key={index}>
           {" "}
           <div
             className="box"
