@@ -1,9 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
-import { addNote, deselectAddNoteMode } from "../../slices/notesSlice";
+import {
+  addNote,
+  deselectAddNoteMode,
+  deselectEditNoteMode,
+  note,
+  selectNoteByTitle,
+} from "../../slices/notesSlice";
 import "./editnote.less";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export const EditNote = () => {
+interface EditNoteProps {
+  note?: note;
+}
+
+export const EditNote: React.FC<EditNoteProps> = ({ note }) => {
   const dispatch = useDispatch();
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
@@ -14,10 +24,9 @@ export const EditNote = () => {
   return (
     <div className="addnote-component">
       <div className="addnote">
-        <p>edit mode</p>
         <input
           type="text"
-          placeholder="Title"
+          value={note?.notes_title}
           name=""
           id=""
           onChange={(t) => {
@@ -26,6 +35,7 @@ export const EditNote = () => {
         />
         <textarea
           placeholder="Write notes here"
+          value={note?.content}
           onChange={(t) => {
             setNoteContent(t.target.value);
           }}
@@ -33,17 +43,10 @@ export const EditNote = () => {
         <div
           className="create-note-button"
           onClick={() => {
-            dispatch(
-              addNote({
-                title: noteTitle,
-                content: noteContent,
-                noteSkill: `${selectedSkill}`,
-              })
-            );
-            dispatch(deselectAddNoteMode());
+            dispatch(deselectEditNoteMode());
           }}
         >
-          Create note
+          Done
         </div>
       </div>
     </div>

@@ -1,0 +1,82 @@
+.modal {
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    display: flex;
+    align-items: center; /* Align vertically center */
+    justify-content: center; /* Align horizontally center */
+    background-color: rgba(0, 0, 0, 0.5); /* Dim background */
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    width: 40%; /* Modal width */
+    max-width: 450px; /* Maximum width */
+  }
+  
+  .close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .close-button:hover,
+  .close-button:focus {
+    color: #000;
+    text-decoration: none;
+  }
+  
+  .modal-header {
+    margin-bottom: 20px;
+  }
+  
+  .modal-title {
+    margin: 0;
+    font-weight: 600;
+  }
+  
+  .modal-body {
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  .modal-footer {
+    text-align: right;
+  }
+  
+  .modal-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+  }
+  
+  .modal-button.confirm {
+    background-color: #ff4444;
+    color: white;
+  }
+  
+  .modal-button.confirm:hover {
+    background-color: #cc0000;
+  }
+  
+  .modal-button.cancel {
+    background-color: #c4c4c4;
+    color: white;
+  }
+  
+  .modal-button.cancel:hover {
+    background-color: #a1a1a1;
+  }
+  

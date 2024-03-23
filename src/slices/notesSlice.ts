@@ -39,6 +39,9 @@ const notesSlice = createSlice({
     addNote: (state, actions) => {
       state.notes.push(actions.payload);
     },
+    deleteNote: (state, action) => {
+      state.notes = state.notes.filter(note => note.notes_title !== action.payload);
+    },
     selectNote: (state) => {
       state.isNoteSelected = true;
     },
@@ -61,10 +64,12 @@ const notesSlice = createSlice({
 });
 
 export const selectNotes = (state: { notes: notesState }) => state.notes.notes;
+
 export const selectNoteByTitle = createSelector(
-  [selectNotes, (state, title: string) => title],
+  [selectNotes, (state, title: string | undefined) => title],
   (notes, title) => notes.find((note) => note.notes_title === title)
 );
+
 export const selectNotesBySkill = createSelector(
   [selectNotes, (state, noteSkill: string) => noteSkill],
   (notes, noteSkill) => notes.filter((note) => note.noteSkill === noteSkill)
@@ -72,6 +77,7 @@ export const selectNotesBySkill = createSelector(
 export const {
   addNote,
   selectNote,
+  deleteNote,
   deselectNote,
   selectAddNoteMode,
   deselectAddNoteMode,

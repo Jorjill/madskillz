@@ -6,11 +6,13 @@ import {
   selectAddNoteMode,
   selectNotesBySkill,
   selectEditNoteMode,
+  deleteNote,
 } from "../../slices/notesSlice";
 import "./notes.less";
 import { Note } from "../note/note";
 import { AddNote } from "../add-note/addnote";
 import { EditNote } from "../edit-note/editnote";
+import { DeleteModal } from "../modal/delete-modal";
 
 const Notes: React.FC = () => {
   const [selectednotetitle, setSelectednotetitle] = useState("");
@@ -18,6 +20,8 @@ const Notes: React.FC = () => {
   const selectednote = useSelector((state) =>
     selectNoteByTitle(state, selectednotetitle)
   );
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
+  const [noteToDelete, setNoteToDelete] = useState<string>("");
   const isEditNoteMode = useSelector(
     (state: any) => state.notes.isEditNoteMode
   );
@@ -33,9 +37,20 @@ const Notes: React.FC = () => {
     selectNotesBySkill(state, selectedSkill)
   );
 
-  const filteredNotes = reactNotes.filter((item) =>
-    item.content.toLowerCase().includes(searchTerm.toLowerCase())
-);
+  const filteredNotes = reactNotes.filter(
+    (item) =>
+      item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.notes_title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleShowDeleteConfirmation = (title: string) => {
+    setShowDeleteConfirmation(true);
+    setNoteToDelete(title);
+  }
+
+  const handleCloseDeleteConfirmation = () => {
+    setShowDeleteConfirmation(false);
+  }
 
   {
     if (isAddNoteMode) {
@@ -43,7 +58,7 @@ const Notes: React.FC = () => {
     } else if (isNoteSelected) {
       return <Note note={selectednote} />;
     } else if (isEditNoteMode) {
-      return <EditNote />;
+      return <EditNote note={selectednote} />;
     } else {
       return (
         <div className="notes-component">
@@ -64,37 +79,56 @@ const Notes: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="items-list">
-              {filteredNotes.map((item, index) => (
-                <div className="list-box" key={index}>
-                  <div className="title-icons">
-                    <h3
+              {filteredNotes
+                .slice()
+                .reverse()
+                .map((item, index) => (
+                  <div className="list-box" key={index}>
+                    <div className="title-icons">
+                      <h3
+                        onClick={() => {
+                          setSelectednotetitle(item.notes_title);
+                          dispatch(selectNote());
+                        }}
+                      >
+                        {item.notes_title}
+                      </h3>
+                      <i
+                        className="ri-edit-line"
+                        onClick={() => {
+                          dispatch(selectEditNoteMode());
+                          setSelectednotetitle(item.notes_title);
+                        }}
+                      ></i>
+                      <i
+                        className="ri-delete-bin-7-line"
+                        onClick={() => {
+                          handleShowDeleteConfirmation(item.notes_title)
+                        }}
+                      ></i>
+                    </div>
+                    <p
                       onClick={() => {
                         setSelectednotetitle(item.notes_title);
                         dispatch(selectNote());
                       }}
                     >
-                      {item.notes_title}
-                    </h3>
-                    <i
-                      className="ri-edit-line"
-                      onClick={() => {
-                        dispatch(selectEditNoteMode());
-                      }}
-                    ></i>
-                    <i className="ri-delete-bin-7-line"></i>
+                      {item.content.slice(0, 1000)}
+                    </p>
                   </div>
-                  <p
-                    onClick={() => {
-                      setSelectednotetitle(item.notes_title);
-                      dispatch(selectNote());
-                    }}
-                  >
-                    {item.content.slice(0, 1000)}
-                  </p>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
+          {showDeleteConfirmation && (
+            <DeleteModal
+              noteTitle={noteToDelete}
+              onClose={handleCloseDeleteConfirmation}
+              onConfirm={() => {
+                dispatch(deleteNote(noteToDelete));
+                handleCloseDeleteConfirmation();
+              }}
+            />
+          )}
         </div>
       );
     }

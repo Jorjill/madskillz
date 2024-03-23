@@ -34,7 +34,7 @@ export const AddNote = () => {
           onClick={() => {
             dispatch(
               addNote({
-                title: noteTitle,
+                notes_title: noteTitle,
                 content: noteContent,
                 noteSkill: `${selectedSkill}`,
               })
