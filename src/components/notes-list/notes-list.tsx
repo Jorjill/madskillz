@@ -54,22 +54,24 @@ export const NotesList: React.FC = () => {
 
   return (
     <div className="notes-component">
-      <div className="add-button">
-        <div
-          className="button"
-          onClick={() => {
-            dispatch(selectAddNoteMode());
-          }}
-        >
-          Create Note
-        </div>
-      </div>
-      <div className="items-list-container">
+      <div className="input-and-button">
         <input
           placeholder="Search..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <div className="add-button">
+          <div
+            className="button"
+            onClick={() => {
+              dispatch(selectAddNoteMode());
+            }}
+          >
+            Create Note
+          </div>
+        </div>
+      </div>
+      <div className="items-list-container">
         <div className="items-list">
           {filteredAndSortedNotes.map((item, index) => (
             <div

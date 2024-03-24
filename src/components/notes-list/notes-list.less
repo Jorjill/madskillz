@@ -1,27 +1,25 @@
 .notes-component {
-  .add-button {
+  .input-and-button {
     display: flex;
-    flex-direction: column;
-    .button {
-      margin-left: auto;
-      margin-bottom: 50px;
-      border: 0.5px solid #eeeeee;
-      background-color: #eeeeee;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-    .button:hover {
-      background-color: #c9c9c9;
-      cursor: pointer;
-    }
-  }
-
-  .items-list-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
+    .add-button {
+      display: flex;
+      flex-direction: column;
+      margin-left: auto;
+      .button {
+        margin-left: auto;
+        margin-bottom: 50px;
+        border: 0.5px solid #eeeeee;
+        background-color: #eeeeee;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+      .button:hover {
+        background-color: #c9c9c9;
+        cursor: pointer;
+      }
+    }
 
     input {
       margin-bottom: 30px;
@@ -31,7 +29,17 @@
       border-radius: 40px;
       background: rgba(212, 212, 212, 0.67);
       border: none;
+      margin-left: auto;
     }
+  }
+
+  .items-list-container {
+    height: 560px;
+    overflow-y: scroll;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     .items-list {
       display: flex;
