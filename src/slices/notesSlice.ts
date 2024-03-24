@@ -47,6 +47,15 @@ const notesSlice = createSlice({
         (note) => note.notes_title !== action.payload
       );
     },
+    updateNote: (state, action) => {
+      const { notes_title, content, noteSkill, datetime } = action.payload;
+      const existingNote = state.notes.find(note => note.notes_title === notes_title);
+      if (existingNote) {
+        existingNote.content = content;
+        existingNote.noteSkill = noteSkill;
+        existingNote.datetime = datetime;
+      }
+    },    
     selectNote: (state) => {
       state.isNoteSelected = true;
     },
@@ -83,6 +92,7 @@ export const {
   addNote,
   selectNote,
   deleteNote,
+  updateNote,
   deselectNote,
   selectAddNoteMode,
   deselectAddNoteMode,

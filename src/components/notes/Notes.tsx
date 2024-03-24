@@ -39,6 +39,17 @@ const Notes: React.FC = () => {
     selectNotesBySkill(state, selectedSkill)
   );
 
+  const extractTextFromHTML = (htmlString: any) => {
+    const tempDiv = document.createElement("div");
+    const processedString = htmlString
+      .replace(/<br\s*[\/]?>/gi, " ")
+      .replace(/<\/p>/gi, " ")
+      .replace(/<\/li>/gi, " ")
+      .replace(/<li>/gi, " - ");
+    tempDiv.innerHTML = processedString;
+    return tempDiv.textContent || tempDiv.innerText || "";
+  };
+
   const filteredNotes = reactNotes.filter(
     (item) =>
       item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -113,7 +124,7 @@ const Notes: React.FC = () => {
                       }}
                     ></i>
                   </div>
-                  <p>{item.content.slice(0, 1000)}</p>
+                  <p>{extractTextFromHTML(item.content).slice(0, 1000)}</p>
                 </div>
               ))}
             </div>

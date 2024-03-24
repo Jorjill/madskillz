@@ -7,6 +7,7 @@ import {
   deselectEditNoteMode,
   note,
   selectNoteByTitle,
+  updateNote,
 } from "../../slices/notesSlice";
 import "./editnote.less";
 import { useEffect, useRef, useState } from "react";
@@ -27,9 +28,10 @@ export const EditNote: React.FC<EditNoteProps> = ({ note }) => {
   const [noteContent, setNoteContent] = useState(note?.content || "");
 
   useEffect(() => {
-    if (quillRef.current == null) {
+    if (quillRef.current === null) {
+      // Only instantiate Quill if quillRef.current is null
       quillRef.current = new Quill("#editor", {
-        theme: "snow", // this needs to match whatever theme you want from Quill
+        theme: "snow",
         modules: {
           toolbar: [
             [{ header: [1, 2, false] }],
@@ -39,9 +41,11 @@ export const EditNote: React.FC<EditNoteProps> = ({ note }) => {
         },
       });
 
-      quillRef.current.on("text-change", function () {
-        // This is where you would handle data from the editor
-        // For example, by updating component state
+      quillRef.current.on("text-change", () => {
+        if (quillRef.current) {
+          // Check for null before accessing quillRef.current
+          setNoteContent(quillRef.current.root.innerHTML);
+        }
       });
     }
 
@@ -59,12 +63,20 @@ export const EditNote: React.FC<EditNoteProps> = ({ note }) => {
           value={noteTitle}
           onChange={(e) => setNoteTitle(e.target.value)}
         />
-        <div id="editor" style={{ height: "200px" }}></div>{" "}
+        <div id="editor" style={{ height: "400px" }}></div>{" "}
         {/* This is where Quill will attach */}
         <div
           className="create-note-button"
           onClick={() => {
-            // dispatch(updateNote({ ...note, content: quillRef.current?.root.innerHTML }));
+            dispatch(
+              updateNote({
+                ...note,
+                notes_title: noteTitle,
+                content: noteContent,
+                noteSkill: selectedSkill,
+                datetime: new Date().toISOString(), // for updating the datetime to the current time
+              })
+            );
             dispatch(deselectEditNoteMode());
           }}
         >
