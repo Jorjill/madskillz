@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -20,7 +21,8 @@ const Notes: React.FC = () => {
   const selectednote = useSelector((state) =>
     selectNoteByTitle(state, selectednotetitle)
   );
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] =
+    useState<boolean>(false);
   const [noteToDelete, setNoteToDelete] = useState<string>("");
   const isEditNoteMode = useSelector(
     (state: any) => state.notes.isEditNoteMode
@@ -43,14 +45,18 @@ const Notes: React.FC = () => {
       item.notes_title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredAndSortedNotes = filteredNotes.sort(
+    (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+  );
+
   const handleShowDeleteConfirmation = (title: string) => {
     setShowDeleteConfirmation(true);
     setNoteToDelete(title);
-  }
+  };
 
   const handleCloseDeleteConfirmation = () => {
     setShowDeleteConfirmation(false);
-  }
+  };
 
   {
     if (isAddNoteMode) {
@@ -79,44 +85,37 @@ const Notes: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div className="items-list">
-              {filteredNotes
-                .slice()
-                .reverse()
-                .map((item, index) => (
-                  <div className="list-box" key={index}>
-                    <div className="title-icons">
-                      <h3
-                        onClick={() => {
-                          setSelectednotetitle(item.notes_title);
-                          dispatch(selectNote());
-                        }}
-                      >
-                        {item.notes_title}
-                      </h3>
-                      <i
-                        className="ri-edit-line"
-                        onClick={() => {
-                          dispatch(selectEditNoteMode());
-                          setSelectednotetitle(item.notes_title);
-                        }}
-                      ></i>
-                      <i
-                        className="ri-delete-bin-7-line"
-                        onClick={() => {
-                          handleShowDeleteConfirmation(item.notes_title)
-                        }}
-                      ></i>
-                    </div>
-                    <p
-                      onClick={() => {
+              {filteredAndSortedNotes.map((item, index) => (
+                <div
+                  className="list-box"
+                  key={index}
+                  onClick={() => {
+                    console.log("clicked");
+                    setSelectednotetitle(item.notes_title);
+                    dispatch(selectNote());
+                  }}
+                >
+                  <div className="title-icons">
+                    <h3>{item.notes_title}</h3>
+                    <i
+                      className="ri-edit-line"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        dispatch(selectEditNoteMode());
                         setSelectednotetitle(item.notes_title);
-                        dispatch(selectNote());
                       }}
-                    >
-                      {item.content.slice(0, 1000)}
-                    </p>
+                    ></i>
+                    <i
+                      className="ri-delete-bin-7-line"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShowDeleteConfirmation(item.notes_title);
+                      }}
+                    ></i>
                   </div>
-                ))}
+                  <p>{item.content.slice(0, 1000)}</p>
+                </div>
+              ))}
             </div>
           </div>
           {showDeleteConfirmation && (
