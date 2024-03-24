@@ -24,10 +24,10 @@ const Notes: React.FC = () => {
   {
     if (isAddNoteMode) {
       return <AddNote />;
-    } else if (isNoteSelected) {
-      return <Note/>;
-    } else if (isEditNoteMode) {
-      return <EditNote note={selectednote} />;
+    } else if (isNoteSelected && !isEditNoteMode) {
+      return <Note />;
+    } else if (isNoteSelected && isEditNoteMode) {
+      return <EditNote />;
     } else {
       return <NotesList />;
     }

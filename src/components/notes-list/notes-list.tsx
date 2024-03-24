@@ -86,6 +86,7 @@ export const NotesList: React.FC = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     dispatch(selectNote(item.notes_title));
+                    dispatch(selectEditNoteMode());
                   }}
                 ></i>
                 <i

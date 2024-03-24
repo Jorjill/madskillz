@@ -2,10 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addNote,
-  deselectAddNoteMode,
   deselectEditNoteMode,
-  note,
   selectNoteByTitle,
   updateNote,
 } from "../../slices/notesSlice";
@@ -14,16 +11,20 @@ import { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 
-interface EditNoteProps {
-  note?: note;
-}
-
-export const EditNote: React.FC<EditNoteProps> = ({ note }) => {
+export const EditNote: React.FC = () => {
   const dispatch = useDispatch();
   const quillRef = useRef<Quill | null>(null);
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
+
+  const selectedNoteTitle = useSelector(
+    (state: any) => state.notes.selectedNoteTitle
+  );
+  const note = useSelector((state) =>
+    selectNoteByTitle(state, selectedNoteTitle)
+  );
+
   const [noteTitle, setNoteTitle] = useState(note?.notes_title || "");
   const [noteContent, setNoteContent] = useState(note?.content || "");
 
