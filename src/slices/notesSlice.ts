@@ -8,6 +8,7 @@ export interface note {
 }
 
 export interface notesState {
+  selectedNoteTitle: string;
   isNoteSelected: boolean;
   isAddNoteMode: boolean;
   isEditNoteMode: boolean;
@@ -15,6 +16,7 @@ export interface notesState {
 }
 
 const initialState: notesState = {
+  selectedNoteTitle: "",
   isNoteSelected: false,
   isAddNoteMode: false,
   isEditNoteMode: false,
@@ -56,8 +58,9 @@ const notesSlice = createSlice({
         existingNote.datetime = datetime;
       }
     },    
-    selectNote: (state) => {
+    selectNote: (state, action) => {
       state.isNoteSelected = true;
+      state.selectedNoteTitle = action.payload;
     },
     deselectNote: (state) => {
       state.isNoteSelected = false;
