@@ -7,19 +7,28 @@ import {
 } from "../../slices/notesSlice";
 import { choosePage } from "../../slices/pageSlice";
 import Notes from "../../components/notes/Notes";
+import { useNavigate } from "react-router-dom";
 
 export const SkillScreen = () => {
-
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
-  )
+  );
 
   return (
     <div className="homebox">
+      <div className="top-nav">
+        <i
+          className="ri-home-line ri-2x"
+          onClick={() => {
+            navigate("/");
+          }}
+        ></i>
+      </div>
       <div className="layout-container">
         <div className="skill-title">{selectedSkill}</div>
         <header className="navbar">
@@ -29,7 +38,7 @@ export const SkillScreen = () => {
                 <button
                   className="nav-button"
                   onClick={() => {
-                    dispatch(choosePage("notes"))
+                    dispatch(choosePage("notes"));
                     dispatch(deselectNote());
                     dispatch(deselectAddNoteMode());
                     dispatch(deselectEditNoteMode());
@@ -42,7 +51,7 @@ export const SkillScreen = () => {
           </nav>
         </header>
         <main id="content">
-          {currentComponent=="notes"?<Notes/>:<Notes/>}
+          {currentComponent == "notes" ? <Notes /> : <Notes />}
         </main>
         <div className="layout-line"></div>
       </div>
