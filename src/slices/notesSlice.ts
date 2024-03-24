@@ -32,7 +32,7 @@ const initialState: notesState = {
       notes_title: "something 2",
       content: "something",
       noteSkill: "REACT",
-      datetime: "2023-03-23T10:00:00Z",
+      datetime: "2023-03-23T11:00:00Z",
     },
   ],
 };

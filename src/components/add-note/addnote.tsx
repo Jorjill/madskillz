@@ -58,6 +58,7 @@ export const AddNote = () => {
                 notes_title: noteTitle,
                 content: noteContent,
                 noteSkill: `${selectedSkill}`,
+                datetime: new Date().toISOString()
               })
             );
             dispatch(deselectAddNoteMode());
