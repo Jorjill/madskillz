@@ -1,7 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addNote, deselectAddNoteMode } from "../../slices/notesSlice";
 import "./addnote.less";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Quill from "quill";
 
 export const AddNote = () => {
   const dispatch = useDispatch();
@@ -10,6 +11,30 @@ export const AddNote = () => {
   );
   const [noteTitle, setNoteTitle] = useState("");
   const [noteContent, setNoteContent] = useState("");
+  const quillRef = useRef<Quill | null>(null);
+  
+  useEffect(() => {
+    if (quillRef.current === null) {
+      // Only instantiate Quill if quillRef.current is null
+      quillRef.current = new Quill("#editor", {
+        theme: "snow",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline"],
+            ["image", "code-block"],
+          ],
+        },
+      });
+
+      quillRef.current.on("text-change", () => {
+        if (quillRef.current) {
+          // Check for null before accessing quillRef.current
+          setNoteContent(quillRef.current.root.innerHTML);
+        }
+      });
+    }
+  }, []);
 
   return (
     <div className="addnote-component">
@@ -23,12 +48,8 @@ export const AddNote = () => {
             setNoteTitle(t.target.value);
           }}
         />
-        <textarea
-          placeholder="Write notes here"
-          onChange={(t) => {
-            setNoteContent(t.target.value);
-          }}
-        />
+        <div id="editor" style={{ height: "400px" }}></div>{" "}
+        {/* This is where Quill will attach */}
         <div
           className="create-note-button"
           onClick={() => {
