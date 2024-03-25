@@ -8,6 +8,7 @@ import {
 import { choosePage } from "../../slices/pageSlice";
 import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
+import Reference from "../../components/reference/reference";
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -47,11 +48,28 @@ export const SkillScreen = () => {
                   Notes
                 </button>
               </li>
+              <li>
+                <button
+                  className="nav-button"
+                  onClick={() => {
+                    dispatch(choosePage("reference"));
+                    dispatch(deselectNote());
+                    dispatch(deselectAddNoteMode());
+                    dispatch(deselectEditNoteMode());
+                  }}
+                >
+                  Reference
+                </button>
+              </li>
             </ul>
           </nav>
         </header>
         <main id="content">
-          {currentComponent == "notes" ? <Notes /> : <Notes />}
+          {currentComponent === "notes" ? (
+            <Notes />
+          ) : currentComponent === "reference" ? (
+            <Reference />
+          ) : null}
         </main>
         <div className="layout-line"></div>
       </div>
