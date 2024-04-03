@@ -1,4 +1,15 @@
 .notes-component {
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .input-and-button {
     display: flex;
     .add-button {
@@ -53,6 +64,8 @@
         border-radius: 8px;
         background-color: #eeeeee;
         overflow: auto;
+        opacity: 0; /* Initially hidden */
+        animation: slideInUp 0.5s ease forwards;
 
         .title-icons {
           display: flex;

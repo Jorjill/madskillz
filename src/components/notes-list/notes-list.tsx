@@ -77,6 +77,7 @@ export const NotesList: React.FC = () => {
             <div
               className="list-box"
               key={index}
+              style={{ animationDelay: `${0.06 * index}s` }}
               onClick={() => {
                 dispatch(selectNote(item.notes_title));
               }}
