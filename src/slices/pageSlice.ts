@@ -5,7 +5,7 @@ interface pageState {
 }
 
 const initialState: pageState = {
-  currentComponent: "",
+  currentComponent: "REACT",
 };
 
 const pageSlice = createSlice({

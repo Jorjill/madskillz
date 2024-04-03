@@ -37,13 +37,10 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
     <div className="box-grid">
       {itemList.map((item, index) => (
         <Link to="/skills" key={index}>
-          {" "}
           <div
             className="box"
-            key={index}
-            onClick={() => {
-              dispatch(selectSkill(item));
-            }}
+            style={{ animationDelay: `${0.03 * index}s` }} // Increment delay for each box
+            onClick={() => dispatch(selectSkill(item))}
           >
             <div className="box-image">
               <img src={imageArray[index]} alt={`Image ${index}`} />

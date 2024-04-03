@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { selectNoteByTitle } from "../../slices/notesSlice";
-import "./notes.less";
 import { Note } from "../note/note";
 import { AddNote } from "../add-note/addnote";
 import { EditNote } from "../edit-note/editnote";

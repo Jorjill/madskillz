@@ -15,11 +15,12 @@
     background: #fff;
     width: 150px;
     height: 150px;
-    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    opacity: 0; /* Start hidden */
+    animation: fadeInUp 0.5s ease forwards; /* Animation with forward fill mode */
   }
 
   .box:hover {
@@ -36,15 +37,23 @@
   }
 
   .box-text p {
-    margin-top: 10px;
     margin: 0;
     color: #000;
     font-family: Inter;
     font-size: 20px;
-    font-style: normal;
     font-weight: 500;
-    line-height: normal;
     margin-top: 10px;
     text-decoration: none;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
