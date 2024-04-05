@@ -9,6 +9,7 @@ import { choosePage } from "../../slices/pageSlice";
 import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
 import Reference from "../../components/reference/reference";
+import { Practice } from "../../components/practice/practice";
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ export const SkillScreen = () => {
         <i
           className="ri-home-line ri-2x"
           onClick={() => {
+            dispatch(choosePage("notes"));
             navigate("/");
           }}
         ></i>
@@ -61,6 +63,19 @@ export const SkillScreen = () => {
                   Reference
                 </button>
               </li>
+              <li>
+                <button
+                  className="nav-button"
+                  onClick={() => {
+                    dispatch(choosePage("practice"));
+                    dispatch(deselectNote());
+                    dispatch(deselectAddNoteMode());
+                    dispatch(deselectEditNoteMode());
+                  }}
+                >
+                  Practice
+                </button>
+              </li>
             </ul>
           </nav>
         </header>
@@ -69,6 +84,8 @@ export const SkillScreen = () => {
             <Notes />
           ) : currentComponent === "reference" ? (
             <Reference />
+          ) : currentComponent === "practice" ? (
+            <Practice />
           ) : null}
         </main>
         <div className="layout-line"></div>
