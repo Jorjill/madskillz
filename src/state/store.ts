@@ -4,8 +4,9 @@ import { persistStore, persistReducer } from "redux-persist";
 import notesReducer from "../slices/notesSlice";
 import skillsReducer from "../slices/skillsSlice";
 import pageReducer from "../slices/pageSlice";
-import referenceReducer from "../slices/referenceSlice"
+import referenceReducer from "../slices/referenceSlice";
 import storageSession from "redux-persist/lib/storage/session";
+import practiceReducer from "../slices/practiceSlice";
 
 // Persist configuration
 const persistConfig = {
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   skills: skillsReducer,
   page: pageReducer,
   reference: referenceReducer,
+  practice: practiceReducer,
 });
 
 // Enhanced reducer with persistence capabilities

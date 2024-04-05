@@ -10,6 +10,9 @@ import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
 import Reference from "../../components/reference/reference";
 import { Practice } from "../../components/practice/practice";
+import { useState } from "react";
+import { PracticeDropdown } from "../../components/practice-dropdown/practice-dropdown";
+import { LoadingScreen } from "../../components/loading/loading";
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -20,6 +23,8 @@ export const SkillScreen = () => {
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
   );
+
+  const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
 
   return (
     <div className="homebox">
@@ -63,11 +68,13 @@ export const SkillScreen = () => {
                   Reference
                 </button>
               </li>
-              <li>
+              <li
+                onMouseEnter={() => setIsPracticeDropdownOpen(true)}
+                onMouseLeave={() => setIsPracticeDropdownOpen(false)}
+              >
                 <button
                   className="nav-button"
                   onClick={() => {
-                    dispatch(choosePage("practice"));
                     dispatch(deselectNote());
                     dispatch(deselectAddNoteMode());
                     dispatch(deselectEditNoteMode());
@@ -75,6 +82,7 @@ export const SkillScreen = () => {
                 >
                   Practice
                 </button>
+                {isPracticeDropdownOpen && <PracticeDropdown />}
               </li>
             </ul>
           </nav>
@@ -86,6 +94,8 @@ export const SkillScreen = () => {
             <Reference />
           ) : currentComponent === "practice" ? (
             <Practice />
+          ) : currentComponent === "loading" ? (
+            <LoadingScreen />
           ) : null}
         </main>
         <div className="layout-line"></div>
