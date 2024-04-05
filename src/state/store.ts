@@ -1,9 +1,10 @@
-import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import { persistStore, persistReducer } from "redux-persist";
 import notesReducer from "../slices/notesSlice";
 import skillsReducer from "../slices/skillsSlice";
 import pageReducer from "../slices/pageSlice";
+import referenceReducer from "../slices/referenceSlice"
 import storageSession from "redux-persist/lib/storage/session";
 
 // Persist configuration
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   notes: notesReducer,
   skills: skillsReducer,
   page: pageReducer,
+  reference: referenceReducer,
 });
 
 // Enhanced reducer with persistence capabilities

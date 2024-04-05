@@ -4,7 +4,7 @@ export interface note {
   notes_title: string;
   content: string;
   noteSkill: string;
-  datetime: string; // ISO 8601 format, e.g., "2023-03-23T10:00:00Z"
+  datetime: string;
 }
 
 export interface notesState {
