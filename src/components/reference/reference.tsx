@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
-
+import React, { useState } from "react";
 import "./reference.less";
 import { useSelector } from "react-redux";
 import { selectReferenceBySkill } from "../../slices/referenceSlice";
@@ -36,9 +35,15 @@ const Reference: React.FC = () => {
           </div>
         ))}
       </div>
-      <div className="reference-content-container">
-        <h1>{selectedTopic.title}</h1>
-        <p>{selectedTopic.content}</p>
+
+      <div className="reference-container">
+        <div className="reference-title-container">
+          <h1>{selectedTopic.title}</h1>
+        </div>
+        <div
+          className="reference-content"
+          dangerouslySetInnerHTML={{ __html: selectedTopic?.content || "" }}
+        ></div>
       </div>
     </div>
   );
