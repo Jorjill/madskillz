@@ -3,14 +3,23 @@ import "./practice.less";
 import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
 import { choosePage } from "../../slices/pageSlice";
+import {
+  selectRandomGeneralQuestion,
+  selectRandomPastQuestion,
+  selectRandomSpecificQuestion,
+  selectRandomTestQuestion,
+} from "../../slices/practiceSlice";
 
 export const Practice: React.FC = () => {
   const dispatch = useDispatch();
   const quillRef = useRef<Quill | null>(null);
   const [answerContent, setAnswerContent] = useState("");
-  const practiceMode = useSelector(
-    (state:any) => state.practice.practiceMode
-  );
+  const practiceMode = useSelector((state: any) => state.practice.practiceMode);
+  const randomGeneralQuestion = useSelector(selectRandomGeneralQuestion);
+  const randomSpecificQuestion = useSelector(selectRandomSpecificQuestion);
+  const randomPastQuestion = useSelector(selectRandomPastQuestion);
+  const randomTestQuestion = useSelector(selectRandomTestQuestion);
+
   useEffect(() => {
     if (quillRef.current === null) {
       // Only instantiate Quill if quillRef.current is null
@@ -37,12 +46,20 @@ export const Practice: React.FC = () => {
   return (
     <div className="practice-container">
       <div className="practice">
-        <h1>{practiceMode}</h1>
+        {practiceMode === "general" ? (
+          <h1>{randomGeneralQuestion}</h1>
+        ) : practiceMode === "specific" ? (
+          <h1>{randomSpecificQuestion}</h1>
+        ) : practiceMode === "past" ? (
+          <h1>{randomPastQuestion}</h1>
+        ) : (
+          <h1>{randomTestQuestion}</h1>
+        )}
         <div id="editor" style={{ height: "500px" }}></div>{" "}
         <div
           className="submit-button"
           onClick={() => {
-            dispatch(choosePage("loading"))
+            dispatch(choosePage("loading"));
           }}
         >
           Submit
