@@ -1,3 +1,14 @@
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* Start from below */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* Move to original position */
+  }
+}
+
 .note-component {
   display: flex;
   flex-direction: column;
@@ -5,6 +16,7 @@
   justify-content: center;
   color: #ffffff;
   width: 100%;
+  animation: fadeInUp 0.5s ease-out;
 
   h1 {
     font-size: 36px;
