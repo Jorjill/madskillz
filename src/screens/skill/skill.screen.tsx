@@ -10,9 +10,10 @@ import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
 import Reference from "../../components/reference/reference";
 import { Practice } from "../../components/practice/practice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PracticeDropdown } from "../../components/practice-dropdown/practice-dropdown";
 import { LoadingScreen } from "../../components/loading/loading";
+import { Test } from "../../components/test/test";
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -23,8 +24,14 @@ export const SkillScreen = () => {
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
   );
-
+  const practiceMode = useSelector((state: any) => state.practice.practiceMode);
   const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
+
+  useEffect(()=>{
+    if(practiceMode==="test"){
+      dispatch(choosePage("test"));
+    }
+  },[practiceMode]);
 
   return (
     <div className="homebox">
@@ -96,6 +103,8 @@ export const SkillScreen = () => {
             <Practice />
           ) : currentComponent === "loading" ? (
             <LoadingScreen />
+          ) : currentComponent === "test" ? (
+            <Test />
           ) : null}
         </main>
         <div className="layout-line"></div>

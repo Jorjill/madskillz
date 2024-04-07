@@ -18,7 +18,6 @@ export const Practice: React.FC = () => {
   const randomGeneralQuestion = useSelector(selectRandomGeneralQuestion);
   const randomSpecificQuestion = useSelector(selectRandomSpecificQuestion);
   const randomPastQuestion = useSelector(selectRandomPastQuestion);
-  const randomTestQuestion = useSelector(selectRandomTestQuestion);
 
   useEffect(() => {
     if (quillRef.current === null) {
@@ -53,7 +52,7 @@ export const Practice: React.FC = () => {
         ) : practiceMode === "past" ? (
           <h1>{randomPastQuestion}</h1>
         ) : (
-          <h1>{randomTestQuestion}</h1>
+        <div></div>
         )}
         <div id="editor" style={{ height: "500px" }}></div>{" "}
         <div

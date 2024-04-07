@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import "./practice-dropdown.less";
 import { choosePage } from "../../slices/pageSlice";
-import { chooseMode, selectPracticeMode } from "../../slices/practiceSlice";
+import { chooseMode } from "../../slices/practiceSlice";
 
 export const PracticeDropdown: React.FC = () => {
   const dispatch = useDispatch();
