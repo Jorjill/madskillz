@@ -5,6 +5,7 @@ export interface note {
   content: string;
   noteSkill: string;
   datetime: string;
+  tags: string[];
 }
 
 export interface notesState {
@@ -27,12 +28,14 @@ const initialState: notesState = {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum .Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
       noteSkill: "REACT",
       datetime: "2023-03-23T10:00:00Z",
+      tags: ["react","typescript"],
     },
     {
       notes_title: "something 2",
       content: "something",
       noteSkill: "REACT",
       datetime: "2023-03-23T11:00:00Z",
+      tags: ["react"],
     },
   ],
 };
@@ -50,7 +53,8 @@ const notesSlice = createSlice({
       );
     },
     updateNote: (state, action) => {
-      const { notes_title, content, noteSkill, datetime } = action.payload;
+      const { notes_title, content, noteSkill, datetime, newTags } =
+        action.payload;
       const existingNote = state.notes.find(
         (note) => note.notes_title === notes_title
       );
@@ -58,6 +62,21 @@ const notesSlice = createSlice({
         existingNote.content = content;
         existingNote.noteSkill = noteSkill;
         existingNote.datetime = datetime;
+        existingNote.tags = [...existingNote.tags, ...newTags];
+      }
+    },
+    updateNoteTags: (state, action) => {
+      const { notes_title, newTag } = action.payload;
+      const note = state.notes.find((note) => note.notes_title === notes_title);
+      if (note && !note.tags.includes(newTag)) {
+        note.tags = [...note.tags, newTag];
+      }
+    },
+    removeNoteTag: (state, action) => {
+      const { notes_title, tagToRemove } = action.payload;
+      const note = state.notes.find((note) => note.notes_title === notes_title);
+      if (note) {
+        note.tags = note.tags.filter((tag) => tag !== tagToRemove); 
       }
     },
     selectNote: (state, action) => {

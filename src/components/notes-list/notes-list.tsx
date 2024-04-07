@@ -7,7 +7,7 @@ import {
   selectNote,
   selectNotesBySkill,
 } from "../../slices/notesSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DeleteModal } from "../modal/delete-modal";
 
 export const NotesList: React.FC = () => {
@@ -101,6 +101,15 @@ export const NotesList: React.FC = () => {
                 ></i>
               </div>
               <p>{extractTextFromHTML(item.content).slice(0, 1000)}</p>
+              <div className="tags">
+                {item.tags.map((tag, index) => (
+                  <div key={index} className="tag">
+                    {tag}
+                  </div>
+                ))}
+
+                {/* <div className="tag">typescript</div> */}
+              </div>
             </div>
           ))}
         </div>
