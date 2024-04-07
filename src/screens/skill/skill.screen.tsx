@@ -24,14 +24,8 @@ export const SkillScreen = () => {
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
   );
-  const practiceMode = useSelector((state: any) => state.practice.practiceMode);
   const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
-
-  useEffect(()=>{
-    if(practiceMode==="test"){
-      dispatch(choosePage("test"));
-    }
-  },[practiceMode]);
+  const practiceMode = useSelector((state: any) => state.practice.practiceMode);
 
   return (
     <div className="homebox">
@@ -100,11 +94,13 @@ export const SkillScreen = () => {
           ) : currentComponent === "reference" ? (
             <Reference />
           ) : currentComponent === "practice" ? (
-            <Practice />
+            practiceMode === "test" ? (
+              <Test />
+            ) : (
+              <Practice />
+            )
           ) : currentComponent === "loading" ? (
             <LoadingScreen />
-          ) : currentComponent === "test" ? (
-            <Test />
           ) : null}
         </main>
         <div className="layout-line"></div>
