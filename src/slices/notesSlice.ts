@@ -37,6 +37,13 @@ const initialState: notesState = {
       datetime: "2023-03-23T11:00:00Z",
       tags: ["react"],
     },
+    {
+      notes_title: "something 3",
+      content: "something",
+      noteSkill: "REACT",
+      datetime: "2023-03-23T11:00:00Z",
+      tags: ["angular"],
+    },
   ],
 };
 

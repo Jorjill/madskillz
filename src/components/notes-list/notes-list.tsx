@@ -46,8 +46,10 @@ export const NotesList: React.FC = () => {
   const filteredNotes = reactNotes.filter(
     (item) =>
       item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.notes_title.toLowerCase().includes(searchTerm.toLowerCase())
+      item.notes_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.tags.includes(searchTerm.toLowerCase())
   );
+
   const filteredAndSortedNotes = filteredNotes.sort(
     (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
   );
