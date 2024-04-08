@@ -1,43 +1,55 @@
+@keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px); /* Start from below */
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0); /* Move to original position */
+    }
+  }
+
 .test-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 50vh; /* Use viewport height to make the container fill the screen */
+    height: 50vh;
     color: white;
-    background-color: #333; /* Dark background for contrast */
+    background-color: #333;
     padding: 20px;
-    
+    animation: fadeInUp 0.5s ease-out;
+
     .question {
         margin-bottom: 20px;
-        font-size: 24px; /* Larger text for the question */
+        font-size: 24px;
         text-align: center;
     }
 
     .answers {
         display: flex;
         flex-direction: column;
-        gap: 10px; /* Spacing between buttons */
+        gap: 10px;
     }
 
     .answers button {
-        background-color: #555; /* Darker background for buttons */
+        background-color: #555; 
         color: white;
         border: none;
         padding: 10px 20px;
-        border-radius: 5px; /* Rounded corners for the buttons */
+        border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.3s ease; /* Smooth background color transition */
+        transition: background-color 0.3s ease;
     }
 
     .answers button:hover {
-        background-color: #777; /* Lighten button background on hover */
+        background-color: #777;
     }
 
     .next-button {
         margin-top: 20px;
-        background-color: #444; /* Slightly different background for the Next button */
+        background-color: #444; 
         color: white;
         border: none;
         padding: 10px 20px;
@@ -47,6 +59,6 @@
     }
 
     .next-button:hover {
-        background-color: #666; /* Lighten Next button background on hover */
+        background-color: #666;
     }
 }
