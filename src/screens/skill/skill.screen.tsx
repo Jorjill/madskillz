@@ -10,7 +10,7 @@ import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
 import Reference from "../../components/reference/reference";
 import { Practice } from "../../components/practice/practice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PracticeDropdown } from "../../components/practice-dropdown/practice-dropdown";
 import { LoadingScreen } from "../../components/loading/loading";
 import { Test } from "../../components/test/test";

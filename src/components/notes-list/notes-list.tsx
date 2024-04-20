@@ -19,6 +19,7 @@ export const NotesList: React.FC = () => {
   const reactNotes = useSelector((state) =>
     selectNotesBySkill(state, selectedSkill)
   );
+
   const [showDeleteConfirmation, setShowDeleteConfirmation] =
     useState<boolean>(false);
   const [noteToDelete, setNoteToDelete] = useState<string>("");
@@ -104,7 +105,7 @@ export const NotesList: React.FC = () => {
               </div>
               <p>{extractTextFromHTML(item.content).slice(0, 1000)}</p>
               <div className="tags">
-                {item.tags.map((tag, index) => (
+                {item.tags?.map((tag, index) => (
                   <div key={index} className="tag">
                     {tag}
                   </div>

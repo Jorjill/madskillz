@@ -117,8 +117,14 @@ export const selectNoteByTitle = createSelector(
 
 export const selectNotesBySkill = createSelector(
   [selectNotes, (state, noteSkill: string) => noteSkill],
-  (notes, noteSkill) => notes.filter((note) => note.noteSkill === noteSkill)
+  (notes, noteSkill) => {
+    if( noteSkill == "ALL"){
+      return notes;
+    }
+    return notes.filter((note) => note.noteSkill === noteSkill);
+  }
 );
+
 export const {
   addNote,
   selectNote,
