@@ -7,6 +7,7 @@ import pageReducer from "../slices/pageSlice";
 import referenceReducer from "../slices/referenceSlice";
 import storageSession from "redux-persist/lib/storage/session";
 import practiceReducer from "../slices/practiceSlice";
+import testReducer from "../slices/testSlice";
 
 // Persist configuration
 const persistConfig = {
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   page: pageReducer,
   reference: referenceReducer,
   practice: practiceReducer,
+  test: testReducer
 });
 
 // Enhanced reducer with persistence capabilities
