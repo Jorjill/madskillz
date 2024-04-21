@@ -9,10 +9,12 @@ export const AddNote = () => {
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
+  const [tags, setTags] = useState<string[]>([]);
   const [noteTitle, setNoteTitle] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const quillRef = useRef<Quill | null>(null);
-  
+  const [tagText, setTagText] = useState("");
+
   useEffect(() => {
     if (quillRef.current === null) {
       // Only instantiate Quill if quillRef.current is null
@@ -29,7 +31,6 @@ export const AddNote = () => {
 
       quillRef.current.on("text-change", () => {
         if (quillRef.current) {
-          // Check for null before accessing quillRef.current
           setNoteContent(quillRef.current.root.innerHTML);
         }
       });
@@ -48,8 +49,42 @@ export const AddNote = () => {
             setNoteTitle(t.target.value);
           }}
         />
-        <div id="editor" style={{ height: "400px" }}></div>{" "}
-        {/* This is where Quill will attach */}
+        <div id="editor"></div> {/* This is where Quill will attach */}
+      </div>
+      <div className="button-and-tag">
+        <div className="tag-input-container">
+          Tags
+          <input
+            className="tag-input"
+            type="text"
+            name=""
+            id=""
+            value={tagText}
+            onChange={(e) => {
+              setTagText(e.target.value);
+            }}
+          />
+          <button
+            onClick={() => {
+              setTags([...tags, tagText]);
+              setTagText("");
+            }}
+          >
+            Add Tag
+          </button>
+        </div>
+        <div className="tags">
+          {tags.map((tag) => (
+            <div
+              className="tag"
+              onClick={() => {
+                setTags(tags.filter((t) => t !== tag));
+              }}
+            >
+              {tag}
+            </div>
+          ))}
+        </div>
         <div
           className="create-note-button"
           onClick={() => {
@@ -58,7 +93,8 @@ export const AddNote = () => {
                 notes_title: noteTitle,
                 content: noteContent,
                 noteSkill: `${selectedSkill}`,
-                datetime: new Date().toISOString()
+                datetime: new Date().toISOString(),
+                tags: tags
               })
             );
             dispatch(deselectAddNoteMode());
