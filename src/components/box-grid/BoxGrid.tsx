@@ -12,6 +12,7 @@ import image10 from "../../assets/10.png";
 import { selectSkill, skill } from "../../slices/skillsSlice";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 
 const imageArray = [
   image1,
@@ -32,25 +33,40 @@ interface BoxGridProps {
 
 export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   const dispatch = useDispatch();
+  const [searchSkill, setSearchSkill] = useState("");
+  const searchedSkills = itemList.filter((skill) =>
+    skill.title.toLowerCase().includes(searchSkill.toLowerCase())
+  );
 
   return (
-    <div className="box-grid">
-      {itemList.map((item, index) => (
-        <Link to="/skills" key={index}>
-          <div
-            className="box"
-            style={{ animationDelay: `${0.04 * index}s` }} // Increment delay for each box
-            onClick={() => dispatch(selectSkill(item))}
-          >
-            <div className="box-image">
-              <img src={imageArray[index]} alt={`Image ${index}`} />
+    <div>
+      <div className="input-box-container">
+        <input
+          className="input-box"
+          placeholder="Search..."
+          onChange={(t) => {
+            setSearchSkill(t.target.value);
+          }}
+        />
+      </div>
+      <div className="box-grid">
+        {searchedSkills.map((item, index) => (
+          <Link to="/skills" key={index}>
+            <div
+              className="box"
+              style={{ animationDelay: `${0.04 * index}s` }} // Increment delay for each box
+              onClick={() => dispatch(selectSkill(item))}
+            >
+              <div className="box-image">
+                <img src={imageArray[index]} alt={`Image ${index}`} />
+              </div>
+              <div className="box-text">
+                <p>{item.title}</p>
+              </div>
             </div>
-            <div className="box-text">
-              <p>{item.title}</p>
-            </div>
-          </div>
-        </Link>
-      ))}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };

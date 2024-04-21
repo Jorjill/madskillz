@@ -16,9 +16,7 @@ export const HomeScreen = () => {
   return (
     <div className="homescreen">
       <div className="homebox-homescreen">
-        <div className="input-box-container">
-          <input className="input-box" placeholder="Search..." />
-        </div>
+
         <BoxGrid itemList={itemsList} />
       </div>
     </div>
