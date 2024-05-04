@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./addReference.less";
 import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
-import { addReference, addTopicToReference } from "../../slices/referenceSlice";
+import { addReference, addTopicToReference, unsetAddReferenceMode } from "../../slices/referenceSlice";
 
 export const AddReference: React.FC = () => {
   const quillRef = useRef<Quill | null>(null);
@@ -60,6 +60,7 @@ export const AddReference: React.FC = () => {
             if (quillRef.current) {
               quillRef.current.setText("");
             }
+            dispatch(unsetAddReferenceMode());
           }}
         >
           Create Reference

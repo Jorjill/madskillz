@@ -15,10 +15,12 @@ interface Reference {
 }
 
 interface ReferenceState {
+  addReferenceMode: boolean;
   references: Reference[];
 }
 
 const initialState: ReferenceState = {
+  addReferenceMode: false,
   references: [
     {
       skill: "REACT",
@@ -30,7 +32,6 @@ const initialState: ReferenceState = {
         },
         { title: "Create React App with ", content: "Content hre..." },
         { title: "Create React App Vite", content: "Content ere..." },
-        { title: "Add Topic", content: "Content ere..." },
       ],
     },
   ],
@@ -53,6 +54,12 @@ const referenceSlice = createSlice({
         reference.topics.push(topic);
       }
     },
+    setAddReferenceMode: (state) => {
+      state.addReferenceMode = true;
+    },
+    unsetAddReferenceMode: (state) => {
+      state.addReferenceMode = false;
+    }
   },
 });
 
@@ -67,5 +74,6 @@ export const selectReferenceBySkill = createSelector(
     )
 );
 
-export const { addReference, addTopicToReference } = referenceSlice.actions;
+export const { addReference, addTopicToReference, setAddReferenceMode, unsetAddReferenceMode } =
+  referenceSlice.actions;
 export default referenceSlice.reducer;

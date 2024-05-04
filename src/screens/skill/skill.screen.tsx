@@ -56,19 +56,22 @@ export const SkillScreen = () => {
                   Notes
                 </button>
               </li>
-              <li>
-                <button
-                  className="nav-button"
-                  onClick={() => {
-                    dispatch(choosePage("reference"));
-                    dispatch(deselectNote());
-                    dispatch(deselectAddNoteMode());
-                    dispatch(deselectEditNoteMode());
-                  }}
-                >
-                  Reference
-                </button>
-              </li>
+              {selectedSkill != "ALL" ? (
+                <li>
+                  <button
+                    className="nav-button"
+                    onClick={() => {
+                      dispatch(choosePage("reference"));
+                      dispatch(deselectNote());
+                      dispatch(deselectAddNoteMode());
+                      dispatch(deselectEditNoteMode());
+                    }}
+                  >
+                    Reference
+                  </button>
+                </li>
+              ) : null}
+
               <li
                 onMouseEnter={() => setIsPracticeDropdownOpen(true)}
                 onMouseLeave={() => setIsPracticeDropdownOpen(false)}
