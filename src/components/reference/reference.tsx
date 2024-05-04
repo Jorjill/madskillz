@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import "./reference.less";
 import { useSelector } from "react-redux";
 import { selectReferenceBySkill } from "../../slices/referenceSlice";
+import { AddReference } from "../add-reference/addReference";
 
 const Reference: React.FC = () => {
   const selectedSkill = useSelector(
@@ -37,13 +38,19 @@ const Reference: React.FC = () => {
       </div>
 
       <div className="reference-container">
-        <div className="reference-title-container">
-          <h1>{selectedTopic.title}</h1>
-        </div>
-        <div
-          className="reference-content"
-          dangerouslySetInnerHTML={{ __html: selectedTopic?.content || "" }}
-        ></div>
+        {selectedTopic?.title === "Add Topic" ? (
+          <AddReference />
+        ) : (
+          <div className="reference-content-container">
+            <div className="reference-title-container">
+              <h1>{selectedTopic?.title}</h1>
+            </div>
+            <div
+              className="reference-content"
+              dangerouslySetInnerHTML={{ __html: selectedTopic?.content || "" }}
+            ></div>
+          </div>
+        )}
       </div>
     </div>
   );

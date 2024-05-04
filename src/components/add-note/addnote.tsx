@@ -94,7 +94,7 @@ export const AddNote = () => {
                 content: noteContent,
                 noteSkill: `${selectedSkill}`,
                 datetime: new Date().toISOString(),
-                tags: tags
+                tags: tags,
               })
             );
             dispatch(deselectAddNoteMode());
