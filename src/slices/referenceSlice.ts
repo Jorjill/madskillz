@@ -69,7 +69,7 @@ const referenceSlice = createSlice({
       if (reference) {
         reference.topics = reference.topics.filter(topic => topic.title !== topicTitle);
       }
-    },
+    }
   },
 });
 

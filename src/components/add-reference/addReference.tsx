@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import "./addReference.less";
 import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
-import { addReference, addTopicToReference, unsetAddReferenceMode } from "../../slices/referenceSlice";
+import {
+  addReference,
+  addTopicToReference,
+  selectReferenceBySkill,
+  unsetAddReferenceMode,
+} from "../../slices/referenceSlice";
 
 export const AddReference: React.FC = () => {
   const quillRef = useRef<Quill | null>(null);
@@ -11,6 +16,9 @@ export const AddReference: React.FC = () => {
   const dispatch = useDispatch();
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
+  );
+  const selectedReference = useSelector((state) =>
+    selectReferenceBySkill(state, selectedSkill)
   );
 
   useEffect(() => {
@@ -49,12 +57,22 @@ export const AddReference: React.FC = () => {
         <div
           className="create-reference-button"
           onClick={() => {
-            dispatch(
-              addTopicToReference({
-                skill: selectedSkill,
-                topic: { title: refTitle, content: refContent },
-              })
-            );
+            if (selectedReference) {
+              dispatch(
+                addTopicToReference({
+                  skill: selectedSkill,
+                  topic: { title: refTitle, content: refContent },
+                })
+              );
+            } else {
+              dispatch(addReference({ skill: selectedSkill, topics: [] }));
+              dispatch(
+                addTopicToReference({
+                  skill: selectedSkill,
+                  topic: { title: refTitle, content: refContent },
+                })
+              );
+            }
             setRefTitle("");
             setRefContent("");
             if (quillRef.current) {
