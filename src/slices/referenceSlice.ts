@@ -59,7 +59,17 @@ const referenceSlice = createSlice({
     },
     unsetAddReferenceMode: (state) => {
       state.addReferenceMode = false;
-    }
+    },
+    deleteTopicByTitle: (
+      state,
+      action: PayloadAction<{ skill: string; topicTitle: string }>
+    ) => {
+      const { skill, topicTitle } = action.payload;
+      const reference = state.references.find(ref => ref.skill === skill);
+      if (reference) {
+        reference.topics = reference.topics.filter(topic => topic.title !== topicTitle);
+      }
+    },
   },
 });
 
@@ -74,6 +84,6 @@ export const selectReferenceBySkill = createSelector(
     )
 );
 
-export const { addReference, addTopicToReference, setAddReferenceMode, unsetAddReferenceMode } =
+export const { addReference, addTopicToReference, setAddReferenceMode, unsetAddReferenceMode, deleteTopicByTitle } =
   referenceSlice.actions;
 export default referenceSlice.reducer;

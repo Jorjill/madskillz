@@ -50,7 +50,7 @@
       cursor: pointer;
     }
   }
-  
+
   .reference-content-container {
     display: flex;
     flex-direction: column;
@@ -58,6 +58,31 @@
     padding: 20px;
     color: #eeeeee;
     align-items: center;
+
+    .reference-title-container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+
+      h1{
+        margin-left: auto;
+      }
+
+      .delete-topic-button {
+        display: flex;
+        justify-content: center;
+        border: solid 1px #eeeeee;
+        background-color: #eeeeee;
+        color: #585858;
+        padding: 10px;
+        border-radius: 10px;
+        margin-left: auto;
+      }
+
+      .delete-topic-button:hover {
+        cursor: pointer;
+      }
+    }
 
     .reference-content {
       margin: 30px;
@@ -67,7 +92,7 @@
     }
   }
 
-  .add-topic{
+  .add-topic {
     margin-top: 20px;
   }
 }

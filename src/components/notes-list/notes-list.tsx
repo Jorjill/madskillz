@@ -117,6 +117,7 @@ export const NotesList: React.FC = () => {
           ))}
         </div>
       </div>
+      
       {showDeleteConfirmation && (
         <DeleteModal
           noteTitle={noteToDelete}

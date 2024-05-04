@@ -2,8 +2,14 @@
 import React, { useState } from "react";
 import "./reference.less";
 import { useDispatch, useSelector } from "react-redux";
-import { selectReferenceBySkill, setAddReferenceMode, unsetAddReferenceMode } from "../../slices/referenceSlice";
+import {
+  deleteTopicByTitle,
+  selectReferenceBySkill,
+  setAddReferenceMode,
+  unsetAddReferenceMode,
+} from "../../slices/referenceSlice";
 import { AddReference } from "../add-reference/addReference";
+import { DeleteModal } from "../modal/delete-modal";
 
 const Reference: React.FC = () => {
   const selectedSkill = useSelector(
@@ -15,13 +21,26 @@ const Reference: React.FC = () => {
   const [selectedTopicTitle, setSelectedTopicTitle] = useState(
     selectedReference?.topics[0].title
   );
+  const [noteToDelete, setNoteToDelete] = useState<string>("");
   const topics = selectedReference?.topics;
   const selectedTopic: any = topics?.find(
     (topic) => topic.title === selectedTopicTitle
   );
   const dispatch = useDispatch();
-  const addReferenceMode = useSelector((state: any) => state.reference.addReferenceMode);
+  const addReferenceMode = useSelector(
+    (state: any) => state.reference.addReferenceMode
+  );
+  const [showDeleteConfirmation, setShowDeleteConfirmation] =
+    useState<boolean>(false);
 
+  const handleCloseDeleteConfirmation = () => {
+    setShowDeleteConfirmation(false);
+  };
+
+  const handleShowDeleteConfirmation = (title: string) => {
+    setShowDeleteConfirmation(true);
+    setNoteToDelete(title);
+  };
 
   return (
     <div className="reference-container">
@@ -38,7 +57,12 @@ const Reference: React.FC = () => {
             {topic.title}
           </div>
         ))}
-        <div className="add-topic-button" onClick={() => {dispatch(setAddReferenceMode())}}>
+        <div
+          className="add-topic-button"
+          onClick={() => {
+            dispatch(setAddReferenceMode());
+          }}
+        >
           Add topic
         </div>
       </div>
@@ -50,6 +74,14 @@ const Reference: React.FC = () => {
           <div className="reference-content-container">
             <div className="reference-title-container">
               <h1>{selectedTopic?.title}</h1>
+              <div
+                className="delete-topic-button"
+                onClick={() => {
+                  handleShowDeleteConfirmation(selectedTopic.title);
+                }}
+              >
+                Delete
+              </div>
             </div>
             <div
               className="reference-content"
@@ -58,6 +90,21 @@ const Reference: React.FC = () => {
           </div>
         )}
       </div>
+      {showDeleteConfirmation && (
+        <DeleteModal
+          noteTitle={selectedTopic?.title}
+          onClose={handleCloseDeleteConfirmation}
+          onConfirm={() => {
+            dispatch(
+              deleteTopicByTitle({
+                skill: selectedSkill,
+                topicTitle: selectedTopic.title,
+              })
+            );
+            handleCloseDeleteConfirmation();
+          }}
+        />
+      )}
     </div>
   );
 };
