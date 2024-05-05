@@ -50,15 +50,28 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
         />
       </div>
       <div className="box-grid">
+        <Link to="/skills" key={0}>
+          <div
+            className="box"
+            onClick={() => dispatch(selectSkill({ title: "ALL", imageurl: "" }))}
+          >
+            <div className="box-image">
+              <img src={imageArray[0]} alt={`Image ${0}`} />
+            </div>
+            <div className="box-text">
+              <p>ALL</p>
+            </div>
+          </div>
+        </Link>
         {searchedSkills.map((item, index) => (
-          <Link to="/skills" key={index}>
+          <Link to="/skills" key={index+1}>
             <div
               className="box"
               style={{ animationDelay: `${0.04 * index}s` }} // Increment delay for each box
               onClick={() => dispatch(selectSkill(item))}
             >
               <div className="box-image">
-                <img src={imageArray[index]} alt={`Image ${index}`} />
+                <img src={imageArray[index+1]} alt={`Image ${index+1}`} />
               </div>
               <div className="box-text">
                 <p>{item.title}</p>

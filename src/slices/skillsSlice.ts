@@ -12,7 +12,6 @@ export interface skillsState {
 
 const initialState: skillsState = {
   skills: [
-    { title: "ALL", imageurl: "" },
     { title: "REACT", imageurl: "" },
     { title: "angular", imageurl: "" },
     { title: "node", imageurl: "" },
