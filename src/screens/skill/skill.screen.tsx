@@ -14,6 +14,7 @@ import { useState } from "react";
 import { PracticeDropdown } from "../../components/practice-dropdown/practice-dropdown";
 import { LoadingScreen } from "../../components/loading/loading";
 import { Test } from "../../components/test/test";
+import { Results } from "../../components/results/results";
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -104,6 +105,8 @@ export const SkillScreen = () => {
             )
           ) : currentComponent === "loading" ? (
             <LoadingScreen />
+          ) : currentComponent === "result" ? (
+            <Results/>
           ) : null}
         </main>
         <div className="layout-line"></div>

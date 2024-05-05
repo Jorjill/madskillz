@@ -1,64 +1,66 @@
 @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px); /* Start from below */
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* Start from below */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* Move to original position */
+  }
+}
+
+.test-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50vh;
+  color: white;
+  background-color: #333;
+  padding: 20px;
+  animation: fadeInUp 0.5s ease-out;
+
+  .question {
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+  }
+
+  .answers-container {
+    .answer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0); /* Move to original position */
+
+    button {
+      background-color: #555;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #777;
     }
   }
 
-.test-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 50vh;
+  .next-button {
+    margin-top: 20px;
+    background-color: #444;
     color: white;
-    background-color: #333;
-    padding: 20px;
-    animation: fadeInUp 0.5s ease-out;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
 
-    .question {
-        margin-bottom: 20px;
-        font-size: 24px;
-        text-align: center;
-    }
-
-    .answers {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .answers button {
-        background-color: #555; 
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .answers button:hover {
-        background-color: #777;
-    }
-
-    .next-button {
-        margin-top: 20px;
-        background-color: #444; 
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .next-button:hover {
-        background-color: #666;
-    }
+  .next-button:hover {
+    background-color: #666;
+  }
 }

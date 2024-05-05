@@ -1,22 +1,25 @@
 import "./test.less";
 import { useDispatch, useSelector } from "react-redux";
-import { nextQuestion } from "../../slices/testSlice";
+import { nextQuestion, selectQuestionsBySkill } from "../../slices/testSlice";
 import { choosePage } from "../../slices/pageSlice";
 
 export const Test: React.FC = () => {
   const dispatch = useDispatch();
-  const { questions, currentQuestionIndex } = useSelector(
-    (state: any) => state.test
+  const { currentQuestionIndex } = useSelector((state: any) => state.test);
+  const selectedSkill = useSelector(
+    (state: any) => state.skills.selectedSkill.title
   );
+
+  const questions = useSelector((state: any) =>
+    selectQuestionsBySkill(state, selectedSkill)
+  );
+
   const currentQuestion = questions[currentQuestionIndex];
 
   const handleAnswerClick = (isCorrect: boolean) => {
     if (isCorrect) {
-      console.log("Correct answer");
-    } else {
-      console.log("Incorrect answer");
+      handleNextQuestion();
     }
-    handleNextQuestion();
   };
 
   const handleNextQuestion = () => {
@@ -30,15 +33,18 @@ export const Test: React.FC = () => {
   return (
     <div className="test-container">
       <div className="question">{currentQuestion.question}</div>
-      <div className="answers">
-        {currentQuestion.answers.map((answer: any, index: any) => (
-          <button
-            key={index}
-            onClick={() => handleAnswerClick(answer.isCorrect)}
-          >
-            {answer.text}
-          </button>
-        ))}
+      <div className="answers-container">
+        <div className="answer">
+          {" "}
+          {currentQuestion.answers.map((answer: any, index: any) => (
+            <button
+              key={index}
+              onClick={() => handleAnswerClick(answer.isCorrect)}
+            >
+              {answer.text}
+            </button>
+          ))}
+        </div>
       </div>
       {currentQuestionIndex < questions.length - 1 && (
         <button className="next-button" onClick={handleNextQuestion}>
