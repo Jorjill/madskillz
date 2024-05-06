@@ -30,7 +30,7 @@ const initialState: QuestionsState = {
       ],
     },
     {
-      skill: "Angular",
+      skill: "angular",
       question: "What is the capital of Mongolia?",
       answers: [
         { text: "Paris", isCorrect: false },

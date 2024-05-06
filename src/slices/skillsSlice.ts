@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface skill {
   title: string;
@@ -11,15 +11,7 @@ export interface skillsState {
 }
 
 const initialState: skillsState = {
-  skills: [
-    { title: "REACT", imageurl: "" },
-    { title: "angular", imageurl: "" },
-    { title: "node", imageurl: "" },
-    { title: "REACT", imageurl: "" },
-    { title: "REACT", imageurl: "" },
-    { title: "REACT", imageurl: "" },
-    { title: "REACT", imageurl: "" },
-  ],
+  skills: [],
   selectedSkill: { title: "", imageurl: "" },
 };
 
@@ -27,6 +19,9 @@ const skillsSlice = createSlice({
   name: "skills",
   initialState,
   reducers: {
+    addSkills: (state, actions) => {
+      state.skills = actions.payload;
+    },
     addSkill: (state, actions) => {
       state.skills.push(actions.payload);
     },
@@ -36,8 +31,21 @@ const skillsSlice = createSlice({
   },
 });
 
+export const fetchSkills = createAsyncThunk(
+  "skills/fetchSkills",
+  async (_, { dispatch }) => {
+    try {
+      const response = await fetch("http://localhost:3000/skills");
+      const data = await response.json();
+      dispatch(addSkills(data));
+    } catch (error) {
+      console.error("Failed to fetch skills:", error);
+    }
+  }
+);
+
 export const selectSkills = (state: { skills: skillsState }) =>
   state.skills.skills;
 
-export const { addSkill, selectSkill } = skillsSlice.actions;
+export const { addSkill, selectSkill, addSkills } = skillsSlice.actions;
 export default skillsSlice.reducer;

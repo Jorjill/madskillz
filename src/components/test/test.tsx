@@ -23,7 +23,7 @@ export const Test: React.FC = () => {
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < questions?.length - 1) {
       dispatch(nextQuestion());
     } else {
       dispatch(choosePage("result"));
@@ -32,11 +32,11 @@ export const Test: React.FC = () => {
 
   return (
     <div className="test-container">
-      <div className="question">{currentQuestion.question}</div>
+      <div className="question">{currentQuestion?.question}</div>
       <div className="answers-container">
         <div className="answer">
           {" "}
-          {currentQuestion.answers.map((answer: any, index: any) => (
+          {currentQuestion?.answers.map((answer: any, index: any) => (
             <button
               key={index}
               onClick={() => handleAnswerClick(answer.isCorrect)}
@@ -46,7 +46,7 @@ export const Test: React.FC = () => {
           ))}
         </div>
       </div>
-      {currentQuestionIndex < questions.length - 1 && (
+      {currentQuestionIndex < questions?.length - 1 && (
         <button className="next-button" onClick={handleNextQuestion}>
           Next
         </button>

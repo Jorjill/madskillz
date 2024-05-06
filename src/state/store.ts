@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { AnyAction, configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import { persistStore, persistReducer } from "redux-persist";
 import notesReducer from "../slices/notesSlice";
@@ -8,6 +8,7 @@ import referenceReducer from "../slices/referenceSlice";
 import storageSession from "redux-persist/lib/storage/session";
 import practiceReducer from "../slices/practiceSlice";
 import testReducer from "../slices/testSlice";
+import thunk, { ThunkDispatch } from 'redux-thunk';
 
 // Persist configuration
 const persistConfig = {
@@ -43,7 +44,7 @@ const store = configureStore({
           "persist/REGISTER",
         ],
       },
-    }),
+    }).prepend(thunk),
 });
 
 // Create a persistor instance
@@ -51,9 +52,9 @@ const persistor = persistStore(store);
 
 // Define the RootState type to represent the overall shape of your Redux store state
 type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch & ThunkDispatch<RootState, null, AnyAction>;
 
 // Export the store and persistor
 export { store, persistor };
-
 // Export the RootState type for use in your components
 export type { RootState };
