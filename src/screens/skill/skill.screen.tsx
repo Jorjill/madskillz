@@ -63,6 +63,7 @@ export const SkillScreen = () => {
                     dispatch(deselectNote());
                     dispatch(deselectAddNoteMode());
                     dispatch(deselectEditNoteMode());
+                    dispatch(deselectNote());
                   }}
                 >
                   Notes

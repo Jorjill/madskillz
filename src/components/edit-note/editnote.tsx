@@ -3,13 +3,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
   deselectEditNoteMode,
+  deselectNote,
+  notesThunks,
   selectNoteByTitle,
-  updateNote,
 } from "../../slices/notesSlice";
 import "./editnote.less";
 import { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
+import { choosePage } from "../../slices/pageSlice";
 
 export const EditNote: React.FC = () => {
   const dispatch = useDispatch();
@@ -69,16 +71,19 @@ export const EditNote: React.FC = () => {
         <div
           className="create-note-button"
           onClick={() => {
-            dispatch(
-              updateNote({
-                ...note,
+            dispatch<any>(
+              notesThunks.updateNote({
+                id: note?.id,
                 notes_title: noteTitle,
                 content: noteContent,
                 noteSkill: selectedSkill,
                 datetime: new Date().toISOString(), // for updating the datetime to the current time
+                tags: [],
               })
             );
             dispatch(deselectEditNoteMode());
+            dispatch(deselectNote());
+            dispatch(choosePage("notes"));
           }}
         >
           Done

@@ -2,6 +2,7 @@ import { createSelector, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export interface note {
+  id?: string;
   notes_title: string;
   content: string;
   noteSkill: string;
@@ -34,24 +35,6 @@ const notesSlice = createSlice({
     },
     addNote: (state, actions) => {
       state.notes.push(actions.payload);
-    },
-    deleteNote: (state, action) => {
-      state.notes = state.notes.filter(
-        (note) => note.notes_title !== action.payload
-      );
-    },
-    updateNote: (state, action) => {
-      const { notes_title, content, noteSkill, datetime, newTags } =
-        action.payload;
-      const existingNote = state.notes.find(
-        (note) => note.notes_title === notes_title
-      );
-      if (existingNote) {
-        existingNote.content = content;
-        existingNote.noteSkill = noteSkill;
-        existingNote.datetime = datetime;
-        existingNote.tags = [...existingNote.tags, ...newTags];
-      }
     },
     updateNoteTags: (state, action) => {
       const { notes_title, newTag } = action.payload;
@@ -110,8 +93,6 @@ export const {
   addNotes,
   addNote,
   selectNote,
-  deleteNote,
-  updateNote,
   deselectNote,
   selectAddNoteMode,
   deselectAddNoteMode,
@@ -136,14 +117,23 @@ export const notesThunks = {
       console.error("Failed to create note:", error);
     }
   },
-  deleteNote: (noteTitle: string) => async (dispatch: any) => { 
+  deleteNote: (id: string | undefined) => async (dispatch: any) => { 
     try {
-      await axios.delete(`http://localhost:3000/notes/${noteTitle}`);
+      await axios.delete(`http://localhost:3000/notes/${id}`);
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to delete note:", error);
     }
   },
+  updateNote: (updatedNote: note) => async (dispatch: any) => {
+    try {
+      await axios.put(`http://localhost:3000/notes/${updatedNote.id}`, updatedNote);
+      dispatch(notesThunks.fetchNotes());
+    } catch (error) {
+      console.error("Failed to update note:", error);
+    }
+  },
+
 };
 
 export default notesSlice.reducer;

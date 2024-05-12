@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import "./notes-list.less";
 import {
-  deleteNote,
   notesThunks,
   selectAddNoteMode,
   selectEditNoteMode,
@@ -24,14 +23,16 @@ export const NotesList: React.FC = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] =
     useState<boolean>(false);
   const [noteToDelete, setNoteToDelete] = useState<string>("");
+  const [deleteNoteId, setDeleteNoteId] = useState<string | undefined>("");
 
   const handleCloseDeleteConfirmation = () => {
     setShowDeleteConfirmation(false);
   };
 
-  const handleShowDeleteConfirmation = (title: string) => {
+  const handleShowDeleteConfirmation = (title: string, id: string | undefined) => {
     setShowDeleteConfirmation(true);
     setNoteToDelete(title);
+    setDeleteNoteId(id);
   };
 
   const extractTextFromHTML = (htmlString: any) => {
@@ -55,10 +56,6 @@ export const NotesList: React.FC = () => {
   const filteredAndSortedNotes = filteredNotes.sort(
     (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
   );
-
-  useEffect(() => {
-    dispatch<any>(notesThunks.fetchNotes());
-  }, []);
 
   return (
     <div className="notes-component">
@@ -104,7 +101,7 @@ export const NotesList: React.FC = () => {
                   className="ri-delete-bin-7-line"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleShowDeleteConfirmation(item.notes_title);
+                    handleShowDeleteConfirmation(item.notes_title, item.id);
                   }}
                 ></i>
               </div>
@@ -126,7 +123,7 @@ export const NotesList: React.FC = () => {
           noteTitle={noteToDelete}
           onClose={handleCloseDeleteConfirmation}
           onConfirm={() => {
-            dispatch<any>(notesThunks.deleteNote(noteToDelete));
+            dispatch<any>(notesThunks.deleteNote(deleteNoteId));
             handleCloseDeleteConfirmation();
           }}
         />

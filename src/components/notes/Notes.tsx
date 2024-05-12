@@ -1,17 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
-import { selectNoteByTitle } from "../../slices/notesSlice";
 import { Note } from "../note/note";
 import { AddNote } from "../add-note/addnote";
 import { EditNote } from "../edit-note/editnote";
 import { NotesList } from "../notes-list/notes-list";
 
 const Notes: React.FC = () => {
-  const [selectednotetitle, setSelectednotetitle] = useState("");
-  const selectednote = useSelector((state) =>
-    selectNoteByTitle(state, selectednotetitle)
-  );
   const isEditNoteMode = useSelector(
     (state: any) => state.notes.isEditNoteMode
   );
