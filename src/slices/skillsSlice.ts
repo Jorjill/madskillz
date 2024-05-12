@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export interface skill {
@@ -29,6 +29,11 @@ const skillsSlice = createSlice({
     selectSkill: (state, actions) => {
       state.selectedSkill = actions.payload;
     },
+    deleteSkill: (state, actions) => {
+      state.skills = state.skills.filter(
+        (skill) => skill.title !== actions.payload.title
+      );
+    }
   },
 });
 
@@ -49,6 +54,14 @@ export const skillsThunks = {
       dispatch(skillsActions.addSkill(newSkill));
     } catch (error) {
       console.error("Failed to add skill:", error);
+    }
+  },
+  deleteSkill: (skill: skill) => async (dispatch: any) => {
+    try {
+      await axios.delete(`http://localhost:3000/skills/${skill}`);
+      dispatch(skillsActions.deleteSkill(skill));
+    } catch (error) {
+      console.error("Failed to delete skill:", error);
     }
   },
 };

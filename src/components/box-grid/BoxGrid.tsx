@@ -12,7 +12,7 @@ import image10 from "../../assets/10.png";
 import { selectSkill, skill, skillsThunks } from "../../slices/skillsSlice";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const imageArray = [
   image1,
@@ -41,8 +41,39 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   const [newSkillName, setNewSkillName] = useState("");
   const [newSkillImage, setNewSkillImage] = useState("");
 
+  useEffect(() => {
+    setTimeout(() => {
+        dispatch<any>(skillsThunks.fetchSkills());
+    }, 500);
+}, []);
+
+  const handleFileChange = (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      uploadFile(file);
+    }
+  };
+
+  const uploadFile = async (file: any) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch("http://localhost:3000/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      setNewSkillImage(data.imageUrl);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+
   const handleAddSkill = () => {
-    dispatch<any>(skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage }));
+    dispatch<any>(
+      skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage })
+    );
     setNewSkillName("");
     setNewSkillImage("");
     setAddSkillModal(false);
@@ -105,7 +136,10 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
       {addSkillModal && (
         <div className="modal">
           <div className="modal-content">
-            <span className="close-button" onClick={() => setAddSkillModal(false)}>
+            <span
+              className="close-button"
+              onClick={() => setAddSkillModal(false)}
+            >
               &times;
             </span>
             <h2>Add New Skill</h2>
@@ -115,12 +149,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
               value={newSkillName}
               onChange={(e) => setNewSkillName(e.target.value)}
             />
-            <input
-              type="text"
-              placeholder="Image URL"
-              value={newSkillImage}
-              onChange={(e) => setNewSkillImage(e.target.value)}
-            />
+            <input type="file" onChange={handleFileChange} accept="image/*" />
             <button onClick={handleAddSkill}>Add Skill</button>
           </div>
         </div>

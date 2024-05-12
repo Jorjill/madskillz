@@ -15,6 +15,7 @@ import { PracticeDropdown } from "../../components/practice-dropdown/practice-dr
 import { LoadingScreen } from "../../components/loading/loading";
 import { Test } from "../../components/test/test";
 import { Results } from "../../components/results/results";
+import { skillsThunks } from "../../slices/skillsSlice";
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -40,7 +41,17 @@ export const SkillScreen = () => {
         ></i>
       </div>
       <div className="layout-container">
-        <div className="skill-title">{selectedSkill}</div>
+        <div className="skill-title-and-delete">
+          <div className="skill-title">{selectedSkill}</div>
+          <i
+            className="ri-delete-bin-7-line"
+            onClick={(e) => {
+              dispatch<any>(skillsThunks.deleteSkill(selectedSkill));
+              navigate("/");
+            }}
+          ></i>
+        </div>
+
         <header className="navbar">
           <nav className="nav-bar">
             <ul className="nav-list">
@@ -106,7 +117,7 @@ export const SkillScreen = () => {
           ) : currentComponent === "loading" ? (
             <LoadingScreen />
           ) : currentComponent === "result" ? (
-            <Results/>
+            <Results />
           ) : null}
         </main>
         <div className="layout-line"></div>
