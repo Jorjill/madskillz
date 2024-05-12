@@ -9,7 +9,7 @@ import image7 from "../../assets/7.png";
 import image8 from "../../assets/8.png";
 import image9 from "../../assets/9.png";
 import image10 from "../../assets/10.png";
-import { selectSkill, skill } from "../../slices/skillsSlice";
+import { selectSkill, skill, skillsThunks } from "../../slices/skillsSlice";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -37,9 +37,19 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   const searchedSkills = itemList.filter((skill) =>
     skill.title.toLowerCase().includes(searchSkill.toLowerCase())
   );
+  const [addSkillModal, setAddSkillModal] = useState(false);
+  const [newSkillName, setNewSkillName] = useState("");
+  const [newSkillImage, setNewSkillImage] = useState("");
+
+  const handleAddSkill = () => {
+    dispatch<any>(skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage }));
+    setNewSkillName("");
+    setNewSkillImage("");
+    setAddSkillModal(false);
+  };
 
   return (
-    <div>
+    <div className="box-grid">
       <div className="input-box-container">
         <input
           className="input-box"
@@ -49,11 +59,13 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
           }}
         />
       </div>
-      <div className="box-grid">
+      <div className="box-grid-container">
         <Link to="/skills" key={0}>
           <div
             className="box"
-            onClick={() => dispatch(selectSkill({ title: "ALL", imageurl: "" }))}
+            onClick={() =>
+              dispatch(selectSkill({ title: "ALL", imageurl: "" }))
+            }
           >
             <div className="box-image">
               <img src={imageArray[0]} alt={`Image ${0}`} />
@@ -64,14 +76,14 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
           </div>
         </Link>
         {searchedSkills.map((item, index) => (
-          <Link to="/skills" key={index+1}>
+          <Link to="/skills" key={index + 1}>
             <div
               className="box"
               style={{ animationDelay: `${0.04 * index}s` }} // Increment delay for each box
               onClick={() => dispatch(selectSkill(item))}
             >
               <div className="box-image">
-                <img src={imageArray[index+1]} alt={`Image ${index+1}`} />
+                <img src={imageArray[index + 1]} alt={`Image ${index + 1}`} />
               </div>
               <div className="box-text">
                 <p>{item.title}</p>
@@ -79,7 +91,40 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
             </div>
           </Link>
         ))}
+        <div
+          className="box"
+          onClick={() => {
+            setAddSkillModal(true);
+          }}
+        >
+          <div className="box-text">
+            <p>+</p>
+          </div>
+        </div>
       </div>
+      {addSkillModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close-button" onClick={() => setAddSkillModal(false)}>
+              &times;
+            </span>
+            <h2>Add New Skill</h2>
+            <input
+              type="text"
+              placeholder="Skill Name"
+              value={newSkillName}
+              onChange={(e) => setNewSkillName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Image URL"
+              value={newSkillImage}
+              onChange={(e) => setNewSkillImage(e.target.value)}
+            />
+            <button onClick={handleAddSkill}>Add Skill</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export interface skill {
   title: string;
@@ -31,18 +32,26 @@ const skillsSlice = createSlice({
   },
 });
 
-export const fetchSkills = createAsyncThunk(
-  "skills/fetchSkills",
-  async (_, { dispatch }) => {
+export const skillsActions = skillsSlice.actions;
+
+export const skillsThunks = {
+  fetchSkills: () => async (dispatch: any) => {
     try {
-      const response = await fetch("http://localhost:3000/skills");
-      const data = await response.json();
-      dispatch(addSkills(data));
+      const response = await axios.get("http://localhost:3000/skills");
+      dispatch(skillsActions.addSkills(response.data));
     } catch (error) {
       console.error("Failed to fetch skills:", error);
     }
-  }
-);
+  },
+  addSkill: (newSkill: skill) => async (dispatch: any) => {
+    try {
+      await axios.post("http://localhost:3000/skills", newSkill);
+      dispatch(skillsActions.addSkill(newSkill));
+    } catch (error) {
+      console.error("Failed to add skill:", error);
+    }
+  },
+};
 
 export const selectSkills = (state: { skills: skillsState }) =>
   state.skills.skills;
