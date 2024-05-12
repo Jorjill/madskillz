@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { addNote, deselectAddNoteMode } from "../../slices/notesSlice";
+import { deselectAddNoteMode, notesThunks } from "../../slices/notesSlice";
 import "./addnote.less";
 import { useEffect, useRef, useState } from "react";
 import Quill from "quill";
@@ -88,8 +88,8 @@ export const AddNote = () => {
         <div
           className="create-note-button"
           onClick={() => {
-            dispatch(
-              addNote({
+            dispatch<any>(
+              notesThunks.createNote({
                 notes_title: noteTitle,
                 content: noteContent,
                 noteSkill: `${selectedSkill}`,

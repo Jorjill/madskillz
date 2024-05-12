@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import "./notes-list.less";
 import {
   deleteNote,
+  notesThunks,
   selectAddNoteMode,
   selectEditNoteMode,
   selectNote,
@@ -54,6 +55,10 @@ export const NotesList: React.FC = () => {
   const filteredAndSortedNotes = filteredNotes.sort(
     (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
   );
+
+  useEffect(() => {
+    dispatch<any>(notesThunks.fetchNotes());
+  }, []);
 
   return (
     <div className="notes-component">
@@ -110,14 +115,12 @@ export const NotesList: React.FC = () => {
                     {tag}
                   </div>
                 ))}
-
-                {/* <div className="tag">typescript</div> */}
               </div>
             </div>
           ))}
         </div>
       </div>
-      
+
       {showDeleteConfirmation && (
         <DeleteModal
           noteTitle={noteToDelete}

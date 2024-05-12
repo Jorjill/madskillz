@@ -1,4 +1,5 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 export interface note {
   notes_title: string;
@@ -21,36 +22,16 @@ const initialState: notesState = {
   isNoteSelected: false,
   isAddNoteMode: false,
   isEditNoteMode: false,
-  notes: [
-    {
-      notes_title: "Create Typescript React Vite App in NX",
-      content:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum .Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-      noteSkill: "REACT",
-      datetime: "2023-03-23T10:00:00Z",
-      tags: ["react","typescript"],
-    },
-    {
-      notes_title: "something 2",
-      content: "something",
-      noteSkill: "REACT",
-      datetime: "2023-03-23T11:00:00Z",
-      tags: ["react"],
-    },
-    {
-      notes_title: "something 3",
-      content: "something",
-      noteSkill: "REACT",
-      datetime: "2023-03-23T11:00:00Z",
-      tags: ["angular"],
-    },
-  ],
+  notes: [],
 };
 
 const notesSlice = createSlice({
   name: "notes",
   initialState,
   reducers: {
+    addNotes: (state, actions) => {
+      state.notes = actions.payload;
+    },
     addNote: (state, actions) => {
       state.notes.push(actions.payload);
     },
@@ -83,7 +64,7 @@ const notesSlice = createSlice({
       const { notes_title, tagToRemove } = action.payload;
       const note = state.notes.find((note) => note.notes_title === notes_title);
       if (note) {
-        note.tags = note.tags.filter((tag) => tag !== tagToRemove); 
+        note.tags = note.tags.filter((tag) => tag !== tagToRemove);
       }
     },
     selectNote: (state, action) => {
@@ -118,7 +99,7 @@ export const selectNoteByTitle = createSelector(
 export const selectNotesBySkill = createSelector(
   [selectNotes, (state, noteSkill: string) => noteSkill],
   (notes, noteSkill) => {
-    if( noteSkill == "ALL"){
+    if (noteSkill == "ALL") {
       return notes;
     }
     return notes.filter((note) => note.noteSkill === noteSkill);
@@ -126,6 +107,7 @@ export const selectNotesBySkill = createSelector(
 );
 
 export const {
+  addNotes,
   addNote,
   selectNote,
   deleteNote,
@@ -136,4 +118,24 @@ export const {
   selectEditNoteMode,
   deselectEditNoteMode,
 } = notesSlice.actions;
+
+export const notesThunks = {
+  fetchNotes: () => async (dispatch: any) => {
+    try {
+      const response = await axios.get("http://localhost:3000/notes");
+      dispatch(addNotes(response.data));
+    } catch (error) {
+      console.error("Failed to fetch notes:", error);
+    }
+  },
+  createNote: (newNote: note) => async (dispatch: any) => {
+    try {
+      await axios.post("http://localhost:3000/notes", newNote);
+      dispatch(notesThunks.fetchNotes());
+    } catch (error) {
+      console.error("Failed to create note:", error);
+    }
+  },
+};
+
 export default notesSlice.reducer;
