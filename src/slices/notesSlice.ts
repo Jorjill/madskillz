@@ -136,6 +136,14 @@ export const notesThunks = {
       console.error("Failed to create note:", error);
     }
   },
+  deleteNote: (noteTitle: string) => async (dispatch: any) => { 
+    try {
+      await axios.delete(`http://localhost:3000/notes/${noteTitle}`);
+      dispatch(notesThunks.fetchNotes());
+    } catch (error) {
+      console.error("Failed to delete note:", error);
+    }
+  },
 };
 
 export default notesSlice.reducer;

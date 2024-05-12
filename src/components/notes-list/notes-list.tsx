@@ -126,7 +126,7 @@ export const NotesList: React.FC = () => {
           noteTitle={noteToDelete}
           onClose={handleCloseDeleteConfirmation}
           onConfirm={() => {
-            dispatch(deleteNote(noteToDelete));
+            dispatch<any>(notesThunks.deleteNote(noteToDelete));
             handleCloseDeleteConfirmation();
           }}
         />
