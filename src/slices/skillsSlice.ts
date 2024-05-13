@@ -24,16 +24,8 @@ const skillsSlice = createSlice({
     addSkills: (state, actions) => {
       state.skills = actions.payload;
     },
-    addSkill: (state, actions) => {
-      state.skills.push(actions.payload);
-    },
     selectSkill: (state, actions) => {
       state.selectedSkill = actions.payload;
-    },
-    deleteSkill: (state, actions) => {
-      state.skills = state.skills.filter(
-        (skill) => skill.id !== actions.payload.id
-      );
     },
   },
 });
@@ -52,17 +44,15 @@ export const skillsThunks = {
   addSkill: (newSkill: skill) => async (dispatch: any) => {
     try {
       await axios.post("http://localhost:3000/skills", newSkill);
-      dispatch(skillsActions.addSkill(newSkill));
+      dispatch(skillsThunks.fetchSkills());
     } catch (error) {
       console.error("Failed to add skill:", error);
     }
   },
   deleteSkill: (id: string) => async (dispatch: any) => {
-    console.log("Deleting skill with id:", id);
-
     try {
       await axios.delete(`http://localhost:3000/skills/${id}`);
-      dispatch(skillsActions.deleteSkill(id));
+      dispatch(skillsThunks.fetchSkills());
     } catch (error) {
       console.error("Failed to delete skill:", error);
     }
@@ -72,5 +62,5 @@ export const skillsThunks = {
 export const selectSkills = (state: { skills: skillsState }) =>
   state.skills.skills;
 
-export const { addSkill, selectSkill, addSkills } = skillsSlice.actions;
+export const { selectSkill, addSkills } = skillsSlice.actions;
 export default skillsSlice.reducer;

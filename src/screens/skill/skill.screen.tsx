@@ -1,16 +1,17 @@
 import "./skill.screen.less";
 import { useDispatch, useSelector } from "react-redux";
-import {
+import notesSlice, {
   deselectNote,
   deselectAddNoteMode,
   deselectEditNoteMode,
+  notesThunks,
 } from "../../slices/notesSlice";
 import { choosePage } from "../../slices/pageSlice";
 import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
 import Reference from "../../components/reference/reference";
 import { Practice } from "../../components/practice/practice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PracticeDropdown } from "../../components/practice-dropdown/practice-dropdown";
 import { LoadingScreen } from "../../components/loading/loading";
 import { Test } from "../../components/test/test";
@@ -20,14 +21,16 @@ import { skillsThunks } from "../../slices/skillsSlice";
 export const SkillScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const selectedSkill = useSelector(
-    (state: any) => state.skills.selectedSkill
-  );
+  const selectedSkill = useSelector((state: any) => state.skills.selectedSkill);
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
   );
   const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
   const practiceMode = useSelector((state: any) => state.practice.practiceMode);
+
+  useEffect(() => {
+    dispatch<any>(notesThunks.fetchNotes());
+  }, []);
 
   return (
     <div className="homebox">
