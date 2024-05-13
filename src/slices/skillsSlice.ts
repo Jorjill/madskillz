@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 export interface skill {
+  id?: string;
   title: string;
   imageurl: string;
 }
@@ -13,7 +14,7 @@ export interface skillsState {
 
 const initialState: skillsState = {
   skills: [],
-  selectedSkill: { title: "", imageurl: "" },
+  selectedSkill: { id: "", title: "", imageurl: "" },
 };
 
 const skillsSlice = createSlice({
@@ -31,9 +32,9 @@ const skillsSlice = createSlice({
     },
     deleteSkill: (state, actions) => {
       state.skills = state.skills.filter(
-        (skill) => skill.title !== actions.payload.title
+        (skill) => skill.id !== actions.payload.id
       );
-    }
+    },
   },
 });
 
@@ -56,10 +57,12 @@ export const skillsThunks = {
       console.error("Failed to add skill:", error);
     }
   },
-  deleteSkill: (skill: skill) => async (dispatch: any) => {
+  deleteSkill: (id: string) => async (dispatch: any) => {
+    console.log("Deleting skill with id:", id);
+
     try {
-      await axios.delete(`http://localhost:3000/skills/${skill}`);
-      dispatch(skillsActions.deleteSkill(skill));
+      await axios.delete(`http://localhost:3000/skills/${id}`);
+      dispatch(skillsActions.deleteSkill(id));
     } catch (error) {
       console.error("Failed to delete skill:", error);
     }

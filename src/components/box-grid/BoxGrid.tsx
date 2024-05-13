@@ -72,7 +72,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
 
   const handleAddSkill = () => {
     dispatch<any>(
-      skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage })
+      skillsThunks.addSkill({ title: newSkillName, imageurl: "asdasd" })
     );
     setNewSkillName("");
     setNewSkillImage("");

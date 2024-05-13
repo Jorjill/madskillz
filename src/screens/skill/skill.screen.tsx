@@ -21,7 +21,7 @@ export const SkillScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const selectedSkill = useSelector(
-    (state: any) => state.skills.selectedSkill.title
+    (state: any) => state.skills.selectedSkill
   );
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
@@ -42,11 +42,12 @@ export const SkillScreen = () => {
       </div>
       <div className="layout-container">
         <div className="skill-title-and-delete">
-          <div className="skill-title">{selectedSkill}</div>
+          <div className="skill-title">{selectedSkill.title}</div>
           <i
             className="ri-delete-bin-7-line"
             onClick={(e) => {
-              dispatch<any>(skillsThunks.deleteSkill(selectedSkill));
+              e.stopPropagation();
+              dispatch<any>(skillsThunks.deleteSkill(selectedSkill.id));
               navigate("/");
             }}
           ></i>
@@ -69,7 +70,7 @@ export const SkillScreen = () => {
                   Notes
                 </button>
               </li>
-              {selectedSkill != "ALL" ? (
+              {selectedSkill.title != "ALL" ? (
                 <li>
                   <button
                     className="nav-button"
