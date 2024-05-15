@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./reference.less";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deleteTopicByTitle,
+  referenceThunks,
   selectReferenceBySkill,
   setAddReferenceMode,
   unsetAddReferenceMode,
 } from "../../slices/referenceSlice";
 import { AddReference } from "../add-reference/addReference";
 import { DeleteModal } from "../modal/delete-modal";
+import axios from "axios";
 
 const Reference: React.FC = () => {
   const selectedSkill = useSelector(
@@ -19,7 +21,7 @@ const Reference: React.FC = () => {
     selectReferenceBySkill(state, selectedSkill)
   );
   const [selectedTopicTitle, setSelectedTopicTitle] = useState(
-    selectedReference?.topics[0].title
+    selectedReference?.topics[0]?.title
   );
   const [noteToDelete, setNoteToDelete] = useState<string>("");
   const topics = selectedReference?.topics;
@@ -41,6 +43,25 @@ const Reference: React.FC = () => {
     setShowDeleteConfirmation(true);
     setNoteToDelete(title);
   };
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/reference/by-name/${selectedSkill}`
+        );
+        if (response.data.length < 1) {
+          axios.post(`http://localhost:3000/reference`, {
+            skill: selectedSkill,
+          });
+        }
+        dispatch<any>(referenceThunks.fetchReferences());
+      } catch (error) {
+        console.error("Failed to fetch skills:", error);
+      }
+    };
+    fetchSkills();
+  }, []);
 
   return (
     <div className="reference-container">

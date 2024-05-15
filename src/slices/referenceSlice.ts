@@ -1,15 +1,18 @@
 import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
+import axios from "axios";
 
 interface RootState {
   reference: ReferenceState;
 }
 
 interface Topic {
+  id?: string;
   title: string;
   content: string;
 }
 
 interface Reference {
+  id?: string;
   skill: string;
   topics: Topic[];
 }
@@ -41,6 +44,9 @@ const referenceSlice = createSlice({
   name: "reference",
   initialState,
   reducers: {
+    addReferences: (state, action: PayloadAction<Reference[]>) => {
+      state.references = action.payload;
+    },
     addReference: (state, action: PayloadAction<Reference>) => {
       state.references.push(action.payload);
     },
@@ -65,11 +71,13 @@ const referenceSlice = createSlice({
       action: PayloadAction<{ skill: string; topicTitle: string }>
     ) => {
       const { skill, topicTitle } = action.payload;
-      const reference = state.references.find(ref => ref.skill === skill);
+      const reference = state.references.find((ref) => ref.skill === skill);
       if (reference) {
-        reference.topics = reference.topics.filter(topic => topic.title !== topicTitle);
+        reference.topics = reference.topics.filter(
+          (topic) => topic.title !== topicTitle
+        );
       }
-    }
+    },
   },
 });
 
@@ -84,6 +92,36 @@ export const selectReferenceBySkill = createSelector(
     )
 );
 
-export const { addReference, addTopicToReference, setAddReferenceMode, unsetAddReferenceMode, deleteTopicByTitle } =
-  referenceSlice.actions;
+export const {
+  addReferences,
+  addReference,
+  addTopicToReference,
+  setAddReferenceMode,
+  unsetAddReferenceMode,
+  deleteTopicByTitle,
+} = referenceSlice.actions;
+
+export const referenceThunks = {
+  fetchReferences: () => async (dispatch: any) => {
+    try {
+      const response = await axios.get("http://localhost:3000/reference");
+      dispatch(addReferences(response.data));
+    } catch (error) {
+      console.error("Failed to fetch references:", error);
+    }
+  },
+  addTopic: (skill: string, topic: Topic) => async (dispatch: any) => {
+    try {
+      await axios.post(`http://localhost:3000/topic`, {
+        title: topic.title,
+        content: topic.content,
+        skill
+      });
+      dispatch(referenceThunks.fetchReferences());
+    } catch (error) {
+      console.error("Failed to add topic:", error);
+    }
+  },
+};
+
 export default referenceSlice.reducer;
