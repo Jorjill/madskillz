@@ -3,8 +3,7 @@ import "./addReference.less";
 import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addReference,
-  addTopicToReference,
+  referenceThunks,
   selectReferenceBySkill,
   unsetAddReferenceMode,
 } from "../../slices/referenceSlice";
@@ -57,22 +56,12 @@ export const AddReference: React.FC = () => {
         <div
           className="create-reference-button"
           onClick={() => {
-            if (selectedReference) {
-              dispatch(
-                addTopicToReference({
-                  skill: selectedSkill,
-                  topic: { title: refTitle, content: refContent },
-                })
-              );
-            } else {
-              dispatch(addReference({ skill: selectedSkill, topics: [] }));
-              dispatch(
-                addTopicToReference({
-                  skill: selectedSkill,
-                  topic: { title: refTitle, content: refContent },
-                })
-              );
-            }
+            dispatch<any>(
+              referenceThunks.addTopic(selectedSkill, {
+                title: refTitle,
+                content: refContent,
+              })
+            );
             setRefTitle("");
             setRefContent("");
             if (quillRef.current) {

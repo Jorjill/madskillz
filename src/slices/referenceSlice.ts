@@ -14,7 +14,7 @@ interface Topic {
 interface Reference {
   id?: string;
   skill: string;
-  topics: Topic[];
+  topics?: Topic[];
 }
 
 interface ReferenceState {
@@ -57,7 +57,7 @@ const referenceSlice = createSlice({
       const { skill, topic } = action.payload;
       const reference = state.references.find((ref) => ref.skill === skill);
       if (reference) {
-        reference.topics.push(topic);
+        reference.topics?.push(topic);
       }
     },
     setAddReferenceMode: (state) => {
@@ -73,7 +73,7 @@ const referenceSlice = createSlice({
       const { skill, topicTitle } = action.payload;
       const reference = state.references.find((ref) => ref.skill === skill);
       if (reference) {
-        reference.topics = reference.topics.filter(
+        reference.topics = reference.topics?.filter(
           (topic) => topic.title !== topicTitle
         );
       }
@@ -104,7 +104,7 @@ export const {
 export const referenceThunks = {
   fetchReferences: () => async (dispatch: any) => {
     try {
-      const response = await axios.get("http://localhost:3000/reference");
+      const response = await axios.get("http://localhost:3000/references");
       dispatch(addReferences(response.data));
     } catch (error) {
       console.error("Failed to fetch references:", error);
@@ -112,7 +112,8 @@ export const referenceThunks = {
   },
   addTopic: (skill: string, topic: Topic) => async (dispatch: any) => {
     try {
-      await axios.post(`http://localhost:3000/topic`, {
+      console.log("adding topic ", topic);
+      await axios.post(`http://localhost:3000/topics`, {
         title: topic.title,
         content: topic.content,
         skill
@@ -120,6 +121,26 @@ export const referenceThunks = {
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
       console.error("Failed to add topic:", error);
+    }
+  },
+  addReference: (reference: Reference) => async (dispatch: any) => {
+    try {
+      console.log("adding reference", reference);
+      
+      await axios.post(`http://localhost:3000/references`, {
+        skill: reference.skill,
+      });
+      dispatch(referenceThunks.fetchReferences());
+    } catch (error) {
+      console.error("Failed to add reference:", error);
+    }
+  },
+  deleteTopic: (id:number) => async (dispatch: any) => {
+    try {
+      await axios.delete(`http://localhost:3000/topics/${id}`);
+      dispatch(referenceThunks.fetchReferences());
+    } catch (error) {
+      console.error("Failed to delete topic:", error);
     }
   },
 };

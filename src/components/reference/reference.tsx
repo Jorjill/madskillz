@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import "./reference.less";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  deleteTopicByTitle,
   referenceThunks,
   selectReferenceBySkill,
   setAddReferenceMode,
@@ -48,10 +47,10 @@ const Reference: React.FC = () => {
     const fetchSkills = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/reference/by-name/${selectedSkill}`
+          `http://localhost:3000/references/by-name/${selectedSkill}`
         );
         if (response.data.length < 1) {
-          axios.post(`http://localhost:3000/reference`, {
+          axios.post(`http://localhost:3000/references`, {
             skill: selectedSkill,
           });
         }
@@ -116,11 +115,8 @@ const Reference: React.FC = () => {
           noteTitle={selectedTopic?.title}
           onClose={handleCloseDeleteConfirmation}
           onConfirm={() => {
-            dispatch(
-              deleteTopicByTitle({
-                skill: selectedSkill,
-                topicTitle: selectedTopic.title,
-              })
+            dispatch<any>(
+              referenceThunks.deleteTopic(selectedTopic?.id)
             );
             handleCloseDeleteConfirmation();
           }}
