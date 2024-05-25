@@ -19,25 +19,14 @@ interface Reference {
 
 interface ReferenceState {
   addReferenceMode: boolean;
+  editReferenceMode: boolean;
   references: Reference[];
 }
 
 const initialState: ReferenceState = {
   addReferenceMode: false,
-  references: [
-    {
-      skill: "REACT",
-      topics: [
-        {
-          title: "Create React App with Vite",
-          content:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum .Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum",
-        },
-        { title: "Create React App with ", content: "Content hre..." },
-        { title: "Create React App Vite", content: "Content ere..." },
-      ],
-    },
-  ],
+  editReferenceMode: false,
+  references: [],
 };
 
 const referenceSlice = createSlice({
@@ -65,6 +54,12 @@ const referenceSlice = createSlice({
     },
     unsetAddReferenceMode: (state) => {
       state.addReferenceMode = false;
+    },
+    setEditReferenceMode: (state) => {
+      state.editReferenceMode = true;
+    },
+    unsetEditReferenceMode: (state) => {
+      state.editReferenceMode = false;
     },
     deleteTopicByTitle: (
       state,
@@ -99,6 +94,8 @@ export const {
   setAddReferenceMode,
   unsetAddReferenceMode,
   deleteTopicByTitle,
+  setEditReferenceMode,
+  unsetEditReferenceMode,
 } = referenceSlice.actions;
 
 export const referenceThunks = {
@@ -112,11 +109,10 @@ export const referenceThunks = {
   },
   addTopic: (skill: string, topic: Topic) => async (dispatch: any) => {
     try {
-      console.log("adding topic ", topic);
       await axios.post(`http://localhost:3000/topics`, {
         title: topic.title,
         content: topic.content,
-        skill
+        skill,
       });
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
@@ -125,8 +121,6 @@ export const referenceThunks = {
   },
   addReference: (reference: Reference) => async (dispatch: any) => {
     try {
-      console.log("adding reference", reference);
-      
       await axios.post(`http://localhost:3000/references`, {
         skill: reference.skill,
       });
@@ -135,7 +129,7 @@ export const referenceThunks = {
       console.error("Failed to add reference:", error);
     }
   },
-  deleteTopic: (id:number) => async (dispatch: any) => {
+  deleteTopic: (id: number) => async (dispatch: any) => {
     try {
       await axios.delete(`http://localhost:3000/topics/${id}`);
       dispatch(referenceThunks.fetchReferences());
@@ -143,6 +137,20 @@ export const referenceThunks = {
       console.error("Failed to delete topic:", error);
     }
   },
+  updateTopic:
+    (id: number, title: string, content: string, skill: string) =>
+    async (dispatch: any) => {
+      try {
+        await axios.put(`http://localhost:3000/topics/${id}`, {
+          title: title,
+          content: content,
+          skill: skill,
+        });
+        dispatch(referenceThunks.fetchReferences());
+      } catch (error) {
+        console.error("Failed to update topic:", error);
+      }
+    },
 };
 
 export default referenceSlice.reducer;

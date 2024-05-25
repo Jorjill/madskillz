@@ -50,57 +50,58 @@ export const AddNote = () => {
           }}
         />
         <div id="editor"></div> {/* This is where Quill will attach */}
-      </div>
-      <div className="button-and-tag">
-        <div className="tag-input-container">
-          Tags
-          <input
-            className="tag-input"
-            type="text"
-            name=""
-            id=""
-            value={tagText}
-            onChange={(e) => {
-              setTagText(e.target.value);
-            }}
-          />
-          <button
-            onClick={() => {
-              setTags([...tags, tagText]);
-              setTagText("");
-            }}
-          >
-            Add Tag
-          </button>
-        </div>
-        <div className="tags">
-          {tags.map((tag) => (
-            <div
-              className="tag"
+        <div className="button-and-tag">
+          <div className="tag-input-container">
+            Tags
+            <input
+              className="tag-input"
+              type="text"
+              name=""
+              id=""
+              value={tagText}
+              onChange={(e) => {
+                setTagText(e.target.value);
+              }}
+            />
+            <button
               onClick={() => {
-                setTags(tags.filter((t) => t !== tag));
+                setTags([...tags, tagText]);
+                setTagText("");
               }}
             >
-              {tag}
+              Add Tag
+            </button>
+            <div className="tags">
+              {tags.map((tag) => (
+                <div
+                  className="tag"
+                  onClick={() => {
+                    setTags(tags.filter((t) => t !== tag));
+                  }}
+                >
+                  {tag}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div
-          className="create-note-button"
-          onClick={() => {
-            dispatch<any>(
-              notesThunks.createNote({
-                notes_title: noteTitle,
-                content: noteContent,
-                noteSkill: `${selectedSkill}`,
-                datetime: new Date().toISOString(),
-                tags: tags,
-              })
-            );
-            dispatch(deselectAddNoteMode());
-          }}
-        >
-          Create note
+          </div>
+
+          <div
+            className="create-note-button"
+            onClick={() => {
+              dispatch<any>(
+                notesThunks.createNote({
+                  notes_title: noteTitle,
+                  content: noteContent,
+                  noteSkill: `${selectedSkill}`,
+                  datetime: new Date().toISOString(),
+                  tags: tags,
+                })
+              );
+              dispatch(deselectAddNoteMode());
+            }}
+          >
+            Create note
+          </div>
         </div>
       </div>
     </div>

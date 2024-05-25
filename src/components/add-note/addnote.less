@@ -1,19 +1,16 @@
 .addnote-component {
   display: flex;
-  flex-direction: column;
+  align-items: center;
 
   .addnote {
     display: flex;
     flex-direction: column;
-    align-items: center;
 
     .ql-toolbar.ql-snow {
       background-color: #eeeeee;
     }
 
     input {
-      width: 80%;
-      max-width: 500px;
       height: 40px;
       border-radius: 10px;
       border: 0.5px solid #ffffff;
@@ -24,61 +21,66 @@
     #editor {
       height: 40vh;
       margin-top: 50px;
-      width: 90vw;
+      width: 60vw;
       background-color: #ffffff;
     }
-  }
 
-  .button-and-tag {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
+    .button-and-tag {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: row;
+      margin-right: auto;
+      width: 100%;
 
-    .tag-input-container {
-      color: #eeeeee;
+      .tag-input-container {
+        color: #eeeeee;
 
-      button {
-        margin-left: 10px;
+        button {
+          margin-left: 10px;
+          padding: 5px;
+        }
+
+        .tag-input {
+          margin-left: 5px;
+          width: 50%;
+        }
+
+        .tags {
+          display: flex;
+          height: 40px;
+          .tag {
+            display: flex;
+            justify-content: center;
+            padding: 2px;
+            border: 0.5px solid #eeeeee;
+            margin-right: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            color: #4e4e4e;
+            background-color: #eeeeee;
+          }
+
+          .tag:hover {
+            cursor: pointer;
+          }
+        }
       }
 
-      .tag-input {
-        margin-left: 5px;
-      }
-    }
-
-    .create-note-button {
-      display: flex;
-      justify-content: center;
-      background-color: #eeeeee;
-      width: 7%;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 10px;
-      font-weight: bold;
-      margin-left: auto;
-    }
-
-    .create-note-button:hover {
-      background-color: #c9c9c9;
-      cursor: pointer;
-    }
-
-    .tags {
-      display: flex;
-      height: 40px;
-      .tag {
+      .create-note-button {
         display: flex;
         justify-content: center;
-        padding: 2px;
-        border: 0.5px solid #eeeeee;
-        margin-right: 10px;
-        margin-top: 10px;
-        border-radius: 5px;
-        color: #4e4e4e;
         background-color: #eeeeee;
+        width: 10%;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 10px;
+        font-weight: bold;
+        margin-left: auto;
+        height: 5%;
       }
 
-      .tag:hover{
+      .create-note-button:hover {
+        background-color: #c9c9c9;
         cursor: pointer;
       }
     }

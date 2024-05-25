@@ -6,11 +6,14 @@ import {
   referenceThunks,
   selectReferenceBySkill,
   setAddReferenceMode,
+  setEditReferenceMode,
   unsetAddReferenceMode,
+  unsetEditReferenceMode,
 } from "../../slices/referenceSlice";
 import { AddReference } from "../add-reference/addReference";
 import { DeleteModal } from "../modal/delete-modal";
 import axios from "axios";
+import { EditTopic } from "../edit-topic/edit-topic";
 
 const Reference: React.FC = () => {
   const selectedSkill = useSelector(
@@ -30,6 +33,9 @@ const Reference: React.FC = () => {
   const dispatch = useDispatch();
   const addReferenceMode = useSelector(
     (state: any) => state.reference.addReferenceMode
+  );
+  const editReferenceMode = useSelector(
+    (state: any) => state.reference.editReferenceMode
   );
   const [showDeleteConfirmation, setShowDeleteConfirmation] =
     useState<boolean>(false);
@@ -71,6 +77,7 @@ const Reference: React.FC = () => {
             key={index}
             onClick={() => {
               dispatch(unsetAddReferenceMode());
+              dispatch(unsetEditReferenceMode());
               setSelectedTopicTitle(topic.title);
             }}
           >
@@ -87,21 +94,28 @@ const Reference: React.FC = () => {
         </div>
       </div>
 
-      <div className="reference-container">
+      <div className="reference-content-container">
         {addReferenceMode ? (
           <AddReference />
+        ) : editReferenceMode ? (
+          <EditTopic id={selectedTopic.id}/>
         ) : (
           <div className="reference-content-container">
             <div className="reference-title-container">
               <h1>{selectedTopic?.title}</h1>
-              <div
-                className="delete-topic-button"
+              <i
+                className="ri-edit-line"
                 onClick={() => {
+                  dispatch(setEditReferenceMode());
+                }}
+              ></i>
+              <i
+                className="ri-delete-bin-7-line"
+                onClick={(e) => {
+                  e.stopPropagation();
                   handleShowDeleteConfirmation(selectedTopic.title);
                 }}
-              >
-                Delete
-              </div>
+              ></i>
             </div>
             <div
               className="reference-content"
@@ -115,9 +129,7 @@ const Reference: React.FC = () => {
           noteTitle={selectedTopic?.title}
           onClose={handleCloseDeleteConfirmation}
           onConfirm={() => {
-            dispatch<any>(
-              referenceThunks.deleteTopic(selectedTopic?.id)
-            );
+            dispatch<any>(referenceThunks.deleteTopic(selectedTopic?.id));
             handleCloseDeleteConfirmation();
           }}
         />
