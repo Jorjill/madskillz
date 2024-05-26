@@ -11,7 +11,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
     onConfirm,
     noteTitle,
   }) => (
-    <div className="modal">
+    <div className="delete-modal">
       <div className="modal-content">
         <span className="close-button" onClick={onClose}>&times;</span>
         <div className="modal-header">

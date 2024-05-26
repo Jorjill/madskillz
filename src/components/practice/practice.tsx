@@ -2,13 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./practice.less";
 import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
-import { choosePage } from "../../slices/pageSlice";
 import {
   practiceThunks,
   selectRandomGeneralQuestionBySkill,
   selectRandomPastQuestion,
   selectRandomSpecificQuestion,
 } from "../../slices/practiceSlice";
+import axios from "axios";
+import { GeneralAnswerModal } from "../general-answer-modal/general-answer-modal";
 
 export const Practice: React.FC = () => {
   const dispatch = useDispatch();
@@ -21,19 +22,14 @@ export const Practice: React.FC = () => {
   const generalQuestions = useSelector(
     (state: any) => state.practice.generalQuestions
   );
-  const randomGeneralQuestion = useMemo(() => {
-    return selectRandomGeneralQuestionBySkill(
-      generalQuestions,
-      selectedSkillTitle
-    );
-  }, [generalQuestions, selectedSkillTitle]);
-
+  const [gptResponse, setGptResponse] = useState({ result: "", reason: "" });
+  const [showResponseModal, setShowResponseModal] = useState(false);
+  const [randomGeneralQuestion, setRandomGeneralQuestion] = useState(null);
   const randomSpecificQuestion = useSelector(selectRandomSpecificQuestion);
   const randomPastQuestion = useSelector(selectRandomPastQuestion);
-
+  
   useEffect(() => {
     dispatch<any>(practiceThunks.fetchGeneralQuestions());
-
     if (quillRef.current === null) {
       // Only instantiate Quill if quillRef.current is null
       quillRef.current = new Quill("#editor", {
@@ -50,11 +46,47 @@ export const Practice: React.FC = () => {
       quillRef.current.on("text-change", () => {
         if (quillRef.current) {
           // Check for null before accessing quillRef.current
-          setAnswerContent(quillRef.current.root.innerHTML);
+          const plainText = quillRef.current
+            .getText()
+            .replace(/<\/?[^>]+(>|$)/g, "")
+            .trim();
+          setAnswerContent(plainText);
         }
       });
     }
   }, []);
+
+  useMemo(() => {
+    setRandomGeneralQuestion(
+      selectRandomGeneralQuestionBySkill(generalQuestions, selectedSkillTitle)
+    );
+  }, [generalQuestions, selectedSkillTitle]);
+
+  const handleNextButton = () => {
+    if (gptResponse.result === "PASS") {
+      const randomQuestion = selectRandomGeneralQuestionBySkill(
+        generalQuestions,
+        selectedSkillTitle
+      );
+      quillRef.current?.setText("");
+      setAnswerContent("");
+      setRandomGeneralQuestion(randomQuestion);
+    }
+    setShowResponseModal(false);
+  };
+
+  const submitAnswer = async () => {
+    const res = await axios.post(
+      "http://localhost:3000/general-question/answer",
+      {
+        question: randomGeneralQuestion?.question,
+        answer: randomGeneralQuestion?.answer,
+        providedAnswer: answerContent,
+      }
+    );
+    setGptResponse(res.data);
+    setShowResponseModal(true);
+  };
 
   return (
     <div className="practice-container">
@@ -72,12 +104,18 @@ export const Practice: React.FC = () => {
         <div
           className="submit-button"
           onClick={() => {
-            dispatch(choosePage("loading"));
+            submitAnswer();
           }}
         >
           Submit
         </div>
       </div>
+      {showResponseModal && (
+        <GeneralAnswerModal
+          onClose={handleNextButton}
+          gptResponse={gptResponse}
+        />
+      )}
     </div>
   );
 };

@@ -36,8 +36,16 @@ const practiceSlice = createSlice({
   },
 });
 
+let prevRandomIndex: any = null;
+
 const getRandomItem = (items: any) => {
-  const randomIndex = Math.floor(Math.random() * items.length);
+  if (items.length === 0) return null;
+
+  let randomIndex = Math.floor(Math.random() * items.length);
+  while (prevRandomIndex === randomIndex && items.length > 1) {
+    randomIndex = Math.floor(Math.random() * items.length);
+  }
+  prevRandomIndex = randomIndex;
   return items[randomIndex];
 };
 
@@ -65,12 +73,7 @@ export const selectRandomTestQuestion = (state: any) =>
 
 export const practiceThunks = {
   fetchGeneralQuestions: () => async (dispatch: any) => {
-    // Fetch general questions from an API
-    console.log("fetching general questions");
-
     const response = await axios.get("http://localhost:3000/general-question");
-    console.log(response.data);
-
     dispatch(practiceSlice.actions.addGeneralQuestions(response.data));
   },
 };
