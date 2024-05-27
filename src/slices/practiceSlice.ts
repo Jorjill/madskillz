@@ -48,17 +48,17 @@ const getRandomItem = (items: any) => {
     randomIndex = Math.floor(Math.random() * items.length);
   }
   prevRandomIndex = randomIndex;
-  console.log("returned random item: " + items[randomIndex].question);
   return items[randomIndex];
 };
 
 export const selectRandomQuestionBySkill = (questions: any, skill: string) => {
+  if(skill === "ALL"){
+    return getRandomItem(questions);
+  }
   const filteredQuestions = questions.filter(
     (question: any) => question.skill === skill
   );
   const randomItem = getRandomItem(filteredQuestions);
-  console.log("received random item: " + randomItem.question);
-  
   return randomItem;
 };
 

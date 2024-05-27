@@ -1,30 +1,12 @@
 import "./BoxGrid.less";
 import image1 from "../../assets/1.png";
-import image2 from "../../assets/2.png";
-import image3 from "../../assets/3.png";
-import image4 from "../../assets/4.png";
-import image5 from "../../assets/5.png";
-import image6 from "../../assets/6.png";
-import image7 from "../../assets/7.png";
-import image8 from "../../assets/8.png";
-import image9 from "../../assets/9.png";
-import image10 from "../../assets/10.png";
 import { selectSkill, skill, skillsThunks } from "../../slices/skillsSlice";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 
 const imageArray = [
-  image1,
-  image2,
-  image3,
-  image4,
-  image5,
-  image6,
-  image7,
-  image8,
-  image9,
-  image10,
+  image1
 ];
 
 interface BoxGridProps {
@@ -43,36 +25,24 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
 
   useEffect(() => {
     setTimeout(() => {
-        dispatch<any>(skillsThunks.fetchSkills());
+      dispatch<any>(skillsThunks.fetchSkills());
     }, 500);
-}, []);
+  }, [dispatch]);
 
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
     if (file) {
-      uploadFile(file);
-    }
-  };
-
-  const uploadFile = async (file: any) => {
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const response = await fetch("http://localhost:3000/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      setNewSkillImage(data.imageUrl);
-    } catch (error) {
-      console.error("Error uploading file:", error);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewSkillImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleAddSkill = () => {
     dispatch<any>(
-      skillsThunks.addSkill({ title: newSkillName, imageurl: "asdasd" })
+      skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage })
     );
     setNewSkillName("");
     setNewSkillImage("");
@@ -114,7 +84,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
               onClick={() => dispatch(selectSkill(item))}
             >
               <div className="box-image">
-                <img src={imageArray[index + 1]} alt={`Image ${index + 1}`} />
+                <img src={item.imageurl} alt={`Image ${index + 1}`} />
               </div>
               <div className="box-text">
                 <p>{item.title}</p>
