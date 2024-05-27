@@ -9,6 +9,7 @@ interface Topic {
   id?: string;
   title: string;
   content: string;
+  datetime: string;
 }
 
 interface Reference {
@@ -108,11 +109,14 @@ export const referenceThunks = {
     }
   },
   addTopic: (skill: string, topic: Topic) => async (dispatch: any) => {
+    console.log("Adding topic:", topic);
+    
     try {
       await axios.post(`http://localhost:3000/topics`, {
         title: topic.title,
         content: topic.content,
-        skill,
+        skill: skill,
+        datetime: topic.datetime,
       });
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {

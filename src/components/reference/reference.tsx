@@ -68,10 +68,16 @@ const Reference: React.FC = () => {
     fetchSkills();
   }, []);
 
+  const sortedTopics = topics?.slice().sort((a, b) => {
+    const dateA = new Date(a.datetime);
+    const dateB = new Date(b.datetime);
+    return dateB.getTime() - dateA.getTime();
+  });
+
   return (
     <div className="reference-container">
       <div className="sidebar-container">
-        {topics?.map((topic, index) => (
+        {sortedTopics?.map((topic, index) => (
           <div
             className="topic-title"
             key={index}

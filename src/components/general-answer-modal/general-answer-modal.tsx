@@ -1,17 +1,19 @@
 import "./general-answer-modal.less";
 
 interface DeleteModalProps {
+  onNext: () => void;
   onClose: () => void;
   gptResponse: any;
 }
 
 export const GeneralAnswerModal: React.FC<DeleteModalProps> = ({
+  onNext,
   onClose,
   gptResponse,
 }) => (
   <div className="general-answer-modal">
     <div className="modal-content">
-      <span className="close-button" onClick={onClose}>
+      <span className="close-button" onClick={onNext}>
         &times;
       </span>
       <div className="modal-header">
@@ -25,7 +27,6 @@ export const GeneralAnswerModal: React.FC<DeleteModalProps> = ({
         <button
           className="modal-button cancel"
           onClick={() => {
-            console.log("confirm");
             onClose();
           }}
         >

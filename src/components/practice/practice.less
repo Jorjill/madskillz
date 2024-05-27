@@ -12,8 +12,15 @@
 .practice-container {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   animation: fadeInUp 0.5s ease-out;
+  color: #eeeeee;
+
+  .practice-question{
+    margin-bottom: 30px;
+  }
 
   .practice {
     display: flex;
@@ -21,33 +28,69 @@
     align-items: center;
     flex-direction: column;
     color: #eeeeee;
+    width: 100%;
 
-    h1 {
-      margin-bottom: 30px;
-    }
-
-    #editor {
-      background-color: #eeeeee;
-      color: black;
-      border-radius: 5px;
-    }
-
-    .submit-button {
-      background-color: #eeeeee;
-      border-radius: 5px;
-      color: black;
+    .editor-and-buttons {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      width: 50%;
       justify-content: center;
-      margin-top: 10px;
-      margin-left: auto;
-      font-size: 15px;
-      padding: 10px;
-    }
+      align-items: center;
 
-    .submit-button:hover {
-      background-color: #c9c9c9;
-      cursor: pointer;
+      .ql-toolbar {
+        border-radius: 5px;
+        display: flex;
+        width: 40%;
+        justify-content: center;
+      }
+
+      #editor {
+        background-color: #eeeeee;
+        color: black;
+        border-radius: 5px;
+        margin-bottom: 30px;
+        width: 100%;
+      }
+
+      .skip-submit-buttons {
+        display: flex;
+        flex-direction: row;
+        margin-left: auto;
+
+        .skip-button {
+          background-color: #eeeeee;
+          border-radius: 5px;
+          color: black;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: auto;
+          font-size: 15px;
+          padding: 10px;
+        }
+
+        .skip-button:hover {
+          background-color: #c9c9c9;
+          cursor: pointer;
+        }
+
+        .submit-button {
+          background-color: #eeeeee;
+          border-radius: 5px;
+          color: black;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: 10px;
+          font-size: 15px;
+          padding: 10px;
+        }
+
+        .submit-button:hover {
+          background-color: #c9c9c9;
+          cursor: pointer;
+        }
+      }
     }
   }
 }

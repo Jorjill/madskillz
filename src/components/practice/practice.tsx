@@ -27,7 +27,7 @@ export const Practice: React.FC = () => {
   const [randomGeneralQuestion, setRandomGeneralQuestion] = useState(null);
   const randomSpecificQuestion = useSelector(selectRandomSpecificQuestion);
   const randomPastQuestion = useSelector(selectRandomPastQuestion);
-  
+
   useEffect(() => {
     dispatch<any>(practiceThunks.fetchGeneralQuestions());
     if (quillRef.current === null) {
@@ -62,6 +62,16 @@ export const Practice: React.FC = () => {
     );
   }, [generalQuestions, selectedSkillTitle]);
 
+  const handleSkipButton = () => {
+    const randomQuestion = selectRandomGeneralQuestionBySkill(
+      generalQuestions,
+      selectedSkillTitle
+    );
+    quillRef.current?.setText("");
+    setAnswerContent("");
+    setRandomGeneralQuestion(randomQuestion);
+  };
+
   const handleNextButton = () => {
     if (gptResponse.result === "PASS") {
       const randomQuestion = selectRandomGeneralQuestionBySkill(
@@ -72,6 +82,10 @@ export const Practice: React.FC = () => {
       setAnswerContent("");
       setRandomGeneralQuestion(randomQuestion);
     }
+    setShowResponseModal(false);
+  };
+
+  const handleCloseButton = () => {
     setShowResponseModal(false);
   };
 
@@ -90,7 +104,7 @@ export const Practice: React.FC = () => {
 
   return (
     <div className="practice-container">
-      <div className="practice">
+      <div className="practice-question">
         {practiceMode === "general" ? (
           <h1>{randomGeneralQuestion?.question}</h1>
         ) : practiceMode === "specific" ? (
@@ -100,19 +114,34 @@ export const Practice: React.FC = () => {
         ) : (
           <div></div>
         )}
-        <div id="editor" style={{ height: "500px" }}></div>{" "}
-        <div
-          className="submit-button"
-          onClick={() => {
-            submitAnswer();
-          }}
-        >
-          Submit
+      </div>
+      <div className="practice">
+        <div className="editor-and-buttons">
+          <div id="editor" style={{ height: "500px" }}></div>
+          <div className="skip-submit-buttons">
+            <div
+              className="skip-button"
+              onClick={() => {
+                handleSkipButton();
+              }}
+            >
+              Skip
+            </div>
+            <div
+              className="submit-button"
+              onClick={() => {
+                submitAnswer();
+              }}
+            >
+              Submit
+            </div>
+          </div>
         </div>
       </div>
       {showResponseModal && (
         <GeneralAnswerModal
-          onClose={handleNextButton}
+          onNext={handleNextButton}
+          onClose={handleCloseButton}
           gptResponse={gptResponse}
         />
       )}

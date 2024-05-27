@@ -60,6 +60,7 @@ export const AddReference: React.FC = () => {
               referenceThunks.addTopic(selectedSkill, {
                 title: refTitle,
                 content: refContent,
+                datetime: new Date().toISOString(),
               })
             );
             setRefTitle("");
