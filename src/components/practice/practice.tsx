@@ -25,6 +25,7 @@ export const Practice: React.FC = () => {
   const specificQuestions = useSelector(
     (state: any) => state.practice.specificQuestions
   );
+  const pastQuestions = useSelector((state: any) => state.practice.pastQuestions);
   const [gptResponse, setGptResponse] = useState({ result: "", reason: "" });
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [randomQuestion, setRandomQuestion] = useState(null);
@@ -65,6 +66,10 @@ export const Practice: React.FC = () => {
     } else if (practiceMode === "specific") {
       setRandomQuestion(
         selectRandomQuestionBySkill(specificQuestions, selectedSkillTitle)
+      );
+    } else if (practiceMode === "past") {
+      setRandomQuestion(
+        selectRandomQuestionBySkill(pastQuestions, selectedSkillTitle)
       );
     }
   };

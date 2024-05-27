@@ -33,6 +33,9 @@ const practiceSlice = createSlice({
     addSpecificQuestions: (state, actions) => {
       state.specificQuestions = actions.payload;
     },
+    addPastQuestions: (state, actions) => {
+      state.pastQuestions = actions.payload;
+    },
     chooseMode: (state, actions) => {
       state.practiceMode = actions.payload;
     },
@@ -84,6 +87,10 @@ export const practiceThunks = {
       "http://localhost:3000/specific-question"
     );
     dispatch(practiceSlice.actions.addSpecificQuestions(specificresponse.data));
+    const pastresponse = await axios.get(
+      "http://localhost:3000/experience-question"
+    );
+    dispatch(practiceSlice.actions.addPastQuestions(pastresponse.data));
   },
 };
 
