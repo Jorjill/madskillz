@@ -4,8 +4,8 @@ import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
 import {
   practiceThunks,
-  selectRandomGeneralQuestionBySkill,
   selectRandomPastQuestion,
+  selectRandomQuestionBySkill,
   selectRandomSpecificQuestion,
 } from "../../slices/practiceSlice";
 import axios from "axios";
@@ -22,14 +22,15 @@ export const Practice: React.FC = () => {
   const generalQuestions = useSelector(
     (state: any) => state.practice.generalQuestions
   );
+  const specificQuestions = useSelector(
+    (state: any) => state.practice.specificQuestions
+  );
   const [gptResponse, setGptResponse] = useState({ result: "", reason: "" });
   const [showResponseModal, setShowResponseModal] = useState(false);
-  const [randomGeneralQuestion, setRandomGeneralQuestion] = useState(null);
-  const randomSpecificQuestion = useSelector(selectRandomSpecificQuestion);
-  const randomPastQuestion = useSelector(selectRandomPastQuestion);
+  const [randomQuestion, setRandomQuestion] = useState(null);
 
   useEffect(() => {
-    dispatch<any>(practiceThunks.fetchGeneralQuestions());
+    dispatch<any>(practiceThunks.fetchQuestions());
     if (quillRef.current === null) {
       // Only instantiate Quill if quillRef.current is null
       quillRef.current = new Quill("#editor", {
@@ -56,31 +57,37 @@ export const Practice: React.FC = () => {
     }
   }, []);
 
+  const selectNewRandomQuestion = () => {
+    if (practiceMode === "general") {
+      setRandomQuestion(
+        selectRandomQuestionBySkill(generalQuestions, selectedSkillTitle)
+      );
+    } else if (practiceMode === "specific") {
+      setRandomQuestion(
+        selectRandomQuestionBySkill(specificQuestions, selectedSkillTitle)
+      );
+    }
+  };
+
+  useEffect(() => {
+    selectNewRandomQuestion();
+  }, [practiceMode]);
+
   useMemo(() => {
-    setRandomGeneralQuestion(
-      selectRandomGeneralQuestionBySkill(generalQuestions, selectedSkillTitle)
-    );
+    selectNewRandomQuestion();
   }, [generalQuestions, selectedSkillTitle]);
 
   const handleSkipButton = () => {
-    const randomQuestion = selectRandomGeneralQuestionBySkill(
-      generalQuestions,
-      selectedSkillTitle
-    );
+    selectNewRandomQuestion();
     quillRef.current?.setText("");
     setAnswerContent("");
-    setRandomGeneralQuestion(randomQuestion);
   };
 
   const handleNextButton = () => {
     if (gptResponse.result === "PASS") {
-      const randomQuestion = selectRandomGeneralQuestionBySkill(
-        generalQuestions,
-        selectedSkillTitle
-      );
+      selectNewRandomQuestion();
       quillRef.current?.setText("");
       setAnswerContent("");
-      setRandomGeneralQuestion(randomQuestion);
     }
     setShowResponseModal(false);
   };
@@ -93,8 +100,8 @@ export const Practice: React.FC = () => {
     const res = await axios.post(
       "http://localhost:3000/general-question/answer",
       {
-        question: randomGeneralQuestion?.question,
-        answer: randomGeneralQuestion?.answer,
+        question: randomQuestion?.question,
+        answer: randomQuestion?.answer,
         providedAnswer: answerContent,
       }
     );
@@ -105,15 +112,7 @@ export const Practice: React.FC = () => {
   return (
     <div className="practice-container">
       <div className="practice-question">
-        {practiceMode === "general" ? (
-          <h1>{randomGeneralQuestion?.question}</h1>
-        ) : practiceMode === "specific" ? (
-          <h1>{randomSpecificQuestion}</h1>
-        ) : practiceMode === "past" ? (
-          <h1>{randomPastQuestion}</h1>
-        ) : (
-          <div></div>
-        )}
+        <h1>{randomQuestion?.question}</h1>
       </div>
       <div className="practice">
         <div className="editor-and-buttons">

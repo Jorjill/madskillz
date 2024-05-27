@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-interface generalQuestion {
+interface Question {
   question: String;
   answer: String;
   skill: String;
@@ -9,18 +9,18 @@ interface generalQuestion {
 
 interface practiceState {
   practiceMode: String;
-  generalQuestions: generalQuestion[];
-  specificQuestions: String[];
-  pastQuestions: String[];
-  testQuestions: String[];
+  generalQuestions: Question[];
+  specificQuestions: Question[];
+  pastQuestions: Question[];
+  testQuestions: Question[];
 }
 
 const initialState: practiceState = {
   practiceMode: "general",
   generalQuestions: [],
-  specificQuestions: ["specific 1", "specific 2", "specific 3"],
-  pastQuestions: ["past 1", "past 2", "past 3"],
-  testQuestions: ["test 1", "test 2", "test 3"],
+  specificQuestions: [],
+  pastQuestions: [],
+  testQuestions: [],
 };
 
 const practiceSlice = createSlice({
@@ -29,6 +29,9 @@ const practiceSlice = createSlice({
   reducers: {
     addGeneralQuestions: (state, actions) => {
       state.generalQuestions = actions.payload;
+    },
+    addSpecificQuestions: (state, actions) => {
+      state.specificQuestions = actions.payload;
     },
     chooseMode: (state, actions) => {
       state.practiceMode = actions.payload;
@@ -40,23 +43,23 @@ let prevRandomIndex: any = null;
 
 const getRandomItem = (items: any) => {
   if (items.length === 0) return null;
-
   let randomIndex = Math.floor(Math.random() * items.length);
   while (prevRandomIndex === randomIndex && items.length > 1) {
     randomIndex = Math.floor(Math.random() * items.length);
   }
   prevRandomIndex = randomIndex;
+  console.log("returned random item: " + items[randomIndex].question);
   return items[randomIndex];
 };
 
-export const selectRandomGeneralQuestionBySkill = (
-  questions: any,
-  skill: string
-) => {
+export const selectRandomQuestionBySkill = (questions: any, skill: string) => {
   const filteredQuestions = questions.filter(
     (question: any) => question.skill === skill
   );
-  return getRandomItem(filteredQuestions);
+  const randomItem = getRandomItem(filteredQuestions);
+  console.log("received random item: " + randomItem.question);
+  
+  return randomItem;
 };
 
 export const selectRandomGeneralQuestion = (state: any) =>
@@ -72,9 +75,15 @@ export const selectRandomTestQuestion = (state: any) =>
   getRandomItem(state.practice.testQuestions);
 
 export const practiceThunks = {
-  fetchGeneralQuestions: () => async (dispatch: any) => {
-    const response = await axios.get("http://localhost:3000/general-question");
-    dispatch(practiceSlice.actions.addGeneralQuestions(response.data));
+  fetchQuestions: () => async (dispatch: any) => {
+    const generalresponse = await axios.get(
+      "http://localhost:3000/general-question"
+    );
+    dispatch(practiceSlice.actions.addGeneralQuestions(generalresponse.data));
+    const specificresponse = await axios.get(
+      "http://localhost:3000/specific-question"
+    );
+    dispatch(practiceSlice.actions.addSpecificQuestions(specificresponse.data));
   },
 };
 

@@ -13,7 +13,7 @@ export const GeneralAnswerModal: React.FC<DeleteModalProps> = ({
 }) => (
   <div className="general-answer-modal">
     <div className="modal-content">
-      <span className="close-button" onClick={onNext}>
+      <span className="close-button" onClick={onClose}>
         &times;
       </span>
       <div className="modal-header">
@@ -27,7 +27,7 @@ export const GeneralAnswerModal: React.FC<DeleteModalProps> = ({
         <button
           className="modal-button cancel"
           onClick={() => {
-            onClose();
+            onNext();
           }}
         >
           Next
