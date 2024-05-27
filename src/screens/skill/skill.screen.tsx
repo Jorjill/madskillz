@@ -17,7 +17,10 @@ import { LoadingScreen } from "../../components/loading/loading";
 import { Test } from "../../components/test/test";
 import { Results } from "../../components/results/results";
 import { skillsThunks } from "../../slices/skillsSlice";
-import { unsetAddReferenceMode, unsetEditReferenceMode } from "../../slices/referenceSlice";
+import {
+  unsetAddReferenceMode,
+  unsetEditReferenceMode,
+} from "../../slices/referenceSlice";
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -104,7 +107,6 @@ export const SkillScreen = () => {
                     dispatch(deselectNote());
                     dispatch(deselectAddNoteMode());
                     dispatch(deselectEditNoteMode());
-  
                   }}
                 >
                   Practice

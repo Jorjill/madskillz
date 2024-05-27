@@ -1,5 +1,6 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 
 export interface note {
   id?: string;
@@ -103,7 +104,16 @@ export const {
 export const notesThunks = {
   fetchNotes: () => async (dispatch: any) => {
     try {
-      const response = await axios.get("http://localhost:3000/notes");
+      const idToken = localStorage.getItem("idToken");
+      if (!idToken) {
+        console.error("No token found. User might not be authenticated.");
+        return;
+      }
+      const response = await axios.get("http://localhost:3000/notes", {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
       dispatch(addNotes(response.data));
     } catch (error) {
       console.error("Failed to fetch notes:", error);
@@ -117,7 +127,7 @@ export const notesThunks = {
       console.error("Failed to create note:", error);
     }
   },
-  deleteNote: (id: string | undefined) => async (dispatch: any) => { 
+  deleteNote: (id: string | undefined) => async (dispatch: any) => {
     try {
       await axios.delete(`http://localhost:3000/notes/${id}`);
       dispatch(notesThunks.fetchNotes());
@@ -127,13 +137,15 @@ export const notesThunks = {
   },
   updateNote: (updatedNote: note) => async (dispatch: any) => {
     try {
-      await axios.put(`http://localhost:3000/notes/${updatedNote.id}`, updatedNote);
+      await axios.put(
+        `http://localhost:3000/notes/${updatedNote.id}`,
+        updatedNote
+      );
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to update note:", error);
     }
   },
-
 };
 
 export default notesSlice.reducer;

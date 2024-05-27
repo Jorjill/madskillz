@@ -1,13 +1,13 @@
 import "./BoxGrid.less";
 import image1 from "../../assets/1.png";
 import { selectSkill, skill, skillsThunks } from "../../slices/skillsSlice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebaseConfig";
 
-const imageArray = [
-  image1
-];
+const imageArray = [image1];
 
 interface BoxGridProps {
   itemList: skill[];
@@ -15,6 +15,7 @@ interface BoxGridProps {
 
 export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [searchSkill, setSearchSkill] = useState("");
   const searchedSkills = itemList.filter((skill) =>
     skill.title.toLowerCase().includes(searchSkill.toLowerCase())
@@ -28,6 +29,11 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
       dispatch<any>(skillsThunks.fetchSkills());
     }, 500);
   }, [dispatch]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate("/login");
+  };
 
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
@@ -51,6 +57,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
 
   return (
     <div className="box-grid">
+      <button onClick={handleLogout}>Logout</button>
       <div className="input-box-container">
         <input
           className="input-box"
