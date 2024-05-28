@@ -4,6 +4,7 @@ import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
 import {
   referenceThunks,
+  selectReferenceBySkill,
   unsetAddReferenceMode,
 } from "../../slices/referenceSlice";
 
@@ -15,7 +16,10 @@ export const AddReference: React.FC = () => {
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
-
+// @ts-ignore
+  const selectedReference = useSelector((state) =>
+    selectReferenceBySkill(state, selectedSkill)
+  );
   useEffect(() => {
     if (quillRef.current === null) {
       quillRef.current = new Quill("#editor", {

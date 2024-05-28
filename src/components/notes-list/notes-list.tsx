@@ -16,8 +16,8 @@ export const NotesList: React.FC = () => {
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
-  const reactNotes = useSelector(() =>
-    selectNotesBySkill(selectedSkill)
+  const reactNotes = useSelector((state) =>
+    selectNotesBySkill(state, selectedSkill)
   );
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] =

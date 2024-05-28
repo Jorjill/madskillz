@@ -23,8 +23,8 @@ export const EditNote: React.FC = () => {
   const selectedNoteTitle = useSelector(
     (state: any) => state.notes.selectedNoteTitle
   );
-  const note = useSelector(() =>
-    selectNoteByTitle(selectedNoteTitle)
+  const note = useSelector((state) =>
+    selectNoteByTitle(state, selectedNoteTitle)
   );
 
   const [noteTitle, setNoteTitle] = useState(note?.notes_title || "");

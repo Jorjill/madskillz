@@ -75,12 +75,14 @@ const notesSlice = createSlice({
 export const selectNotes = (state: { notes: notesState }) => state.notes.notes;
 
 export const selectNoteByTitle = createSelector(
-  [selectNotes, (title: string | undefined) => title],
+  // @ts-ignore
+  [selectNotes, (state, title: string | undefined) => title],
   (notes, title) => notes.find((note) => note.notes_title === title)
 );
 
 export const selectNotesBySkill = createSelector(
-  [selectNotes, (noteSkill: string) => noteSkill],
+  // @ts-ignore
+  [selectNotes, (state, noteSkill: string) => noteSkill],
   (notes, noteSkill) => {
     if (noteSkill == "ALL") {
       return notes;
