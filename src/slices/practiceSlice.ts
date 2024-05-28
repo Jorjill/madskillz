@@ -55,7 +55,7 @@ const getRandomItem = (items: any) => {
 };
 
 export const selectRandomQuestionBySkill = (questions: any, skill: string) => {
-  if(skill === "ALL"){
+  if (skill === "ALL") {
     return getRandomItem(questions);
   }
   const filteredQuestions = questions.filter(
@@ -77,20 +77,42 @@ export const selectRandomPastQuestion = (state: any) =>
 export const selectRandomTestQuestion = (state: any) =>
   getRandomItem(state.practice.testQuestions);
 
+const getAuthHeaders = () => {
+  const idToken = localStorage.getItem("idToken");
+  if (!idToken) {
+    throw new Error("No token found. User might not be authenticated.");
+  }
+  return {
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  };
+};
+
 export const practiceThunks = {
   fetchQuestions: () => async (dispatch: any) => {
     const generalresponse = await axios.get(
-      "http://localhost:3000/general-question"
+      `${import.meta.env.VITE_API_URL}/general-question`,
+      getAuthHeaders()
     );
     dispatch(practiceSlice.actions.addGeneralQuestions(generalresponse.data));
     const specificresponse = await axios.get(
-      "http://localhost:3000/specific-question"
+      `${import.meta.env.VITE_API_URL}/specific-question`,
+      getAuthHeaders()
     );
     dispatch(practiceSlice.actions.addSpecificQuestions(specificresponse.data));
     const pastresponse = await axios.get(
-      "http://localhost:3000/experience-question"
+      `${import.meta.env.VITE_API_URL}/experience-question`,
+      getAuthHeaders()
     );
     dispatch(practiceSlice.actions.addPastQuestions(pastresponse.data));
+  },
+  deleteGeneralQuestion: (question: any) => async (dispatch: any) => {
+    await axios.delete(
+      `${import.meta.env.VITE_API_URL}/general-question/${question.id}`,
+      getAuthHeaders()
+    );
+    dispatch(practiceThunks.fetchQuestions());
   },
 };
 

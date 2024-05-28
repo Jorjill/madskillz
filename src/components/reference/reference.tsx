@@ -49,16 +49,29 @@ const Reference: React.FC = () => {
     setNoteToDelete(title);
   };
 
+  const getAuthHeaders = () => {
+    const idToken = localStorage.getItem("idToken");
+    if (!idToken) {
+      throw new Error("No token found. User might not be authenticated.");
+    }
+    return {
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+      },
+    };
+  };
+
   useEffect(() => {
     const fetchSkills = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/references/by-name/${selectedSkill}`
+          `http://localhost:3000/references/by-name/${selectedSkill}`,
+          getAuthHeaders()
         );
         if (response.data.length < 1) {
           axios.post(`http://localhost:3000/references`, {
             skill: selectedSkill,
-          });
+          }, getAuthHeaders());
         }
         dispatch<any>(referenceThunks.fetchReferences());
       } catch (error) {
@@ -104,7 +117,7 @@ const Reference: React.FC = () => {
         {addReferenceMode ? (
           <AddReference />
         ) : editReferenceMode ? (
-          <EditTopic id={selectedTopic.id}/>
+          <EditTopic id={selectedTopic.id} />
         ) : (
           <div className="reference-content-container">
             <div className="reference-title-container">

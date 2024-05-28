@@ -99,10 +99,25 @@ export const {
   unsetEditReferenceMode,
 } = referenceSlice.actions;
 
+const getAuthHeaders = () => {
+  const idToken = localStorage.getItem("idToken");
+  if (!idToken) {
+    throw new Error("No token found. User might not be authenticated.");
+  }
+  return {
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  };
+};
+
 export const referenceThunks = {
   fetchReferences: () => async (dispatch: any) => {
     try {
-      const response = await axios.get("http://localhost:3000/references");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/references`,
+        getAuthHeaders()
+      );
       dispatch(addReferences(response.data));
     } catch (error) {
       console.error("Failed to fetch references:", error);
@@ -110,14 +125,18 @@ export const referenceThunks = {
   },
   addTopic: (skill: string, topic: Topic) => async (dispatch: any) => {
     console.log("Adding topic:", topic);
-    
+
     try {
-      await axios.post(`http://localhost:3000/topics`, {
-        title: topic.title,
-        content: topic.content,
-        skill: skill,
-        datetime: topic.datetime,
-      });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/topics`,
+        {
+          title: topic.title,
+          content: topic.content,
+          skill: skill,
+          datetime: topic.datetime,
+        },
+        getAuthHeaders()
+      );
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
       console.error("Failed to add topic:", error);
@@ -125,9 +144,13 @@ export const referenceThunks = {
   },
   addReference: (reference: Reference) => async (dispatch: any) => {
     try {
-      await axios.post(`http://localhost:3000/references`, {
-        skill: reference.skill,
-      });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/references`,
+        {
+          skill: reference.skill,
+        },
+        getAuthHeaders()
+      );
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
       console.error("Failed to add reference:", error);
@@ -135,7 +158,10 @@ export const referenceThunks = {
   },
   deleteTopic: (id: number) => async (dispatch: any) => {
     try {
-      await axios.delete(`http://localhost:3000/topics/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/topics/${id}`,
+        getAuthHeaders()
+      );
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
       console.error("Failed to delete topic:", error);
@@ -145,11 +171,15 @@ export const referenceThunks = {
     (id: number, title: string, content: string, skill: string) =>
     async (dispatch: any) => {
       try {
-        await axios.put(`http://localhost:3000/topics/${id}`, {
-          title: title,
-          content: content,
-          skill: skill,
-        });
+        await axios.put(
+          `${import.meta.env.VITE_API_URL}/topics/${id}`,
+          {
+            title: title,
+            content: content,
+            skill: skill,
+          },
+          getAuthHeaders()
+        );
         dispatch(referenceThunks.fetchReferences());
       } catch (error) {
         console.error("Failed to update topic:", error);

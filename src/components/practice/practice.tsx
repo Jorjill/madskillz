@@ -25,7 +25,9 @@ export const Practice: React.FC = () => {
   const specificQuestions = useSelector(
     (state: any) => state.practice.specificQuestions
   );
-  const pastQuestions = useSelector((state: any) => state.practice.pastQuestions);
+  const pastQuestions = useSelector(
+    (state: any) => state.practice.pastQuestions
+  );
   const [gptResponse, setGptResponse] = useState({ result: "", reason: "" });
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [randomQuestion, setRandomQuestion] = useState(null);
@@ -114,10 +116,20 @@ export const Practice: React.FC = () => {
     setShowResponseModal(true);
   };
 
+  const handleDeleteGeneralQuestion = () => {
+    dispatch<any>(practiceThunks.deleteGeneralQuestion(randomQuestion));
+  };
+
   return (
     <div className="practice-container">
       <div className="practice-question">
-        <h1>{randomQuestion?.question}</h1>
+        <h1>{randomQuestion?.question}</h1>{" "}
+        <i
+          className="ri-delete-bin-7-line"
+          onClick={() => {
+            handleDeleteGeneralQuestion();
+          }}
+        ></i>
       </div>
       <div className="practice">
         <div className="editor-and-buttons">

@@ -1,6 +1,5 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 
 export interface note {
   id?: string;
@@ -101,19 +100,25 @@ export const {
   deselectEditNoteMode,
 } = notesSlice.actions;
 
+const getAuthHeaders = () => {
+  const idToken = localStorage.getItem("idToken");
+  if (!idToken) {
+    throw new Error("No token found. User might not be authenticated.");
+  }
+  return {
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  };
+};
+
 export const notesThunks = {
   fetchNotes: () => async (dispatch: any) => {
     try {
-      const idToken = localStorage.getItem("idToken");
-      if (!idToken) {
-        console.error("No token found. User might not be authenticated.");
-        return;
-      }
-      const response = await axios.get("http://localhost:3000/notes", {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/notes`,
+        getAuthHeaders()
+      );
       dispatch(addNotes(response.data));
     } catch (error) {
       console.error("Failed to fetch notes:", error);
@@ -121,7 +126,11 @@ export const notesThunks = {
   },
   createNote: (newNote: note) => async (dispatch: any) => {
     try {
-      await axios.post("http://localhost:3000/notes", newNote);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/notes`,
+        newNote,
+        getAuthHeaders()
+      );
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to create note:", error);
@@ -129,7 +138,7 @@ export const notesThunks = {
   },
   deleteNote: (id: string | undefined) => async (dispatch: any) => {
     try {
-      await axios.delete(`http://localhost:3000/notes/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/notes/${id}`, getAuthHeaders());
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to delete note:", error);
@@ -138,8 +147,9 @@ export const notesThunks = {
   updateNote: (updatedNote: note) => async (dispatch: any) => {
     try {
       await axios.put(
-        `http://localhost:3000/notes/${updatedNote.id}`,
-        updatedNote
+        `${import.meta.env.VITE_API_URL}/notes/${updatedNote.id}`,
+        updatedNote,
+        getAuthHeaders()
       );
       dispatch(notesThunks.fetchNotes());
     } catch (error) {

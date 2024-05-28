@@ -32,10 +32,25 @@ const skillsSlice = createSlice({
 
 export const skillsActions = skillsSlice.actions;
 
+const getAuthHeaders = () => {
+  const idToken = localStorage.getItem("idToken");
+  if (!idToken) {
+    throw new Error("No token found. User might not be authenticated.");
+  }
+  return {
+    headers: {
+      Authorization: `Bearer ${idToken}`,
+    },
+  };
+};
+
 export const skillsThunks = {
   fetchSkills: () => async (dispatch: any) => {
     try {
-      const response = await axios.get("http://localhost:3000/skills");
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/skills`,
+        getAuthHeaders()
+      );
       dispatch(skillsActions.addSkills(response.data));
     } catch (error) {
       console.error("Failed to fetch skills:", error);
@@ -43,7 +58,11 @@ export const skillsThunks = {
   },
   addSkill: (newSkill: skill) => async (dispatch: any) => {
     try {
-      await axios.post("http://localhost:3000/skills", newSkill);
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/skills`,
+        newSkill,
+        getAuthHeaders()
+      );
       dispatch(skillsThunks.fetchSkills());
     } catch (error) {
       console.error("Failed to add skill:", error);
@@ -51,7 +70,10 @@ export const skillsThunks = {
   },
   deleteSkill: (id: string) => async (dispatch: any) => {
     try {
-      await axios.delete(`http://localhost:3000/skills/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/skills/${id}`,
+        getAuthHeaders()
+      );
       dispatch(skillsThunks.fetchSkills());
     } catch (error) {
       console.error("Failed to delete skill:", error);
