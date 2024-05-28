@@ -103,7 +103,7 @@ export const Practice: React.FC = () => {
 
   const submitAnswer = async () => {
     const res = await axios.post(
-      "http://localhost:3000/general-question/answer",
+      `${import.meta.env.VITE_API_URL}/general-question/answer`,
       {
         question: randomQuestion?.question,
         answer: randomQuestion?.answer,

@@ -23,16 +23,7 @@ const initialState: notesState = {
   isNoteSelected: false,
   isAddNoteMode: false,
   isEditNoteMode: false,
-  notes: [
-    {
-      id: "1",
-      notes_title: "React",
-      content: "React is a JavaScript library for building user interfaces",
-      noteSkill: "React",
-      datetime: "2021-09-01T00:00:00.000Z",
-      tags: ["JavaScript", "Frontend"],
-    },
-  ],
+  notes: [],
 };
 
 const notesSlice = createSlice({

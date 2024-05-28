@@ -63,11 +63,11 @@ const Reference: React.FC = () => {
     const fetchSkills = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/references/by-name/${selectedSkill}`,
+          `${import.meta.env.VITE_API_URL}/references/by-name/${selectedSkill}`,
           getAuthHeaders()
         );
         if (response.data.length < 1) {
-          axios.post(`http://localhost:3000/references`, {
+          axios.post(`${import.meta.env.VITE_API_URL}/references`, {
             skill: selectedSkill,
           }, getAuthHeaders());
         }
