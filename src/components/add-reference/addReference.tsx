@@ -4,7 +4,6 @@ import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
 import {
   referenceThunks,
-  selectReferenceBySkill,
   unsetAddReferenceMode,
 } from "../../slices/referenceSlice";
 
@@ -15,9 +14,6 @@ export const AddReference: React.FC = () => {
   const dispatch = useDispatch();
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
-  );
-  const selectedReference = useSelector((state) =>
-    selectReferenceBySkill(state, selectedSkill)
   );
 
   useEffect(() => {

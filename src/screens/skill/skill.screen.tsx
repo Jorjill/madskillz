@@ -1,6 +1,6 @@
 import "./skill.screen.less";
 import { useDispatch, useSelector } from "react-redux";
-import notesSlice, {
+import {
   deselectNote,
   deselectAddNoteMode,
   deselectEditNoteMode,

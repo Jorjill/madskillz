@@ -7,7 +7,7 @@ import {
   selectNote,
   selectNotesBySkill,
 } from "../../slices/notesSlice";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DeleteModal } from "../modal/delete-modal";
 
 export const NotesList: React.FC = () => {
@@ -16,8 +16,8 @@ export const NotesList: React.FC = () => {
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
-  const reactNotes = useSelector((state) =>
-    selectNotesBySkill(state, selectedSkill)
+  const reactNotes = useSelector(() =>
+    selectNotesBySkill(selectedSkill)
   );
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] =

@@ -4,9 +4,7 @@ import Quill from "quill";
 import { useDispatch, useSelector } from "react-redux";
 import {
   practiceThunks,
-  selectRandomPastQuestion,
   selectRandomQuestionBySkill,
-  selectRandomSpecificQuestion,
 } from "../../slices/practiceSlice";
 import axios from "axios";
 import { GeneralAnswerModal } from "../general-answer-modal/general-answer-modal";
@@ -30,7 +28,7 @@ export const Practice: React.FC = () => {
   );
   const [gptResponse, setGptResponse] = useState({ result: "", reason: "" });
   const [showResponseModal, setShowResponseModal] = useState(false);
-  const [randomQuestion, setRandomQuestion] = useState(null);
+  const [randomQuestion, setRandomQuestion] = useState<any>(null);
 
   useEffect(() => {
     dispatch<any>(practiceThunks.fetchQuestions());

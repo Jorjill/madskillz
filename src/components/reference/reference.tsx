@@ -19,16 +19,15 @@ const Reference: React.FC = () => {
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
-  const selectedReference = useSelector((state) =>
+  const selectedReference: any = useSelector((state) =>
     selectReferenceBySkill(state, selectedSkill)
   );
   const [selectedTopicTitle, setSelectedTopicTitle] = useState(
     selectedReference?.topics[0]?.title
   );
-  const [noteToDelete, setNoteToDelete] = useState<string>("");
   const topics = selectedReference?.topics;
   const selectedTopic: any = topics?.find(
-    (topic) => topic.title === selectedTopicTitle
+    (topic: any) => topic.title === selectedTopicTitle
   );
   const dispatch = useDispatch();
   const addReferenceMode = useSelector(
@@ -44,9 +43,8 @@ const Reference: React.FC = () => {
     setShowDeleteConfirmation(false);
   };
 
-  const handleShowDeleteConfirmation = (title: string) => {
+  const handleShowDeleteConfirmation = () => {
     setShowDeleteConfirmation(true);
-    setNoteToDelete(title);
   };
 
   const getAuthHeaders = () => {
@@ -81,7 +79,7 @@ const Reference: React.FC = () => {
     fetchSkills();
   }, []);
 
-  const sortedTopics = topics?.slice().sort((a, b) => {
+  const sortedTopics = topics?.slice().sort((a: any, b: any) => {
     const dateA = new Date(a.datetime);
     const dateB = new Date(b.datetime);
     return dateB.getTime() - dateA.getTime();
@@ -90,7 +88,7 @@ const Reference: React.FC = () => {
   return (
     <div className="reference-container">
       <div className="sidebar-container">
-        {sortedTopics?.map((topic, index) => (
+        {sortedTopics?.map((topic: any, index: any) => (
           <div
             className="topic-title"
             key={index}
@@ -132,7 +130,7 @@ const Reference: React.FC = () => {
                 className="ri-delete-bin-7-line"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleShowDeleteConfirmation(selectedTopic.title);
+                  handleShowDeleteConfirmation();
                 }}
               ></i>
             </div>
