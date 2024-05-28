@@ -51,7 +51,7 @@ export const skillsThunks = {
         `${import.meta.env.VITE_API_URL}/skills`,
         getAuthHeaders()
       );
-      dispatch(skillsActions.addSkills(response.data));
+     // dispatch(skillsActions.addSkills(response.data));
     } catch (error) {
       console.error("Failed to fetch skills:", error);
     }
