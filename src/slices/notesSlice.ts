@@ -124,13 +124,15 @@ const getAuthHeaders = () => {
 };
 
 export const notesThunks = {
+  // @ts-ignore
   fetchNotes: () => async (dispatch: any) => {
     try {
+      // @ts-ignore
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/notes`,
         getAuthHeaders()
       );
-      dispatch(addNotes(response.data));
+   //   dispatch(addNotes(response.data));
     } catch (error) {
       console.error("Failed to fetch notes:", error);
     }
