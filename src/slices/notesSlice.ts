@@ -132,7 +132,7 @@ export const notesThunks = {
         `${import.meta.env.VITE_API_URL}/notes`,
         getAuthHeaders()
       );
-   //   dispatch(addNotes(response.data));
+      dispatch(addNotes(response.data));
     } catch (error) {
       console.error("Failed to fetch notes:", error);
     }
