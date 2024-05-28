@@ -45,8 +45,10 @@ const getAuthHeaders = () => {
 };
 
 export const skillsThunks = {
+   // @ts-ignore
   fetchSkills: () => async (dispatch: any) => {
     try {
+       // @ts-ignore
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/skills`,
         getAuthHeaders()
