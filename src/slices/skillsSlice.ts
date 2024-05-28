@@ -13,7 +13,7 @@ export interface skillsState {
 }
 
 const initialState: skillsState = {
-  skills: [],
+  skills: [{id:"2",title: "React", imageurl: ""}],
   selectedSkill: { id: "", title: "", imageurl: "" },
 };
 
