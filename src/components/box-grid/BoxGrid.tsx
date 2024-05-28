@@ -71,6 +71,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
         <Link to="/skills" key={0}>
           <div
             className="box"
+            style={{ animationDelay: `0s` }} // Add animation delay for the first box
             onClick={() =>
               dispatch(selectSkill({ title: "ALL", imageurl: "" }))
             }
@@ -87,7 +88,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
           <Link to="/skills" key={index + 1}>
             <div
               className="box"
-              style={{ animationDelay: `${0.04 * index}s` }} // Increment delay for each box
+              style={{ animationDelay: `${0.04 * (index + 1)}s` }} // Increment delay for each box, starting from the second box
               onClick={() => dispatch(selectSkill(item))}
             >
               <div className="box-image">
@@ -101,6 +102,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
         ))}
         <div
           className="box"
+          style={{ animationDelay: `${0.04 * (searchedSkills.length + 1)}s` }} // Add animation delay for the last box
           onClick={() => {
             setAddSkillModal(true);
           }}
