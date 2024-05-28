@@ -1,17 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useDispatch, useSelector } from "react-redux";
-import {
-  deselectEditNoteMode,
-  deselectNote,
-  notesThunks,
-  selectNoteByTitle,
-} from "../../slices/notesSlice";
 import "./edit-topic.less";
 import { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
-import { choosePage } from "../../slices/pageSlice";
 import {
   referenceThunks,
   selectReferenceBySkill,

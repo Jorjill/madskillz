@@ -75,12 +75,12 @@ const notesSlice = createSlice({
 export const selectNotes = (state: { notes: notesState }) => state.notes.notes;
 
 export const selectNoteByTitle = createSelector(
-  [selectNotes, (state, title: string | undefined) => title],
+  [selectNotes, (title: string | undefined) => title],
   (notes, title) => notes.find((note) => note.notes_title === title)
 );
 
 export const selectNotesBySkill = createSelector(
-  [selectNotes, (state, noteSkill: string) => noteSkill],
+  [selectNotes, (noteSkill: string) => noteSkill],
   (notes, noteSkill) => {
     if (noteSkill == "ALL") {
       return notes;
@@ -138,7 +138,10 @@ export const notesThunks = {
   },
   deleteNote: (id: string | undefined) => async (dispatch: any) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/notes/${id}`, getAuthHeaders());
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/notes/${id}`,
+        getAuthHeaders()
+      );
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to delete note:", error);

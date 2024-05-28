@@ -6,8 +6,8 @@ export const Note: React.FC = () => {
   const selectedNoteTitle = useSelector(
     (state: any) => state.notes.selectedNoteTitle
   );
-  const selectednote = useSelector((state) =>
-    selectNoteByTitle(state, selectedNoteTitle)
+  const selectednote = useSelector(() =>
+    selectNoteByTitle(selectedNoteTitle)
   );
   return (
     <div className="note-component">
