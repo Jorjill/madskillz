@@ -30,6 +30,18 @@ export const Practice: React.FC = () => {
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [randomQuestion, setRandomQuestion] = useState<any>(null);
 
+  const getAuthHeaders = () => {
+    const idToken = localStorage.getItem("idToken");
+    if (!idToken) {
+      throw new Error("No token found. User might not be authenticated.");
+    }
+    return {
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+      },
+    };
+  };
+
   useEffect(() => {
     dispatch<any>(practiceThunks.fetchQuestions());
     if (quillRef.current === null) {
@@ -108,7 +120,8 @@ export const Practice: React.FC = () => {
         question: randomQuestion?.question,
         answer: randomQuestion?.answer,
         providedAnswer: answerContent,
-      }
+      },
+      getAuthHeaders()
     );
     setGptResponse(res.data);
     setShowResponseModal(true);
