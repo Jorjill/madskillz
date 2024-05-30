@@ -47,14 +47,11 @@ const Login: React.FC = () => {
     }
   };
 
+  
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      const user = auth.currentUser;
-      if (user) {
-        await storeToken(user);
-      }
       navigate("/"); // Redirect to a protected route after successful login
     } catch (error: any) {
       setError(error.message);
