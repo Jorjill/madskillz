@@ -7,6 +7,8 @@ import {
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebaseConfig";
+import "./login.less";
+import img from  "../../assets/mskillz.png";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -60,31 +62,34 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p>{error}</p>}
-        <button type="submit">Login</button>
-      </form>
-      <button onClick={handleGoogleLogin}>Login with Google</button>
+    <div className="login-page">
+      <img src={img} alt="logo" />
+      <div className="login-container">
+        <h2>Login</h2>
+        <form onSubmit={handleLogin}>
+          <div>
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <p>{error}</p>}
+          <button type="submit">Login</button>
+        </form>
+        <button onClick={handleGoogleLogin}>Login with Google</button>
+      </div>
     </div>
   );
 };
