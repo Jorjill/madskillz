@@ -18,89 +18,103 @@
   animation: fadeInUp 0.5s ease-out;
   color: #eeeeee;
 
-  .practice-question {
+  .practice-question-container {
     display: flex;
-    margin-bottom: 30px;
-    align-items: center;
-    width: 50%;
-
-    h1 {
-      margin-left: auto;
-    }
-
-    .ri-delete-bin-7-line {
-      margin-left: auto;
-      cursor: pointer;
-    }
-  }
-
-  .practice {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
-    color: #eeeeee;
     width: 100%;
 
-    .editor-and-buttons {
+    .practice-question-and-bin {
       display: flex;
-      flex-direction: column;
-      width: 50%;
+      flex-direction: row;
+      margin-bottom: 30px;
+      width: 100%;
       justify-content: center;
       align-items: center;
 
-      .ql-toolbar {
-        border-radius: 5px;
-        display: flex;
-        width: 40%;
-        justify-content: center;
-      }
-
-      #editor {
-        background-color: #eeeeee;
-        color: black;
-        border-radius: 5px;
-        margin-bottom: 30px;
-        width: 100%;
-      }
-
-      .skip-submit-buttons {
-        display: flex;
-        flex-direction: row;
+      h1 {
+        height: 3vh;
         margin-left: auto;
+      }
 
-        .skip-button {
-          background-color: #eeeeee;
+      .ri-add-circle-line {
+        margin-left: auto;
+        cursor: pointer;
+      }
+
+      .ri-delete-bin-7-line {
+        margin-left: 2rem;
+        cursor: pointer;
+      }
+    }
+
+    .practice {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: #eeeeee;
+      width: 100%;
+
+      .editor-and-buttons {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+        justify-content: center;
+        align-items: center;
+
+        .ql-toolbar {
           border-radius: 5px;
-          color: black;
           display: flex;
-          align-items: center;
+          width: 40%;
           justify-content: center;
+        }
+
+        #editor {
+          background-color: #eeeeee;
+          color: black;
+          border-radius: 5px;
+          margin-bottom: 30px;
+          width: 100%;
+        }
+
+        .skip-submit-buttons {
+          display: flex;
+          flex-direction: row;
           margin-left: auto;
-          font-size: 15px;
-          padding: 10px;
-        }
 
-        .skip-button:hover {
-          background-color: #c9c9c9;
-          cursor: pointer;
-        }
+          .skip-button {
+            background-color: #eeeeee;
+            border-radius: 5px;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            font-size: 15px;
+            padding: 10px;
+          }
 
-        .submit-button {
-          background-color: #eeeeee;
-          border-radius: 5px;
-          color: black;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-left: 10px;
-          font-size: 15px;
-          padding: 10px;
-        }
+          .skip-button:hover {
+            background-color: #c9c9c9;
+            cursor: pointer;
+          }
 
-        .submit-button:hover {
-          background-color: #c9c9c9;
-          cursor: pointer;
+          .submit-button {
+            background-color: #eeeeee;
+            border-radius: 5px;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            font-size: 15px;
+            padding: 10px;
+          }
+
+          .submit-button:hover {
+            background-color: #c9c9c9;
+            cursor: pointer;
+          }
         }
       }
     }

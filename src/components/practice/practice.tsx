@@ -8,10 +8,12 @@ import {
 } from "../../slices/practiceSlice";
 import axios from "axios";
 import { GeneralAnswerModal } from "../general-answer-modal/general-answer-modal";
+import { AddQuestion } from "../add-question/add-question";
 
 export const Practice: React.FC = () => {
   const dispatch = useDispatch();
   const quillRef = useRef<Quill | null>(null);
+  const [addQuestionMode, setAddQuestionMode] = useState(false);
   const [answerContent, setAnswerContent] = useState("");
   const selectedSkillTitle = useSelector(
     (state: any) => state.skills.selectedSkill.title
@@ -44,30 +46,29 @@ export const Practice: React.FC = () => {
 
   useEffect(() => {
     dispatch<any>(practiceThunks.fetchQuestions());
-    if (quillRef.current === null) {
-      // Only instantiate Quill if quillRef.current is null
-      quillRef.current = new Quill("#editor", {
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, false] }],
-            ["bold", "italic", "underline"],
-            ["image", "code-block"],
-          ],
-        },
-      });
 
-      quillRef.current.on("text-change", () => {
-        if (quillRef.current) {
-          // Check for null before accessing quillRef.current
-          const plainText = quillRef.current
-            .getText()
-            .replace(/<\/?[^>]+(>|$)/g, "")
-            .trim();
-          setAnswerContent(plainText);
-        }
-      });
-    }
+    // Only instantiate Quill if quillRef.current is null
+    quillRef.current = new Quill("#editor", {
+      theme: "snow",
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, false] }],
+          ["bold", "italic", "underline"],
+          ["image", "code-block"],
+        ],
+      },
+    });
+
+    quillRef.current.on("text-change", () => {
+      if (quillRef.current) {
+        // Check for null before accessing quillRef.current
+        const plainText = quillRef.current
+          .getText()
+          .replace(/<\/?[^>]+(>|$)/g, "")
+          .trim();
+        setAnswerContent(plainText);
+      }
+    });
   }, []);
 
   const selectNewRandomQuestion = () => {
@@ -133,38 +134,54 @@ export const Practice: React.FC = () => {
 
   return (
     <div className="practice-container">
-      <div className="practice-question">
-        <h1>{randomQuestion?.question}</h1>{" "}
-        <i
-          className="ri-delete-bin-7-line"
-          onClick={() => {
-            handleDeleteGeneralQuestion();
-          }}
-        ></i>
-      </div>
-      <div className="practice">
-        <div className="editor-and-buttons">
-          <div id="editor" style={{ height: "500px" }}></div>
-          <div className="skip-submit-buttons">
-            <div
-              className="skip-button"
+      {addQuestionMode ? (
+        <div className="add-question-container">
+          <AddQuestion onClose={() => setAddQuestionMode(false)} />
+        </div>
+      ) : (
+        <div className="practice-question-container">
+          {" "}
+          <div className="practice-question-and-bin">
+            <h1>{randomQuestion?.question}</h1>{" "}
+            <i
+              className="ri-add-circle-line"
               onClick={() => {
-                handleSkipButton();
+                setAddQuestionMode(true);
               }}
-            >
-              Skip
-            </div>
-            <div
-              className="submit-button"
+            ></i>
+            <i
+              className="ri-delete-bin-7-line"
               onClick={() => {
-                submitAnswer();
+                handleDeleteGeneralQuestion();
               }}
-            >
-              Submit
+            ></i>
+          </div>
+          <div className="practice">
+            <div className="editor-and-buttons">
+              <div id="editor" style={{ height: "500px" }}></div>
+              <div className="skip-submit-buttons">
+                <div
+                  className="skip-button"
+                  onClick={() => {
+                    handleSkipButton();
+                  }}
+                >
+                  Skip
+                </div>
+                <div
+                  className="submit-button"
+                  onClick={() => {
+                    submitAnswer();
+                  }}
+                >
+                  Submit
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
+
       {showResponseModal && (
         <GeneralAnswerModal
           onNext={handleNextButton}
