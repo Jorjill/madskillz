@@ -12,7 +12,7 @@ export const AddQuestion: React.FC<AddQuestionProps> = ({ onClose }) => {
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
-  const [questionTitle, setQuestionTitle] = useState("");
+
   const [questionContent, setQuestionContent] = useState("");
   const [answer, setAnswer] = useState("");
 
@@ -24,9 +24,6 @@ export const AddQuestion: React.FC<AddQuestionProps> = ({ onClose }) => {
           placeholder="Question title"
           name=""
           id=""
-          onChange={(t) => {
-            setQuestionTitle(t.target.value);
-          }}
         />
         <p>Question:</p>
         <textarea
