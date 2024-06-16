@@ -114,14 +114,26 @@ export const practiceThunks = {
     );
     dispatch(practiceThunks.fetchQuestions());
   },
-  createQuestion:
+  createGeneralQuestion:
     (question: string, answer: string, skill: string) =>
     async (dispatch: any) => {
       try {
-        console.log("skills is: "+skill);
-        
         await axios.post(
           `${import.meta.env.VITE_API_URL}/general-question`,
+          { question: question, answer: answer, skill: skill },
+          getAuthHeaders()
+        );
+        dispatch(practiceThunks.fetchQuestions());
+      } catch (error) {
+        console.error("Failed to create note:", error);
+      }
+    },
+  createSpecificQuestion:
+    (question: string, answer: string, skill: string) =>
+    async (dispatch: any) => {
+      try {
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/specific-question`,
           { question: question, answer: answer, skill: skill },
           getAuthHeaders()
         );

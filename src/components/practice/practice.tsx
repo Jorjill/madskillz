@@ -136,7 +136,7 @@ export const Practice: React.FC = () => {
     <div className="practice-container">
       {addQuestionMode ? (
         <div className="add-question-container">
-          <AddQuestion onClose={() => setAddQuestionMode(false)} />
+          <AddQuestion practiceMode={practiceMode} onClose={() => setAddQuestionMode(false)} />
         </div>
       ) : (
         <div className="practice-question-container">
