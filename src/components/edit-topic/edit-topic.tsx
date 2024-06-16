@@ -88,7 +88,8 @@ export const EditTopic: React.FC<EditTopicProps> = ({ id }) => {
                 selectedTopic?.id,
                 topicTitle,
                 topicContent,
-                selectedSkill
+                selectedSkill,
+                selectedTopic?.datetime
               )
             );
             dispatch(unsetEditReferenceMode());

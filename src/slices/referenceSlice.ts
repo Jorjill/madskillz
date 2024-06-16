@@ -168,7 +168,7 @@ export const referenceThunks = {
     }
   },
   updateTopic:
-    (id: number, title: string, content: string, skill: string) =>
+    (id: number, title: string, content: string, skill: string, datetime: string) =>
     async (dispatch: any) => {
       try {
         await axios.put(
@@ -177,6 +177,7 @@ export const referenceThunks = {
             title: title,
             content: content,
             skill: skill,
+            datetime: datetime,
           },
           getAuthHeaders()
         );
