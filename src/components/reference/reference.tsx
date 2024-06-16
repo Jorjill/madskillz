@@ -82,7 +82,7 @@ const Reference: React.FC = () => {
   const sortedTopics = topics?.slice().sort((a: any, b: any) => {
     const dateA = new Date(a.datetime);
     const dateB = new Date(b.datetime);
-    return dateB.getTime() - dateA.getTime();
+    return dateA.getTime() - dateB.getTime();
   });
 
   return (
