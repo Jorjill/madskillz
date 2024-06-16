@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import Editor from '@monaco-editor/react';
-import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { practiceThunks, selectRandomQuestionBySkill } from '../../slices/practiceSlice';
-import { AddQuestion } from '../add-question/add-question';
-import { GeneralAnswerModal } from '../general-answer-modal/general-answer-modal';
+import React, { useState, useEffect, useMemo } from "react";
+import Editor from "@monaco-editor/react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  practiceThunks,
+  selectRandomQuestionBySkill,
+} from "../../slices/practiceSlice";
+import { AddQuestion } from "../add-question/add-question";
+import { GeneralAnswerModal } from "../general-answer-modal/general-answer-modal";
 import "./practice.less";
 
 export const Practice: React.FC = () => {
@@ -24,7 +27,10 @@ export const Practice: React.FC = () => {
   const pastQuestions = useSelector(
     (state: any) => state.practice.pastQuestions
   );
-  const [gptResponse, setGptResponse] = useState<{ result: string, reason: string }>({ result: "", reason: "" });
+  const [gptResponse, setGptResponse] = useState<{
+    result: string;
+    reason: string;
+  }>({ result: "", reason: "" });
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [randomQuestion, setRandomQuestion] = useState<any>(null);
 
@@ -41,6 +47,7 @@ export const Practice: React.FC = () => {
   };
 
   const selectNewRandomQuestion = () => {
+    console.log("selectNewRandomQuestion");
     if (practiceMode === "general") {
       setRandomQuestion(
         selectRandomQuestionBySkill(generalQuestions, selectedSkillTitle)
@@ -61,12 +68,20 @@ export const Practice: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    selectNewRandomQuestion();
-  }, [practiceMode]);
-
-  useMemo(() => {
-    selectNewRandomQuestion();
-  }, [generalQuestions, selectedSkillTitle]);
+    if (
+      generalQuestions.length > 0 ||
+      specificQuestions.length > 0 ||
+      pastQuestions.length > 0
+    ) {
+      selectNewRandomQuestion();
+    }
+  }, [
+    practiceMode,
+    generalQuestions,
+    specificQuestions,
+    pastQuestions,
+    selectedSkillTitle,
+  ]);
 
   const handleSkipButton = () => {
     selectNewRandomQuestion();
@@ -117,7 +132,7 @@ export const Practice: React.FC = () => {
       ) : (
         <div className="practice-question-container">
           <div className="practice-question-and-bin">
-            <h1>{randomQuestion?.question}</h1>
+            <h1>{randomQuestion?.question || "Loading question..."}</h1>
             <i
               className="ri-add-circle-line"
               onClick={() => {
@@ -141,16 +156,10 @@ export const Practice: React.FC = () => {
                 theme="vs-dark"
               />
               <div className="skip-submit-buttons">
-                <div
-                  className="skip-button"
-                  onClick={handleSkipButton}
-                >
+                <div className="skip-button" onClick={handleSkipButton}>
                   Skip
                 </div>
-                <div
-                  className="submit-button"
-                  onClick={submitAnswer}
-                >
+                <div className="submit-button" onClick={submitAnswer}>
                   Submit
                 </div>
               </div>
