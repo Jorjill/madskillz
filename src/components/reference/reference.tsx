@@ -111,7 +111,7 @@ const Reference: React.FC = () => {
         </div>
       </div>
 
-      <div className="reference-content-container">
+      <div className="reference-content-right">
         {addReferenceMode ? (
           <AddReference />
         ) : editReferenceMode ? (
