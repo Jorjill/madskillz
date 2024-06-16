@@ -44,31 +44,43 @@ export const Practice: React.FC = () => {
     };
   };
 
+  const initializeQuill = () => {
+    if (quillRef.current === null) {
+      console.log("creating quill");
+      quillRef.current = new Quill("#editor", {
+        theme: "snow",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline"],
+            ["image", "code-block"],
+          ],
+        },
+      });
+
+      quillRef.current.on("text-change", () => {
+        if (quillRef.current) {
+          const plainText = quillRef.current
+            .getText()
+            .replace(/<\/?[^>]+(>|$)/g, "")
+            .trim();
+          setAnswerContent(plainText);
+        }
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!addQuestionMode) {
+      console.log("intializing quill");
+      initializeQuill();
+    }
+  }, [addQuestionMode]);
+
   useEffect(() => {
     dispatch<any>(practiceThunks.fetchQuestions());
 
-    // Only instantiate Quill if quillRef.current is null
-    quillRef.current = new Quill("#editor", {
-      theme: "snow",
-      modules: {
-        toolbar: [
-          [{ header: [1, 2, false] }],
-          ["bold", "italic", "underline"],
-          ["image", "code-block"],
-        ],
-      },
-    });
-
-    quillRef.current.on("text-change", () => {
-      if (quillRef.current) {
-        // Check for null before accessing quillRef.current
-        const plainText = quillRef.current
-          .getText()
-          .replace(/<\/?[^>]+(>|$)/g, "")
-          .trim();
-        setAnswerContent(plainText);
-      }
-    });
+    initializeQuill();
   }, []);
 
   const selectNewRandomQuestion = () => {
@@ -136,7 +148,13 @@ export const Practice: React.FC = () => {
     <div className="practice-container">
       {addQuestionMode ? (
         <div className="add-question-container">
-          <AddQuestion practiceMode={practiceMode} onClose={() => setAddQuestionMode(false)} />
+          <AddQuestion
+            practiceMode={practiceMode}
+            onClose={() => {
+              quillRef.current = null;
+              setAddQuestionMode(false);
+            }}
+          />
         </div>
       ) : (
         <div className="practice-question-container">
