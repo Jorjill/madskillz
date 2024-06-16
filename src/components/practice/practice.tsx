@@ -1,20 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useState, useEffect, useMemo } from 'react';
+import Editor from '@monaco-editor/react';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { practiceThunks, selectRandomQuestionBySkill } from '../../slices/practiceSlice';
+import { AddQuestion } from '../add-question/add-question';
+import { GeneralAnswerModal } from '../general-answer-modal/general-answer-modal';
 import "./practice.less";
-import Quill from "quill";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  practiceThunks,
-  selectRandomQuestionBySkill,
-} from "../../slices/practiceSlice";
-import axios from "axios";
-import { GeneralAnswerModal } from "../general-answer-modal/general-answer-modal";
-import { AddQuestion } from "../add-question/add-question";
 
 export const Practice: React.FC = () => {
   const dispatch = useDispatch();
-  const quillRef = useRef<Quill | null>(null);
   const [addQuestionMode, setAddQuestionMode] = useState(false);
-  const [answerContent, setAnswerContent] = useState("");
+  const [answerContent, setAnswerContent] = useState<string>("");
   const selectedSkillTitle = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
@@ -28,7 +24,7 @@ export const Practice: React.FC = () => {
   const pastQuestions = useSelector(
     (state: any) => state.practice.pastQuestions
   );
-  const [gptResponse, setGptResponse] = useState({ result: "", reason: "" });
+  const [gptResponse, setGptResponse] = useState<{ result: string, reason: string }>({ result: "", reason: "" });
   const [showResponseModal, setShowResponseModal] = useState(false);
   const [randomQuestion, setRandomQuestion] = useState<any>(null);
 
@@ -43,45 +39,6 @@ export const Practice: React.FC = () => {
       },
     };
   };
-
-  const initializeQuill = () => {
-    if (quillRef.current === null) {
-      console.log("creating quill");
-      quillRef.current = new Quill("#editor", {
-        theme: "snow",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, false] }],
-            ["bold", "italic", "underline"],
-            ["image", "code-block"],
-          ],
-        },
-      });
-
-      quillRef.current.on("text-change", () => {
-        if (quillRef.current) {
-          const plainText = quillRef.current
-            .getText()
-            .replace(/<\/?[^>]+(>|$)/g, "")
-            .trim();
-          setAnswerContent(plainText);
-        }
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (!addQuestionMode) {
-      console.log("intializing quill");
-      initializeQuill();
-    }
-  }, [addQuestionMode]);
-
-  useEffect(() => {
-    dispatch<any>(practiceThunks.fetchQuestions());
-
-    initializeQuill();
-  }, []);
 
   const selectNewRandomQuestion = () => {
     if (practiceMode === "general") {
@@ -100,6 +57,10 @@ export const Practice: React.FC = () => {
   };
 
   useEffect(() => {
+    dispatch<any>(practiceThunks.fetchQuestions());
+  }, [dispatch]);
+
+  useEffect(() => {
     selectNewRandomQuestion();
   }, [practiceMode]);
 
@@ -109,14 +70,12 @@ export const Practice: React.FC = () => {
 
   const handleSkipButton = () => {
     selectNewRandomQuestion();
-    quillRef.current?.setText("");
     setAnswerContent("");
   };
 
   const handleNextButton = () => {
     if (gptResponse.result === "PASS") {
       selectNewRandomQuestion();
-      quillRef.current?.setText("");
       setAnswerContent("");
     }
     setShowResponseModal(false);
@@ -151,16 +110,14 @@ export const Practice: React.FC = () => {
           <AddQuestion
             practiceMode={practiceMode}
             onClose={() => {
-              quillRef.current = null;
               setAddQuestionMode(false);
             }}
           />
         </div>
       ) : (
         <div className="practice-question-container">
-          {" "}
           <div className="practice-question-and-bin">
-            <h1>{randomQuestion?.question}</h1>{" "}
+            <h1>{randomQuestion?.question}</h1>
             <i
               className="ri-add-circle-line"
               onClick={() => {
@@ -176,21 +133,23 @@ export const Practice: React.FC = () => {
           </div>
           <div className="practice">
             <div className="editor-and-buttons">
-              <div id="editor" style={{ height: "500px" }}></div>
+              <Editor
+                height="500px"
+                defaultLanguage="javascript"
+                value={answerContent}
+                onChange={(value) => setAnswerContent(value || "")}
+                theme="vs-dark"
+              />
               <div className="skip-submit-buttons">
                 <div
                   className="skip-button"
-                  onClick={() => {
-                    handleSkipButton();
-                  }}
+                  onClick={handleSkipButton}
                 >
                   Skip
                 </div>
                 <div
                   className="submit-button"
-                  onClick={() => {
-                    submitAnswer();
-                  }}
+                  onClick={submitAnswer}
                 >
                   Submit
                 </div>
@@ -210,3 +169,5 @@ export const Practice: React.FC = () => {
     </div>
   );
 };
+
+export default Practice;
