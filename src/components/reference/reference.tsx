@@ -12,7 +12,6 @@ import {
 } from "../../slices/referenceSlice";
 import { AddReference } from "../add-reference/addReference";
 import { DeleteModal } from "../modal/delete-modal";
-import axios from "axios";
 import { EditTopic } from "../edit-topic/edit-topic";
 
 const Reference: React.FC = () => {
@@ -47,17 +46,17 @@ const Reference: React.FC = () => {
     setShowDeleteConfirmation(true);
   };
 
-  const getAuthHeaders = () => {
-    const idToken = localStorage.getItem("idToken");
-    if (!idToken) {
-      throw new Error("No token found. User might not be authenticated.");
-    }
-    return {
-      headers: {
-        Authorization: `Bearer ${idToken}`,
-      },
-    };
-  };
+  // const getAuthHeaders = () => {
+  //   const idToken = localStorage.getItem("idToken");
+  //   if (!idToken) {
+  //     throw new Error("No token found. User might not be authenticated.");
+  //   }
+  //   return {
+  //     headers: {
+  //       Authorization: `Bearer ${idToken}`,
+  //     },
+  //   };
+  // };
 
   useEffect(() => {
     const fetchSkills = async () => {
