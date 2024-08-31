@@ -62,15 +62,15 @@ const Reference: React.FC = () => {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/references/by-name/${selectedSkill}`,
-          getAuthHeaders()
-        );
-        if (response.data.length < 1) {
-          axios.post(`${import.meta.env.VITE_API_URL}/references`, {
-            skill: selectedSkill,
-          }, getAuthHeaders());
-        }
+        // const response = await axios.get(
+        //   `${import.meta.env.VITE_API_URL}/references/by-name/${selectedSkill}`,
+        //   getAuthHeaders()
+        // );
+        // if (response.data.length < 1) {
+        //   axios.post(`${import.meta.env.VITE_API_URL}/references`, {
+        //     skill: selectedSkill,
+        //   }, getAuthHeaders());
+        // }
         dispatch<any>(referenceThunks.fetchReferences());
       } catch (error) {
         console.error("Failed to fetch skills:", error);
