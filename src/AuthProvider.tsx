@@ -29,6 +29,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIdToken(idToken);
       localStorage.setItem("idToken", idToken);
     } else {
+      console.log("no user");
       setIdToken(null);
       localStorage.removeItem("idToken");
     }
@@ -36,6 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
+      console.log("onIdTokenChanged triggered", user);
       setUser(user);
       await storeToken(user);
     });
