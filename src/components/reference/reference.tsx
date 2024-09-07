@@ -100,13 +100,15 @@ const Reference: React.FC = () => {
             {topic.title}
           </div>
         ))}
-        <div
-          className="add-topic-button"
-          onClick={() => {
-            dispatch(setAddReferenceMode());
-          }}
-        >
-          Add topic
+        <div className="add-topic-button-container">
+          <div
+            className="add-topic-button"
+            onClick={() => {
+              dispatch(setAddReferenceMode());
+            }}
+          >
+            Add topic
+          </div>
         </div>
       </div>
 

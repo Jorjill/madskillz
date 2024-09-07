@@ -66,7 +66,13 @@ export const EditNote: React.FC = () => {
           value={noteTitle}
           onChange={(e) => setNoteTitle(e.target.value)}
         />
-        <div id="editor" style={{ height: "400px" }}></div>{" "}
+        <div
+          id="editor"
+          style={{
+            height: "400px",
+            width: "35vw",
+          }}
+        ></div>{" "}
         {/* This is where Quill will attach */}
         <div
           className="create-note-button"

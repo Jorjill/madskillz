@@ -76,7 +76,7 @@ export const SkillScreen = () => {
                     dispatch(unsetEditReferenceMode());
                   }}
                 >
-                  Notes
+                  Notez
                 </button>
               </li>
               {selectedSkill.title != "ALL" ? (
