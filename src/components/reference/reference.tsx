@@ -107,7 +107,7 @@ const Reference: React.FC = () => {
               dispatch(setAddReferenceMode());
             }}
           >
-            Add topic
+            Add Topic
           </div>
         </div>
       </div>

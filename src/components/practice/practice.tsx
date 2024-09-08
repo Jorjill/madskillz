@@ -47,7 +47,6 @@ export const Practice: React.FC = () => {
   };
 
   const selectNewRandomQuestion = () => {
-    console.log("selectNewRandomQuestion");
     if (practiceMode === "general") {
       setRandomQuestion(
         selectRandomQuestionBySkill(generalQuestions, selectedSkillTitle)
