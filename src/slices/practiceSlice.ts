@@ -114,6 +114,13 @@ export const practiceThunks = {
     );
     dispatch(practiceThunks.fetchQuestions());
   },
+  deleteSpecificQuestion: (question: any) => async (dispatch: any) => { 
+    await axios.delete(
+      `${import.meta.env.VITE_API_URL}/specific-question/${question.id}`,
+      getAuthHeaders()
+    );
+    dispatch(practiceThunks.fetchQuestions());
+  },
   createGeneralQuestion:
     (question: string, answer: string, skill: string) =>
     async (dispatch: any) => {

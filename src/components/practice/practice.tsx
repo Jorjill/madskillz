@@ -141,7 +141,13 @@ export const Practice: React.FC = () => {
             <i
               className="ri-delete-bin-7-line"
               onClick={() => {
-                handleDeleteGeneralQuestion();
+                if (practiceMode === "general") {
+                  handleDeleteGeneralQuestion();
+                } else if (practiceMode === "specific") {
+                  dispatch<any>(
+                    practiceThunks.deleteSpecificQuestion(randomQuestion)
+                  );
+                }
               }}
             ></i>
           </div>
