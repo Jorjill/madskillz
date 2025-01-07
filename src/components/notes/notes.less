@@ -1,35 +1,26 @@
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px); /* Start from below */
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0); /* Move to original position */
-  }
-}
-
-.reference-container {
+.notes-container {
   padding: 2rem;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 
-  .reference-header {
-    margin-bottom: 3rem;
-    text-align: center;
-    position: relative;
-    padding: 2rem;
+  .notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(20px);
-    border-radius: 20px;
+    border-radius: 15px;
     border: 1px solid rgba(101, 135, 122, 0.2);
+    position: relative;
     
     &::before {
       content: '';
       position: absolute;
       inset: -1px;
-      border-radius: 21px;
+      border-radius: 16px;
       background: linear-gradient(45deg, 
         rgba(101, 135, 122, 0.5),
         rgba(255, 255, 255, 0.2),
@@ -40,28 +31,26 @@
     }
 
     h1 {
-      font-size: 3rem;
+      font-size: 2.5rem;
       font-weight: 700;
-      margin-bottom: 1rem;
       background: linear-gradient(45deg, #fff, #93c5b1);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 2px 10px rgba(101, 135, 122, 0.3);
     }
 
-    .add-reference {
+    .add-note-btn {
       padding: 0.8rem 2rem;
       border: none;
       border-radius: 12px;
       background: linear-gradient(45deg, #65877a, #93c5b1);
       color: #fff;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
-      margin-top: 1rem;
       animation: glow 2s ease-in-out infinite;
 
       &::before {
@@ -97,32 +86,21 @@
     }
   }
 
-  .reference-grid {
+  .notes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
     padding: 1rem;
 
-    .reference-card {
+    .note-card {
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(20px);
       border-radius: 15px;
       border: 1px solid rgba(101, 135, 122, 0.2);
-      padding: 2rem;
+      padding: 1.5rem;
       transition: all 0.3s ease;
       position: relative;
-      animation: fadeInUp 0.5s ease-out;
-      animation-fill-mode: both;
-      
-      &:nth-child(1) { animation-delay: 0.1s; }
-      &:nth-child(2) { animation-delay: 0.2s; }
-      &:nth-child(3) { animation-delay: 0.3s; }
-      &:nth-child(4) { animation-delay: 0.4s; }
-      &:nth-child(5) { animation-delay: 0.5s; }
-      &:nth-child(6) { animation-delay: 0.6s; }
-      &:nth-child(7) { animation-delay: 0.7s; }
-      &:nth-child(8) { animation-delay: 0.8s; }
-      &:nth-child(9) { animation-delay: 0.9s; }
+      overflow: hidden;
       
       &::before {
         content: '';
@@ -150,39 +128,23 @@
         }
       }
 
-      .reference-title {
-        font-size: 1.8rem;
+      .note-title {
+        font-size: 1.5rem;
         font-weight: 600;
         margin-bottom: 1rem;
+        color: #fff;
         background: linear-gradient(45deg, #fff, #93c5b1);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
       }
 
-      .reference-description {
+      .note-content {
         color: rgba(255, 255, 255, 0.9);
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
-      }
-
-      .reference-link {
-        display: inline-block;
-        padding: 0.8rem 1.5rem;
-        background: rgba(101, 135, 122, 0.1);
-        border: 1px solid rgba(101, 135, 122, 0.2);
-        border-radius: 12px;
-        color: #93c5b1;
-        text-decoration: none;
-        transition: all 0.3s ease;
         margin-bottom: 1rem;
-
-        &:hover {
-          background: rgba(101, 135, 122, 0.2);
-          transform: translateX(5px);
-        }
+        line-height: 1.6;
       }
 
-      .reference-footer {
+      .note-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -190,12 +152,12 @@
         padding-top: 1rem;
         border-top: 1px solid rgba(101, 135, 122, 0.2);
 
-        .reference-date {
+        .note-date {
           color: rgba(255, 255, 255, 0.6);
           font-size: 0.9rem;
         }
 
-        .reference-actions {
+        .note-actions {
           display: flex;
           gap: 1rem;
 
@@ -247,6 +209,69 @@
   }
 }
 
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(101, 135, 122, 0.3),
+                0 0 30px rgba(101, 135, 122, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(101, 135, 122, 0.4),
+                0 0 40px rgba(101, 135, 122, 0.3);
+  }
+}
+      display: block;
+      margin-bottom: 0.5rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(101, 135, 122, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+
+      &:focus {
+        outline: none;
+        border-color: rgba(101, 135, 122, 0.6);
+        box-shadow: 0 0 15px rgba(101, 135, 122, 0.2);
+      }
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+
+    button {
+      .cosmic-button();
+    }
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -258,6 +283,11 @@
   }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
 @keyframes glow {
   0%, 100% {
     box-shadow: 0 0 15px rgba(101, 135, 122, 0.3),
@@ -267,4 +297,10 @@
     box-shadow: 0 0 20px rgba(101, 135, 122, 0.4),
                 0 0 40px rgba(101, 135, 122, 0.3);
   }
+}
+
+@keyframes magicBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }

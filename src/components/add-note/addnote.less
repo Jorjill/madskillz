@@ -2,88 +2,178 @@
   display: flex;
   align-items: center;
 
-  .addnote {
-    display: flex;
-    flex-direction: column;
+  .add-note {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(101, 135, 122, 0.2);
+    animation: fadeInUp 0.5s ease-out;
 
-    .ql-toolbar.ql-snow {
-      background-color: #eeeeee;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 21px;
+      background: linear-gradient(45deg, 
+        rgba(101, 135, 122, 0.5),
+        rgba(255, 255, 255, 0.2),
+        rgba(101, 135, 122, 0.5)
+      );
+      z-index: -1;
+      opacity: 0.3;
     }
 
-    input {
-      height: 40px;
-      border-radius: 10px;
-      border: 0.5px solid #ffffff;
-      background-color: #eeeeee;
-      margin: 10px;
+    h2 {
+      margin-bottom: 2rem;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 600;
+      text-align: center;
+      background: linear-gradient(45deg, #fff, #93c5b1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(101, 135, 122, 0.3);
     }
 
-    #editor {
-      height: 40vh;
-      margin-top: 50px;
-      width: 60vw;
-      background-color: #ffffff;
-      border-radius: 10px;
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(101, 135, 122, 0.2);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+
+        &:focus {
+          outline: none;
+          border-color: rgba(101, 135, 122, 0.5);
+          box-shadow: 
+            0 0 20px rgba(101, 135, 122, 0.2),
+            0 0 40px rgba(101, 135, 122, 0.1);
+          background: rgba(255, 255, 255, 0.08);
+        }
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.5);
+        }
+      }
+
+      textarea {
+        min-height: 150px;
+        resize: vertical;
+      }
     }
 
-    .button-and-tag {
-      margin-top: 10px;
+    .buttons {
       display: flex;
-      flex-direction: row;
-      margin-right: auto;
-      width: 100%;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
 
-      .tag-input-container {
-        color: #eeeeee;
-
-        button {
-          margin-left: 10px;
-          padding: 5px;
-        }
-
-        .tag-input {
-          margin-left: 5px;
-          width: 50%;
-        }
-
-        .tags {
-          display: flex;
-          height: 40px;
-          .tag {
-            display: flex;
-            justify-content: center;
-            padding: 2px;
-            border: 0.5px solid #eeeeee;
-            margin-right: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-            color: #4e4e4e;
-            background-color: #eeeeee;
-          }
-
-          .tag:hover {
-            cursor: pointer;
-          }
-        }
-      }
-
-      .create-note-button {
-        display: flex;
-        justify-content: center;
-        background-color: #eeeeee;
-        width: 10%;
-        padding: 10px;
-        margin: 10px;
-        border-radius: 10px;
-        font-weight: bold;
-        margin-left: auto;
-        height: 5%;
-      }
-
-      .create-note-button:hover {
-        background-color: #c9c9c9;
+      button {
+        padding: 0.8rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 500;
         cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+          transform: rotate(45deg);
+          transition: all 0.6s ease-in-out;
+          opacity: 0;
+        }
+
+        &:hover {
+          transform: translateY(-2px);
+
+          &::before {
+            opacity: 1;
+            transform: rotate(45deg) translateY(-80%);
+          }
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+
+        &.submit {
+          background: linear-gradient(45deg, #65877a, #93c5b1);
+          color: #fff;
+          animation: glow 2s ease-in-out infinite;
+
+          &:hover {
+            background: linear-gradient(45deg, #93c5b1, #65877a);
+            box-shadow: 
+              0 10px 20px rgba(101, 135, 122, 0.3),
+              0 0 20px rgba(101, 135, 122, 0.2),
+              0 0 40px rgba(101, 135, 122, 0.1);
+          }
+        }
+
+        &.cancel {
+          background: rgba(255, 255, 255, 0.05);
+          color: rgba(255, 255, 255, 0.9);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 
+              0 10px 20px rgba(0, 0, 0, 0.2),
+              0 0 30px rgba(101, 135, 122, 0.1);
+          }
+        }
       }
     }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(101, 135, 122, 0.3),
+                0 0 30px rgba(101, 135, 122, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(101, 135, 122, 0.4),
+                0 0 40px rgba(101, 135, 122, 0.3);
   }
 }
