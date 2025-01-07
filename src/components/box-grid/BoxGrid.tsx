@@ -57,82 +57,96 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
 
   return (
     <div className="box-grid">
-      <button className="logout-button" onClick={handleLogout}>Logout</button>
-      <div className="input-box-container">
-        <input
-          className="input-box"
-          placeholder="Search..."
-          onChange={(t) => {
-            setSearchSkill(t.target.value);
-          }}
-        />
+      <div className="background-effects">
+        <div className="cosmic-background" />
+        <div className="galaxy" />
+        <div className="nebula" />
+        <div className="star-field" />
+        <div className="meteor-shower">
+          <div className="meteor" />
+          <div className="meteor" />
+          <div className="meteor" />
+        </div>
+        <div className="aurora" />
       </div>
-      <div className="box-grid-container">
-        <Link to="/skills" key={0}>
-          <div
-            className="box"
-            style={{ animationDelay: `0s` }} // Add animation delay for the first box
-            onClick={() =>
-              dispatch(selectSkill({ title: "ALL", imageurl: "" }))
-            }
-          >
-            <div className="box-image">
-              <img src={imageArray[0]} alt={`Image ${0}`} />
-            </div>
-            <div className="box-text">
-              <p>ALL</p>
-            </div>
-          </div>
-        </Link>
-        {searchedSkills.map((item, index) => (
-          <Link to="/skills" key={index + 1}>
+      <div className="content-wrapper">
+        <button className="logout-button" onClick={handleLogout}>Logout</button>
+        <div className="input-box-container">
+          <input
+            className="input-box"
+            placeholder="Search..."
+            onChange={(t) => {
+              setSearchSkill(t.target.value);
+            }}
+          />
+        </div>
+        <div className="box-grid-container">
+          <Link to="/skills" key={0}>
             <div
               className="box"
-              style={{ animationDelay: `${0.009 * (index + 1)}s` }} // Increment delay for each box, starting from the second box
-              onClick={() => dispatch(selectSkill(item))}
+              style={{ animationDelay: `0s` }} // Add animation delay for the first box
+              onClick={() =>
+                dispatch(selectSkill({ title: "ALL", imageurl: "" }))
+              }
             >
               <div className="box-image">
-                <img src={item.imageurl} alt={`Image ${index + 1}`} />
+                <img src={imageArray[0]} alt={`Image ${0}`} />
               </div>
               <div className="box-text">
-                <p>{item.title}</p>
+                <p>ALL</p>
               </div>
             </div>
           </Link>
-        ))}
-        <div
-          className="box"
-          style={{ animationDelay: `${0.009 * (searchedSkills.length + 1)}s` }} // Add animation delay for the last box
-          onClick={() => {
-            setAddSkillModal(true);
-          }}
-        >
-          <div className="box-text">
-            <p>+</p>
+          {searchedSkills.map((item, index) => (
+            <Link to="/skills" key={index + 1}>
+              <div
+                className="box"
+                style={{ animationDelay: `${0.009 * (index + 1)}s` }} // Increment delay for each box, starting from the second box
+                onClick={() => dispatch(selectSkill(item))}
+              >
+                <div className="box-image">
+                  <img src={item.imageurl} alt={`Image ${index + 1}`} />
+                </div>
+                <div className="box-text">
+                  <p>{item.title}</p>
+                </div>
+              </div>
+            </Link>
+          ))}
+          <div
+            className="box"
+            style={{ animationDelay: `${0.009 * (searchedSkills.length + 1)}s` }} // Add animation delay for the last box
+            onClick={() => {
+              setAddSkillModal(true);
+            }}
+          >
+            <div className="box-text">
+              <p>+</p>
+            </div>
           </div>
         </div>
+        {addSkillModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <span
+                className="close-button"
+                onClick={() => setAddSkillModal(false)}
+              >
+                &times;
+              </span>
+              <h2>Add New Skill</h2>
+              <input
+                type="text"
+                placeholder="Skill Name"
+                value={newSkillName}
+                onChange={(e) => setNewSkillName(e.target.value)}
+              />
+              <input type="file" onChange={handleFileChange} accept="image/*" />
+              <button onClick={handleAddSkill}>Add Skill</button>
+            </div>
+          </div>
+        )}
       </div>
-      {addSkillModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span
-              className="close-button"
-              onClick={() => setAddSkillModal(false)}
-            >
-              &times;
-            </span>
-            <h2>Add New Skill</h2>
-            <input
-              type="text"
-              placeholder="Skill Name"
-              value={newSkillName}
-              onChange={(e) => setNewSkillName(e.target.value)}
-            />
-            <input type="file" onChange={handleFileChange} accept="image/*" />
-            <button onClick={handleAddSkill}>Add Skill</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
