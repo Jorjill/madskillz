@@ -4,19 +4,24 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   onIdTokenChanged,
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebaseConfig";
 import { isOfflineMode, setOfflineMode } from "../../utils/offlineMode";
+import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./login.less";
 import img from "../../assets/mskillz.png";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [offline, setOffline] = useState(isOfflineMode());
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
   const storeToken = async (user: any) => {
@@ -91,80 +96,137 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (offline) {
+      navigate("/home");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      if (user) {
+        await storeToken(user);
+      }
+      navigate("/home");
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="login-page">
-      <img src={img} alt="logo" />
+      <div className="star-background" />
       <div className="login-container">
-        <h2>Welcome Back</h2>
+        <div className="login-card">
+          <img src={img} alt="MadSkillz" className="logo" />
+          <h1>{isSignUp ? "Create Account" : "Welcome Back"}</h1>
+          <p className="subtitle">
+            {isSignUp
+              ? "Start your skill mastery journey"
+              : "Continue your learning journey"}
+          </p>
 
-        {(import.meta.env.VITE_DEV === "true") && (
-          <div className="offline-mode-toggle">
-            <button
-              type="button"
-              onClick={handleOfflineToggle}
-              className={offline ? "active" : ""}
-            >
-              {offline ? "✓ Offline Mode" : "🔌 Work Offline"}
-            </button>
-            {offline && (
-              <p className="offline-notice">
-                You are working offline. No authentication required.
-              </p>
-            )}
-          </div>
-        )}
-
-        {!offline && (
-          <>
-            <form onSubmit={handleLogin}>
-              <div>
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-              <div>
-                <label>Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-              {error && <p className="error">{error}</p>}
-              <button type="submit" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
-              </button>
-            </form>
-            <button
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-              className="google-button"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                xmlns="http://www.w3.org/2000/svg"
+          {(import.meta.env.VITE_DEV === "true") && (
+            <div className="offline-mode-toggle">
+              <button
+                type="button"
+                onClick={handleOfflineToggle}
+                className={offline ? "active" : ""}
               >
-                <path
-                  fill="#ffffff"
-                  d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"
-                />
-              </svg>
-              {isLoading ? "Signing in..." : "Sign in with Google"}
-            </button>
-          </>
-        )}
+                {offline ? "✓ Offline Mode" : "🔌 Work Offline"}
+              </button>
+              {offline && (
+                <p className="offline-notice">
+                  You are working offline. No authentication required.
+                </p>
+              )}
+            </div>
+          )}
+
+          {!offline && (
+            <div className="auth-container">
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={isLoading}
+                className="google-button"
+              >
+                <FaGoogle />
+                <span>{isLoading ? "Signing in..." : "Continue with Google"}</span>
+              </button>
+
+              <div className="divider">
+                <span>or continue with email</span>
+              </div>
+
+              <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
+                <div className="input-group">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="input-group">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+                {isSignUp && (
+                  <div className="input-group">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm Password"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                )}
+                {error && <p className="error">{error}</p>}
+                <button type="submit" disabled={isLoading} className="submit-button">
+                  {isLoading ? "Please wait..." : isSignUp ? "Sign Up" : "Sign In"}
+                </button>
+              </form>
+
+              <div className="auth-switch">
+                <p>
+                  {isSignUp ? "Already have an account?" : "Don't have an account?"}
+                  <button type="button" onClick={() => setIsSignUp(!isSignUp)}>
+                    {isSignUp ? "Sign In" : "Sign Up"}
+                  </button>
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
