@@ -226,34 +226,6 @@ const Landing: React.FC = () => {
           </Timeline>
         </Box>
 
-        <Box className="testimonials-section">
-          <Typography variant="h2" className="section-title" gutterBottom>
-            Success Stories
-          </Typography>
-          <Grid container spacing={4}>
-            {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <div className={`animate-fade-up delay-${index}`}>
-                  <Box className="testimonial-card">
-                    <div className="quote">"</div>
-                    <Typography className="testimonial-text">
-                      {testimonial.text}
-                    </Typography>
-                    <Box className="testimonial-author">
-                      <div className="author-avatar" />
-                      <div>
-                        <Typography variant="h6">{testimonial.author}</Typography>
-                        <Typography className="role">{testimonial.role}</Typography>
-                        <Typography className="company">{testimonial.company}</Typography>
-                      </div>
-                    </Box>
-                  </Box>
-                </div>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-
         <Box className="features-comparison">
           <Typography variant="h2" className="section-title">
             Features That Set Us Apart
@@ -329,20 +301,6 @@ const Landing: React.FC = () => {
               </div>
             </Grid>
           </Grid>
-        </Box>
-
-        <Box className="stats-section">
-          {[
-            { value: '10k+', label: 'Active Users' },
-            { value: '50k+', label: 'Skills Tracked' },
-            { value: '95%', label: 'Success Rate' },
-            { value: '24/7', label: 'Support' }
-          ].map((stat, index) => (
-            <div key={index} className={`animate-fade-up delay-${index} stat-item`}>
-              <Typography variant="h3">{stat.value}</Typography>
-              <Typography>{stat.label}</Typography>
-            </div>
-          ))}
         </Box>
 
         <Box className="cta-section">
