@@ -134,7 +134,7 @@ const Landing: React.FC = () => {
       <Container maxWidth="lg" className="content">
         <nav className="nav-bar">
           <div className="logo-container animate-fade-in">
-            <img src="src/assets/mskillz.png" alt="MadSkillz Logo" className="logo-image" />
+            <img src="https://i.ibb.co/rHqPDg4/mskillz-removebg-preview.png" alt="MadSkillz Logo" className="logo-image" />
           </div>
           <div className="animate-fade-in">
             <Button
