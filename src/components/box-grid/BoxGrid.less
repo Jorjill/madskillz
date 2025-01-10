@@ -272,9 +272,9 @@
   }
 
   .input-box-container {
-    margin: 2rem auto;
+    margin: 0rem auto;
     width: 100%;
-    max-width: 600px;
+    max-width: 400px;
     position: relative;
     
     &::before {
@@ -323,10 +323,10 @@
 
   .box-grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 30px;
-    padding: 2rem;
-    max-width: 1600px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+    padding: 1rem;
+    max-width: 1400px;
     margin: 0 auto;
     position: relative;
 
@@ -338,7 +338,7 @@
 
     .box {
       cursor: pointer;
-      border-radius: 20px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(10px);
       width: 100%;
@@ -348,119 +348,61 @@
       align-items: center;
       justify-content: center;
       opacity: 0;
-      animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      animation: fadeInUp 0.4s ease forwards;
       position: relative;
       overflow: hidden;
-      border: 2px solid transparent;
-      background-image: linear-gradient(45deg, 
-        rgba(101, 135, 122, 0.2), 
-        rgba(255, 255, 255, 0.1), 
-        rgba(101, 135, 122, 0.2)
-      );
-      background-size: 200% 200%;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        inset: -2px;
-        z-index: -1;
-        background: linear-gradient(45deg, 
-          #65877a, 
-          rgba(255,255,255,0.5), 
-          #65877a
-        );
-        background-size: 200% 200%;
-        animation: magicBorder 3s linear infinite;
-        border-radius: 22px;
-        opacity: 0;
-        transition: opacity 0.4s ease;
-      }
-
-      &::after {
-        filter: blur(10px);
-      }
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
 
       &:hover {
-        transform: translateY(-8px) scale(1.02);
-        background-position: 100% 100%;
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(101, 135, 122, 0.3);
         box-shadow: 
-          0 15px 35px rgba(101, 135, 122, 0.2),
-          0 0 30px rgba(101, 135, 122, 0.1),
-          0 0 20px rgba(101, 135, 122, 0.1);
-
-        &::before,
-        &::after {
-          opacity: 1;
-        }
+          0 8px 16px rgba(0, 0, 0, 0.1),
+          0 2px 4px rgba(0, 0, 0, 0.1);
 
         .box-image {
-          transform: translateY(-5px) scale(1.1);
-          filter: drop-shadow(0 10px 20px rgba(101, 135, 122, 0.3));
+          transform: scale(1.05);
           
           img {
-            transform: scale(1.15) rotate(5deg);
-            filter: brightness(1.2) contrast(1.1);
-          }
-
-          &::after {
-            opacity: 1;
-            transform: scale(1.2);
+            filter: brightness(1.1);
           }
         }
 
         .box-text p {
           color: #fff;
-          text-shadow: 
-            0 0 10px rgba(101, 135, 122, 0.5),
-            0 0 20px rgba(101, 135, 122, 0.3);
-          transform: translateY(3px);
-          letter-spacing: 0.5px;
         }
       }
 
       .box-image {
-        width: 65%;
-        height: 65%;
+        width: 50%;
+        height: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 1.5rem;
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        
-        &::after {
-          content: '';
-          position: absolute;
-          inset: -20%;
-          background: radial-gradient(circle, 
-            rgba(101, 135, 122, 0.2) 0%,
-            transparent 70%
-          );
-          opacity: 0;
-          transition: all 0.5s ease;
-          z-index: -1;
-        }
+        margin-bottom: 0.75rem;
+        transition: transform 0.3s ease;
         
         img {
           max-width: 100%;
           max-height: 100%;
           object-fit: contain;
-          transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-          filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+          transition: all 0.3s ease;
+          filter: brightness(0.9);
         }
       }
 
       .box-text {
         p {
           margin: 0;
-          color: rgba(255, 255, 255, 0.9);
+          color: rgba(255, 255, 255, 0.8);
           font-family: Inter, sans-serif;
-          font-size: 18px;
+          font-size: 0.875rem;
           font-weight: 500;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: color 0.3s ease;
           text-align: center;
+          padding: 0 0.5rem;
         }
       }
     }
@@ -642,11 +584,11 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(40px) scale(0.9);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
