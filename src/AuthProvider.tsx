@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { onIdTokenChanged, User } from "firebase/auth";
 import { auth } from "./firebaseConfig";
+import { isOfflineMode, getMockUser } from "./utils/offlineMode";
 
 interface AuthContextProps {
   user: User | null;
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [idToken, setIdToken] = useState<string | null>(null);
+  const offlineMode = isOfflineMode();
 
   const storeToken = async (user: User | null) => {
     if (user) {
@@ -35,8 +37,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    if (offlineMode) {
+      const mockUser = getMockUser() as any;
+      setUser(mockUser);
+      setIdToken('offline-token');
+      localStorage.setItem("idToken", 'offline-token');
+      return;
+    }
+
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
-      console.log("onIdTokenChanged triggered", user);
       setUser(user);
       await storeToken(user);
     });
@@ -44,7 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [offlineMode]);
 
   return (
     <AuthContext.Provider value={{ user, idToken }}>
@@ -55,7 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 export const useAuth = (): AuthContextProps => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
