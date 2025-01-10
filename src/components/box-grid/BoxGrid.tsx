@@ -1,20 +1,16 @@
-import "./BoxGrid.less";
-import image1 from "../../assets/1.png";
-import { selectSkill, skill, skillsThunks } from "../../slices/skillsSlice";
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { setSkills, selectSkill, skillsThunks } from '../../store/skillsSlice';
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
-import { signOut } from "firebase/auth";
-import { auth } from "../../firebaseConfig";
-
-const imageArray = [image1];
+import './BoxGrid.less';
 
 interface BoxGridProps {
   itemList: skill[];
 }
 
-export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
-  const dispatch = useDispatch();
+const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [searchSkill, setSearchSkill] = useState("");
   const searchedSkills = itemList.filter((skill) =>
@@ -84,7 +80,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
               }
             >
               <div className="box-image">
-                <img src={imageArray[0]} alt={`Image ${0}`} />
+                <img src={itemList[0].imageurl} alt={`Image ${0}`} />
               </div>
               <div className="box-text">
                 <p>ALL</p>
