@@ -1,10 +1,10 @@
 import { useSelector } from "react-redux";
-import { BoxGrid } from "../../components/box-grid/BoxGrid";
 import "./home.screen.less";
 import { selectSkills, skillsThunks } from "../../slices/skillsSlice";
 import { useEffect } from "react";
 import { deselectNote } from "../../slices/notesSlice";
 import { useDispatch } from "../../hooks";
+import BoxGrid from "../../components/box-grid/BoxGrid";
 
 export const HomeScreen = () => {
   const itemsList = useSelector(selectSkills);

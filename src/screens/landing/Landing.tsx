@@ -180,7 +180,7 @@ const Landing: React.FC = () => {
         </div>
 
         <Box className="benefits-section">
-          <Typography variant="h2" className="section-title">
+          <Typography variant="h2" className="section-title" gutterBottom>
             Why Choose MadSkillz?
           </Typography>
           <Grid container spacing={4}>
@@ -201,7 +201,7 @@ const Landing: React.FC = () => {
         </Box>
 
         <Box className="timeline-section">
-          <Typography variant="h2" className="section-title">
+          <Typography variant="h2" className="section-title" gutterBottom>
             Your Journey
           </Typography>
           <Timeline position="alternate">
@@ -227,7 +227,7 @@ const Landing: React.FC = () => {
         </Box>
 
         <Box className="testimonials-section">
-          <Typography variant="h2" className="section-title">
+          <Typography variant="h2" className="section-title" gutterBottom>
             Success Stories
           </Typography>
           <Grid container spacing={4}>
@@ -266,19 +266,19 @@ const Landing: React.FC = () => {
                   <ul className="features-list">
                     <li>
                       <span className="feature-name">Basic Skill Tracking</span>
-                      <span className="feature-detail">Track up to 5 skills simultaneously</span>
+                      <span className="feature-detail">Track up to 3 skills</span>
                     </li>
                     <li>
-                      <span className="feature-name">Progress Visualization</span>
-                      <span className="feature-detail">Essential charts and progress indicators</span>
+                      <span className="feature-name">Simple Progress Charts</span>
+                      <span className="feature-detail">Basic progress visualization</span>
                     </li>
                     <li>
-                      <span className="feature-name">Community Access</span>
-                      <span className="feature-detail">Join skill-based discussion groups</span>
+                      <span className="feature-name">Community Forums</span>
+                      <span className="feature-detail">Access to skill discussions</span>
                     </li>
                     <li>
-                      <span className="feature-name">Limited Analytics</span>
-                      <span className="feature-detail">Basic progress reports and insights</span>
+                      <span className="feature-name">Email Support</span>
+                      <span className="feature-detail">Basic email support</span>
                     </li>
                   </ul>
                   <Button
@@ -286,7 +286,7 @@ const Landing: React.FC = () => {
                     className="plan-button"
                     onClick={() => navigate('/login')}
                   >
-                    Get Started
+                    Start Free
                   </Button>
                 </Box>
               </div>
@@ -298,28 +298,24 @@ const Landing: React.FC = () => {
                   <Typography variant="h5" className="plan-title">Pro Plan</Typography>
                   <ul className="features-list">
                     <li>
-                      <span className="feature-name">Advanced AI Insights</span>
-                      <span className="feature-detail">Personalized recommendations and deep learning analysis</span>
+                      <span className="feature-name">Everything in Free</span>
+                      <span className="feature-detail">Plus all premium features below</span>
                     </li>
                     <li>
-                      <span className="feature-name">Unlimited Skill Tracking</span>
-                      <span className="feature-detail">Track unlimited skills with detailed progression paths</span>
+                      <span className="feature-name">AI Skill Assistant</span>
+                      <span className="feature-detail">24/7 chatbot for personalized guidance</span>
                     </li>
                     <li>
-                      <span className="feature-name">Team Collaboration</span>
-                      <span className="feature-detail">Share progress and collaborate with team members</span>
+                      <span className="feature-name">Unlimited Skills</span>
+                      <span className="feature-detail">Track any number of skills</span>
                     </li>
                     <li>
-                      <span className="feature-name">Custom Dashboards</span>
-                      <span className="feature-detail">Create personalized views and reporting layouts</span>
+                      <span className="feature-name">Advanced Analytics</span>
+                      <span className="feature-detail">Detailed insights and predictions</span>
                     </li>
                     <li>
                       <span className="feature-name">Priority Support</span>
-                      <span className="feature-detail">24/7 dedicated support with 1-hour response time</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">API Access</span>
-                      <span className="feature-detail">Full access to MadSkillz API for custom integrations</span>
+                      <span className="feature-detail">24/7 dedicated support</span>
                     </li>
                   </ul>
                   <Button

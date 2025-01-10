@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../store/store';
-import { setSkills, selectSkill, skillsThunks } from '../../store/skillsSlice';
-import { Link, useNavigate } from "react-router-dom";
+
+import { Link } from "react-router-dom";
 import './BoxGrid.less';
+import { selectSkill, skill, skillsThunks } from '../../slices/skillsSlice';
+import { AppDispatch } from '../../state/store';
 
 interface BoxGridProps {
   itemList: skill[];
@@ -11,7 +12,6 @@ interface BoxGridProps {
 
 const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const [searchSkill, setSearchSkill] = useState("");
   const searchedSkills = itemList.filter((skill) =>
     skill.title.toLowerCase().includes(searchSkill.toLowerCase())
