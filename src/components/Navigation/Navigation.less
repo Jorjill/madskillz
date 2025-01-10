@@ -1,0 +1,103 @@
+.navigation-wrapper {
+  .MuiAppBar-root {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .MuiToolbar-root {
+    padding: 0.5rem 1rem;
+  }
+
+  .MuiIconButton-root {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+  }
+
+  .MuiAvatar-root {
+    background: linear-gradient(45deg, #65877a, #7a9e8f);
+    box-shadow: 0 0 10px rgba(101, 135, 122, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 15px rgba(101, 135, 122, 0.8);
+    }
+  }
+
+  .MuiTypography-root {
+    background: linear-gradient(45deg, #fff, #e0e0e0);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+  }
+}
+
+// Menu styling
+.MuiMenu-paper {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(101, 135, 122, 0.2);
+  border-radius: 12px !important;
+  box-shadow: 
+    0 15px 35px rgba(101, 135, 122, 0.2),
+    0 0 30px rgba(101, 135, 122, 0.1),
+    0 0 20px rgba(101, 135, 122, 0.1) !important;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    background: linear-gradient(45deg, 
+      #65877a, 
+      rgba(255,255,255,0.5), 
+      #65877a
+    );
+    background-size: 200% 200%;
+    animation: magicBorder 3s linear infinite;
+    border-radius: 14px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .MuiMenuItem-root {
+    color: white;
+    transition: all 0.3s ease;
+    position: relative;
+    background: transparent !important;
+
+    &:hover {
+      background: rgba(101, 135, 122, 0.2) !important;
+      transform: translateX(5px);
+
+      .MuiListItemIcon-root {
+        transform: scale(1.1);
+      }
+    }
+
+    .MuiListItemIcon-root {
+      color: #65877a;
+      transition: transform 0.3s ease;
+    }
+  }
+
+  .MuiDivider-root {
+    background: rgba(101, 135, 122, 0.2);
+    margin: 0.5rem 0;
+  }
+}
+
+@keyframes magicBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

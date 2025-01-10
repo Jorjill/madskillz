@@ -6,16 +6,6 @@ import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Divider from '@mui/material/Divider';
-import Settings from '@mui/icons-material/Settings';
-import Person from '@mui/icons-material/Person';
-import ExitToApp from '@mui/icons-material/ExitToApp';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const imageArray = [image1];
 
@@ -33,8 +23,6 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   const [addSkillModal, setAddSkillModal] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
   const [newSkillImage, setNewSkillImage] = useState("");
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
 
   useEffect(() => {
     setTimeout(() => {
@@ -67,32 +55,6 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
     setAddSkillModal(false);
   };
 
-  const handleProfile = () => {
-    handleClose();
-    // TODO: Navigate to profile page
-    navigate('/profile');
-  };
-
-  const handleSettings = () => {
-    handleClose();
-    // TODO: Navigate to settings page
-    navigate('/settings');
-  };
-
-  const handleDashboard = () => {
-    handleClose();
-    // TODO: Navigate to dashboard page
-    navigate('/dashboard');
-  };
-
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   return (
     <div className="box-grid">
       <div className="background-effects">
@@ -108,57 +70,6 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
         <div className="aurora" />
       </div>
       <div className="content-wrapper">
-        <div className="user-menu">
-          <IconButton
-            onClick={handleClick}
-            size="large"
-            sx={{ color: 'white' }}
-          >
-            <AccountCircleIcon />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            PaperProps={{
-              sx: {
-                width: '200px',
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(10px)',
-                mt: 1.5,
-              }
-            }}
-          >
-            <MenuItem onClick={handleProfile}>
-              <ListItemIcon>
-                <Person fontSize="small" />
-              </ListItemIcon>
-              Profile
-            </MenuItem>
-            <MenuItem onClick={handleDashboard}>
-              <ListItemIcon>
-                <DashboardIcon fontSize="small" />
-              </ListItemIcon>
-              Dashboard
-            </MenuItem>
-            <MenuItem onClick={handleSettings}>
-              <ListItemIcon>
-                <Settings fontSize="small" />
-              </ListItemIcon>
-              Settings
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={() => {
-              handleClose();
-              handleLogout();
-            }}>
-              <ListItemIcon>
-                <ExitToApp fontSize="small" />
-              </ListItemIcon>
-              Logout
-            </MenuItem>
-          </Menu>
-        </div>
         <div className="input-box-container">
           <input
             className="input-box"
@@ -172,7 +83,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
           <Link to="/skills" key={0}>
             <div
               className="box"
-              style={{ animationDelay: `0s` }} // Add animation delay for the first box
+              style={{ animationDelay: `0s` }}
               onClick={() =>
                 dispatch(selectSkill({ title: "ALL", imageurl: "" }))
               }
@@ -189,7 +100,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
             <Link to="/skills" key={index + 1}>
               <div
                 className="box"
-                style={{ animationDelay: `${0.009 * (index + 1)}s` }} // Increment delay for each box, starting from the second box
+                style={{ animationDelay: `${0.009 * (index + 1)}s` }}
                 onClick={() => dispatch(selectSkill(item))}
               >
                 <div className="box-image">
@@ -203,7 +114,7 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
           ))}
           <div
             className="box"
-            style={{ animationDelay: `${0.009 * (searchedSkills.length + 1)}s` }} // Add animation delay for the last box
+            style={{ animationDelay: `${0.009 * (searchedSkills.length + 1)}s` }}
             onClick={() => {
               setAddSkillModal(true);
             }}
@@ -238,3 +149,5 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
     </div>
   );
 };
+
+export default BoxGrid;

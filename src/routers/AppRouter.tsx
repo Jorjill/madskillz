@@ -3,37 +3,70 @@ import { HomeScreen } from "../screens/home/home.screen";
 import { SkillScreen } from "../screens/skill/skill.screen";
 import ProtectedRoute from "../protectedRoute";
 import Login from "../screens/login/login";
+import Dashboard from "../screens/dashboard/dashboard";
+import Profile from "../screens/profile/profile";
+import Settings from "../screens/settings/settings";
+import Layout from "../components/Layout";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export const AppRouter = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          index
-          element={
-            <ProtectedRoute>
-              <HomeScreen />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <HomeScreen />
-            </ProtectedRoute>
-          }
-        ></Route>
-        <Route
-          path="skills"
-          element={
-            <ProtectedRoute>
-              <SkillScreen />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <HomeScreen />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/skills"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <SkillScreen />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Profile />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Settings />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
