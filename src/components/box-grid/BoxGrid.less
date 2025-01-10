@@ -324,8 +324,8 @@
   .box-grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 30px;
-    padding: 2rem;
+    gap: 16px;
+    padding: 0.25rem 1.5rem;
     max-width: 1600px;
     margin: 0 auto;
     position: relative;
@@ -338,7 +338,7 @@
 
     .box {
       cursor: pointer;
-      border-radius: 20px;
+      border-radius: 16px;
       background: rgba(255, 255, 255, 0.03);
       backdrop-filter: blur(10px);
       width: 100%;
@@ -373,7 +373,7 @@
         );
         background-size: 200% 200%;
         animation: magicBorder 3s linear infinite;
-        border-radius: 22px;
+        border-radius: 18px;
         opacity: 0;
         transition: opacity 0.4s ease;
       }
@@ -383,12 +383,12 @@
       }
 
       &:hover {
-        transform: translateY(-8px) scale(1.02);
+        transform: translateY(-6px) scale(1.02);
         background-position: 100% 100%;
         box-shadow: 
-          0 15px 35px rgba(101, 135, 122, 0.2),
-          0 0 30px rgba(101, 135, 122, 0.1),
-          0 0 20px rgba(101, 135, 122, 0.1);
+          0 12px 28px rgba(101, 135, 122, 0.2),
+          0 0 24px rgba(101, 135, 122, 0.1),
+          0 0 16px rgba(101, 135, 122, 0.1);
 
         &::before,
         &::after {
@@ -396,8 +396,8 @@
         }
 
         .box-image {
-          transform: translateY(-5px) scale(1.1);
-          filter: drop-shadow(0 10px 20px rgba(101, 135, 122, 0.3));
+          transform: translateY(-4px) scale(1.1);
+          filter: drop-shadow(0 8px 16px rgba(101, 135, 122, 0.3));
           
           img {
             transform: scale(1.15) rotate(5deg);
@@ -413,20 +413,20 @@
         .box-text p {
           color: #fff;
           text-shadow: 
-            0 0 10px rgba(101, 135, 122, 0.5),
-            0 0 20px rgba(101, 135, 122, 0.3);
-          transform: translateY(3px);
+            0 0 8px rgba(101, 135, 122, 0.5),
+            0 0 16px rgba(101, 135, 122, 0.3);
+          transform: translateY(2px);
           letter-spacing: 0.5px;
         }
       }
 
       .box-image {
-        width: 65%;
-        height: 65%;
+        width: 55%;
+        height: 55%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
         transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         
@@ -448,7 +448,7 @@
           max-height: 100%;
           object-fit: contain;
           transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-          filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+          filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
         }
       }
 
@@ -457,7 +457,7 @@
           margin: 0;
           color: rgba(255, 255, 255, 0.9);
           font-family: Inter, sans-serif;
-          font-size: 18px;
+          font-size: 14px;
           font-weight: 500;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           text-align: center;
