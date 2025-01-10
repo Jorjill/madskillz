@@ -2,7 +2,8 @@
 
 Welcome to **MadSkillz**! Designed for professionals, software developers, students, and enthusiastic learners, MadSkillz is your one-stop hub for centralized, organized, and interactive study materials. With our innovative AI-powered platform, you'll experience a whole new level of learning efficiency and engagement.
 
-![Screenshot 2024-02-13 012401](https://github.com/Jorjill/madskillz/assets/48145722/dd7c42da-5b7a-4902-96cc-f6bbffa43708)
+![screen](https://github.com/user-attachments/assets/7a1959d2-a7d2-416d-a9e2-425dbe9eab09)
+
 
 ## 🌟 Key Features
 
