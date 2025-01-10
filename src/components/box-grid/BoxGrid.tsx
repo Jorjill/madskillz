@@ -84,7 +84,7 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
             >
               <div className="box-image">
                 <img 
-                  src={itemList?.[0]?.imageurl || defaultImage} 
+                  src={defaultImage} 
                   alt="All Skills" 
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
