@@ -3,7 +3,7 @@ import { Button, Typography, Box, Container, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { 
   FaChartLine, FaBrain, FaTrophy, FaRocket,
-  FaLightbulb, FaUsers, FaChartBar, FaCog, FaCheck 
+  FaLightbulb, FaCheck 
 } from 'react-icons/fa';
 import './Landing.less';
 
