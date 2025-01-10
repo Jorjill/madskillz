@@ -69,7 +69,7 @@ const Navigation: React.FC = () => {
             edge="start"
             color="inherit"
             aria-label="home"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/home')}
             sx={{ mr: 2 }}
           >
             <HomeIcon />
