@@ -71,27 +71,6 @@ const Landing: React.FC = () => {
     }
   ];
 
-  const testimonials = [
-    {
-      text: "MadSkillz transformed my learning journey. The AI-powered recommendations helped me focus on the right skills at the right time. I've seen a 40% improvement in my productivity!",
-      author: "Sarah Chen",
-      role: "Full Stack Developer",
-      company: "TechCorp"
-    },
-    {
-      text: "The visualization tools and progress tracking features are game-changers. I can clearly see my growth and identify areas that need attention. It's like having a personal skill coach.",
-      author: "Michael Rodriguez",
-      role: "UX Designer",
-      company: "DesignHub"
-    },
-    {
-      text: "As a team leader, MadSkillz helps me track my team's skill development effectively. The insights and analytics are invaluable for planning training and growth strategies.",
-      author: "Emma Thompson",
-      role: "Engineering Manager",
-      company: "InnovateTech"
-    }
-  ];
-
   const timelineItems = [
     {
       icon: <FaLightbulb />,
