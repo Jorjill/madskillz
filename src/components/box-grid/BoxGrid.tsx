@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-
 import { Link } from "react-router-dom";
 import './BoxGrid.less';
 import { selectSkill, skill, skillsThunks } from '../../slices/skillsSlice';
@@ -10,20 +9,22 @@ interface BoxGridProps {
   itemList: skill[];
 }
 
-const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
+const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchSkill, setSearchSkill] = useState("");
-  const searchedSkills = itemList.filter((skill) =>
-    skill.title.toLowerCase().includes(searchSkill.toLowerCase())
-  );
+  const searchedSkills = itemList?.filter((skill) =>
+    skill?.title?.toLowerCase().includes(searchSkill.toLowerCase())
+  ) || [];
   const [addSkillModal, setAddSkillModal] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
   const [newSkillImage, setNewSkillImage] = useState("");
 
   useEffect(() => {
-    setTimeout(() => {
-      dispatch<any>(skillsThunks.fetchSkills());
+    const timer = setTimeout(() => {
+      dispatch(skillsThunks.fetchSkills());
     }, 500);
+
+    return () => clearTimeout(timer);
   }, [dispatch]);
 
   const handleFileChange = (event: any) => {
@@ -38,13 +39,15 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
   };
 
   const handleAddSkill = () => {
-    dispatch<any>(
-      skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage })
-    );
-    setNewSkillName("");
-    setNewSkillImage("");
-    setAddSkillModal(false);
+    if (newSkillName && newSkillImage) {
+      dispatch(skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage }));
+      setNewSkillName("");
+      setNewSkillImage("");
+      setAddSkillModal(false);
+    }
   };
+
+  const defaultImage = "src/assets/1.png"; // Add a default image path
 
   return (
     <div className="box-grid">
@@ -76,11 +79,18 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
               className="box"
               style={{ animationDelay: `0s` }}
               onClick={() =>
-                dispatch(selectSkill({ title: "ALL", imageurl: "" }))
+                dispatch(selectSkill({ title: "ALL", imageurl: defaultImage }))
               }
             >
               <div className="box-image">
-                <img src={itemList[0].imageurl} alt={`Image ${0}`} />
+                <img 
+                  src={itemList?.[0]?.imageurl || defaultImage} 
+                  alt="All Skills" 
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = defaultImage;
+                  }}
+                />
               </div>
               <div className="box-text">
                 <p>ALL</p>
@@ -95,10 +105,17 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
                 onClick={() => dispatch(selectSkill(item))}
               >
                 <div className="box-image">
-                  <img src={item.imageurl} alt={`Image ${index + 1}`} />
+                  <img 
+                    src={item?.imageurl || defaultImage} 
+                    alt={`Skill ${index + 1}`}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = defaultImage;
+                    }}
+                  />
                 </div>
                 <div className="box-text">
-                  <p>{item.title}</p>
+                  <p>{item?.title || 'Untitled Skill'}</p>
                 </div>
               </div>
             </Link>
