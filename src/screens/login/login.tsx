@@ -43,14 +43,14 @@ const Login: React.FC = () => {
     setOffline(newOfflineMode);
     setOfflineMode(newOfflineMode);
     if (newOfflineMode) {
-      navigate("/");
+      navigate("/home");
     }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (offline) {
-      navigate("/");
+      navigate("/home");
       return;
     }
 
@@ -63,7 +63,7 @@ const Login: React.FC = () => {
       if (user) {
         await storeToken(user);
       }
-      navigate("/");
+      navigate("/home");
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -73,7 +73,7 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     if (offline) {
-      navigate("/");
+      navigate("/home");
       return;
     }
 
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
     const provider = new GoogleAuthProvider();
     try {
       await signInWithPopup(auth, provider);
-      navigate("/");
+      navigate("/home");
     } catch (error: any) {
       setError(error.message);
     } finally {
