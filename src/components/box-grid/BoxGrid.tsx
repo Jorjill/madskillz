@@ -30,11 +30,6 @@ export const BoxGrid: React.FC<BoxGridProps> = ({ itemList }) => {
     }, 500);
   }, [dispatch]);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/login");
-  };
-
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
     if (file) {

@@ -20,7 +20,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { isOfflineMode, setOfflineMode } from '../../utils/offlineMode';
 
 const Settings: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [settings, setSettings] = useState({

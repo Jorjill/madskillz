@@ -7,7 +7,6 @@ import {
   Button,
   TextField,
   Chip,
-  IconButton,
   Card,
   CardContent,
   CardActions,
@@ -15,7 +14,6 @@ import {
 import {
   Add as AddIcon,
   Search as SearchIcon,
-  Book as BookIcon,
   Note as NoteIcon,
   Link as LinkIcon,
 } from '@mui/icons-material';

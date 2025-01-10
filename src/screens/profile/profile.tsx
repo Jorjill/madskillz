@@ -3,7 +3,6 @@ import { Box, Typography, Paper, Avatar, Grid, Chip, Button } from '@mui/materia
 import { Edit as EditIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { getAllSkills, getAllNotes, getAllReferences } from '../../utils/offlineMode';
-import { Skill } from '../../types';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
