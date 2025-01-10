@@ -39,13 +39,6 @@ export const SkillScreen = () => {
   return (
     <div className="homebox">
       <div className="top-nav">
-        <i
-          className="ri-home-line ri-2x"
-          onClick={() => {
-            dispatch(choosePage("notes"));
-            navigate("/");
-          }}
-        ></i>
       </div>
       <div className="layout-container">
         <div className="skill-title-and-delete">
