@@ -3,17 +3,15 @@ import { Button, Typography, Box, Container, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { 
   FaChartLine, FaBrain, FaTrophy, FaRocket,
-  FaLightbulb, FaUsers, FaChartBar, FaCog
+  FaLightbulb, FaUsers, FaChartBar, FaCog, FaCheck 
 } from 'react-icons/fa';
-import {
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot
-} from '@mui/lab';
 import './Landing.less';
+
+// Add Plus Jakarta Sans font
+const fontLink = document.createElement('link');
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
+fontLink.rel = 'stylesheet';
+document.head.appendChild(fontLink);
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
@@ -71,26 +69,76 @@ const Landing: React.FC = () => {
     }
   ];
 
-  const timelineItems = [
+  const journeySteps = [
     {
       icon: <FaLightbulb />,
-      title: 'Set Your Goals',
-      description: 'Define clear objectives and create your personalized skill roadmap'
+      title: 'Choose Your Skills',
+      description: 'Select from our vast library of skills or create your own custom skill paths.',
+      color: '#FFD700'
     },
     {
-      icon: <FaUsers />,
-      title: 'Join Communities',
-      description: 'Connect with like-minded individuals and share experiences'
-    },
-    {
-      icon: <FaChartBar />,
+      icon: <FaChartLine />,
       title: 'Track Progress',
-      description: 'Monitor your growth with detailed analytics and insights'
+      description: 'Monitor your growth with advanced analytics and milestone tracking.',
+      color: '#65877a'
     },
     {
-      icon: <FaCog />,
-      title: 'Optimize & Adapt',
-      description: 'Fine-tune your learning path based on performance data'
+      icon: <FaBrain />,
+      title: 'Learn & Practice',
+      description: 'Access curated resources and AI-generated quizzes to enhance your skills.',
+      color: '#9C27B0'
+    },
+    {
+      icon: <FaRocket />,
+      title: 'Master Skills',
+      description: 'Achieve mastery through consistent practice and expert guidance.',
+      color: '#FF4081'
+    }
+  ];
+
+  const pricingPlans = [
+    {
+      title: 'Free',
+      price: '$0',
+      period: 'forever',
+      features: [
+        'Up to 5 skills',
+        'Manual quiz creation',
+        'Basic progress tracking',
+        'Community support'
+      ],
+      buttonText: 'Get Started',
+      buttonVariant: 'outlined'
+    },
+    {
+      title: 'Pro',
+      price: '$1',
+      period: 'per month',
+      features: [
+        'Everything in Free plan',
+        'Unlimited skills',
+        'Advanced progress tracking',
+        'Advanced analytics',
+        'AI generated quizzes'
+      ],
+      buttonText: 'Upgrade Now',
+      buttonVariant: 'contained',
+      highlighted: true
+    },
+    {
+      title: 'Ultimate',
+      price: 'Coming Soon',
+      period: '',
+      features: [
+        'Everything in Pro plan',
+        'AI powered chatbot assistant',
+        'AI powered skill generation',
+        'Automated learning materials',
+        'Personalized curriculum'
+      ],
+      buttonText: 'Join Waitlist',
+      buttonVariant: 'outlined',
+      comingSoon: true
     }
   ];
 
@@ -179,106 +227,78 @@ const Landing: React.FC = () => {
           </Grid>
         </Box>
 
-        <Box className="timeline-section">
+        <Box className="journey-section">
           <Typography variant="h2" className="section-title" gutterBottom>
-            Your Journey
+            Your Learning Journey
           </Typography>
-          <Timeline position="alternate">
-            {timelineItems.map((item, index) => (
-              <TimelineItem key={index}>
-                <TimelineSeparator>
-                  <div className={`animate-scale delay-${index}`}>
-                    <TimelineDot className="timeline-dot">
-                      {item.icon}
-                    </TimelineDot>
+          <Typography variant="h6" className="section-subtitle" gutterBottom>
+            Four simple steps to skill mastery
+          </Typography>
+          
+          <Box className="journey-path">
+            <div className="path-line"></div>
+            <Grid container spacing={4}>
+              {journeySteps.map((step, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <div className={`journey-card animate-fade-up delay-${index}`}>
+                    <div className="step-number">{index + 1}</div>
+                    <div className="icon-wrapper" style={{ background: `linear-gradient(135deg, ${step.color}22, ${step.color}11)` }}>
+                      <div className="icon-background" style={{ color: step.color }}>
+                        {step.icon}
+                      </div>
+                    </div>
+                    <Typography variant="h5" className="step-title">
+                      {step.title}
+                    </Typography>
+                    <Typography className="step-description">
+                      {step.description}
+                    </Typography>
                   </div>
-                  {index < timelineItems.length - 1 && <TimelineConnector />}
-                </TimelineSeparator>
-                <TimelineContent>
-                  <div className={`animate-fade-${index % 2 === 0 ? 'right' : 'left'} delay-${index}`}>
-                    <Typography variant="h6">{item.title}</Typography>
-                    <Typography>{item.description}</Typography>
-                  </div>
-                </TimelineContent>
-              </TimelineItem>
-            ))}
-          </Timeline>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
         </Box>
 
-        <Box className="features-comparison">
-          <Typography variant="h2" className="section-title">
-            Features That Set Us Apart
+        <Box className="pricing-section">
+          <Typography variant="h2" className="section-title" gutterBottom>
+            Choose Your Plan
           </Typography>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={6}>
-              <div className="animate-fade-right">
-                <Box className="comparison-card free">
-                  <Typography variant="h5" className="plan-title">Free Plan</Typography>
-                  <ul className="features-list">
-                    <li>
-                      <span className="feature-name">Basic Skill Tracking</span>
-                      <span className="feature-detail">Track up to 3 skills</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">Simple Progress Charts</span>
-                      <span className="feature-detail">Basic progress visualization</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">Community Forums</span>
-                      <span className="feature-detail">Access to skill discussions</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">Email Support</span>
-                      <span className="feature-detail">Basic email support</span>
-                    </li>
-                  </ul>
-                  <Button
-                    variant="outlined"
-                    className="plan-button"
-                    onClick={() => navigate('/login')}
-                  >
-                    Start Free
-                  </Button>
-                </Box>
-              </div>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <div className="animate-fade-left">
-                <Box className="comparison-card pro">
-                  <div className="pro-badge">PRO</div>
-                  <Typography variant="h5" className="plan-title">Pro Plan</Typography>
-                  <ul className="features-list">
-                    <li>
-                      <span className="feature-name">Everything in Free</span>
-                      <span className="feature-detail">Plus all premium features below</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">AI Skill Assistant</span>
-                      <span className="feature-detail">24/7 chatbot for personalized guidance</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">Unlimited Skills</span>
-                      <span className="feature-detail">Track any number of skills</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">Advanced Analytics</span>
-                      <span className="feature-detail">Detailed insights and predictions</span>
-                    </li>
-                    <li>
-                      <span className="feature-name">Priority Support</span>
-                      <span className="feature-detail">24/7 dedicated support</span>
-                    </li>
-                  </ul>
-                  <Button
-                    variant="contained"
-                    className="plan-button"
-                    onClick={() => navigate('/login')}
-                  >
-                    Try Pro Free
-                  </Button>
-                </Box>
-              </div>
-            </Grid>
+          <Grid container spacing={4} justifyContent="center">
+            {pricingPlans.map((plan, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <div className={`animate-fade-up delay-${index}`}>
+                  <Box className={`pricing-card ${plan.highlighted ? 'highlighted' : ''} ${plan.comingSoon ? 'coming-soon' : ''}`}>
+                    <Typography variant="h4" className="plan-title">
+                      {plan.title}
+                    </Typography>
+                    <Typography variant="h3" className="plan-price">
+                      {plan.price}
+                    </Typography>
+                    {plan.period && (
+                      <Typography className="plan-period">
+                        {plan.period}
+                      </Typography>
+                    )}
+                    <ul className="feature-list">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx}>
+                          <FaCheck className="check-icon" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button 
+                      variant={plan.buttonVariant as 'outlined' | 'contained'} 
+                      className="action-button"
+                      disabled={plan.comingSoon}
+                    >
+                      {plan.buttonText}
+                    </Button>
+                  </Box>
+                </div>
+              </Grid>
+            ))}
           </Grid>
         </Box>
 
