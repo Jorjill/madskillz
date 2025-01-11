@@ -80,7 +80,7 @@
     margin: 0 auto;
     position: relative;
     z-index: 1;
-    overflow-y: auto;
+    overflow: hidden;
 
     .skill-title-and-delete {
       display: flex;
@@ -170,16 +170,21 @@
       }
     }
 
+    main#content {
+      height: 100%;
+      overflow: hidden;
+    }
+
     main {
       background: rgba(30, 41, 59, 0.5);
       backdrop-filter: blur(12px);
+      height: 100%;
+      overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 16px;
       margin: 0 2rem;
-      height: calc(100vh - 250px);
       padding: 2rem;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      overflow-y: auto;
 
       @media (max-width: 768px) {
         margin: 0 1rem;
