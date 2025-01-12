@@ -10,12 +10,9 @@ import { choosePage } from "../../slices/pageSlice";
 import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
 import Reference from "../../components/reference/reference";
-import { Practice } from "../../components/practice/practice";
-import { useEffect, useState } from "react";
-import { PracticeDropdown } from "../../components/practice-dropdown/practice-dropdown";
+import Quiz from "../../components/quiz/quiz";
+import { useEffect } from "react";
 import { LoadingScreen } from "../../components/loading/loading";
-import { Test } from "../../components/test/test";
-import { Results } from "../../components/results/results";
 import { skillsThunks } from "../../slices/skillsSlice";
 import {
   unsetAddReferenceMode,
@@ -29,8 +26,6 @@ export const SkillScreen = () => {
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
   );
-  const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
-  const practiceMode = useSelector((state: any) => state.practice.practiceMode);
 
   useEffect(() => {
     dispatch<any>(notesThunks.fetchNotes());
@@ -89,22 +84,20 @@ export const SkillScreen = () => {
                   </button>
                 </li>
               ) : null}
-
-              <li
-                onMouseEnter={() => setIsPracticeDropdownOpen(true)}
-                onMouseLeave={() => setIsPracticeDropdownOpen(false)}
-              >
+              <li>
                 <button
                   className="nav-button"
                   onClick={() => {
+                    dispatch(choosePage("quiz"));
                     dispatch(deselectNote());
                     dispatch(deselectAddNoteMode());
                     dispatch(deselectEditNoteMode());
+                    dispatch(unsetAddReferenceMode());
+                    dispatch(unsetEditReferenceMode());
                   }}
                 >
-                  Practice
+                  Quiz
                 </button>
-                {isPracticeDropdownOpen && <PracticeDropdown />}
               </li>
             </ul>
           </nav>
@@ -114,16 +107,10 @@ export const SkillScreen = () => {
             <Notes />
           ) : currentComponent === "reference" ? (
             <Reference />
-          ) : currentComponent === "practice" ? (
-            practiceMode === "test" ? (
-              <Test />
-            ) : (
-              <Practice />
-            )
+          ) : currentComponent === "quiz" ? (
+            <Quiz />
           ) : currentComponent === "loading" ? (
             <LoadingScreen />
-          ) : currentComponent === "result" ? (
-            <Results />
           ) : null}
         </main>
         <div className="layout-line"></div>

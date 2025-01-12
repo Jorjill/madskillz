@@ -45,15 +45,37 @@ const getAuthHeaders = () => {
 };
 
 export const skillsThunks = {
-   // @ts-ignore
+  // @ts-ignore
   fetchSkills: () => async (dispatch: any) => {
     try {
-       // @ts-ignore
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/skills`,
-        getAuthHeaders()
-      );
-     dispatch(skillsActions.addSkills(response.data));
+      if (import.meta.env.VITE_DEV === "true") {
+        // In development mode, use offline data
+        const offlineSkills = [
+          {
+            id: '1',
+            title: 'javascript',
+            imageurl: '/images/javascript.png'
+          },
+          {
+            id: '2',
+            title: 'react',
+            imageurl: '/images/react.png'
+          },
+          {
+            id: '3',
+            title: 'typescript',
+            imageurl: '/images/typescript.png'
+          }
+        ];
+        dispatch(skillsActions.addSkills(offlineSkills));
+      } else {
+        // In production mode, use API
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/skills`,
+          getAuthHeaders()
+        );
+        dispatch(skillsActions.addSkills(response.data));
+      }
     } catch (error) {
       console.error("Failed to fetch skills:", error);
     }

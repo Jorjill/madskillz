@@ -8,6 +8,7 @@ import referenceReducer from "../slices/referenceSlice";
 import storageSession from "redux-persist/lib/storage/session";
 import practiceReducer from "../slices/practiceSlice";
 import testReducer from "../slices/testSlice";
+import quizReducer from "../slices/quizSlice";
 import thunk, { ThunkDispatch } from 'redux-thunk';
 
 // Persist configuration
@@ -23,13 +24,17 @@ const rootReducer = combineReducers({
   page: pageReducer,
   reference: referenceReducer,
   practice: practiceReducer,
-  test: testReducer
+  test: testReducer,
+  quiz: quizReducer,
 });
 
-// Enhanced reducer with persistence capabilities
+// Define the RootState type to represent the overall shape of your Redux store state
+type RootState = ReturnType<typeof rootReducer>;
+
+// Create the persisted reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// Configure store with persisted reducer
+// Create the store with the persisted reducer
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
@@ -47,14 +52,12 @@ const store = configureStore({
     }).prepend(thunk),
 });
 
-// Create a persistor instance
+// Create the persistor
 const persistor = persistStore(store);
-
-// Define the RootState type to represent the overall shape of your Redux store state
-type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch & ThunkDispatch<RootState, null, AnyAction>;
 
 // Export the store and persistor
 export { store, persistor };
-// Export the RootState type for use in your components
+// Export types
 export type { RootState };
+// Export the AppDispatch type for use with useDispatch
+export type AppDispatch = typeof store.dispatch & ThunkDispatch<RootState, null, AnyAction>;
