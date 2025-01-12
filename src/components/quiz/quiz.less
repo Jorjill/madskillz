@@ -68,6 +68,64 @@
       display: flex;
       width: 100%;
       justify-content: center;
+      margin-top: 20px;
+
+      .new-quiz-input-container {
+        width: 80%;
+        min-width: 150px;
+
+        .new-quiz-input {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 10px;
+          border: solid 1px #eeeeee;
+          border-radius: 8px;
+          background-color: rgba(255, 255, 255, 0.05);
+          color: #eeeeee;
+
+          &::placeholder {
+            color: rgba(238, 238, 238, 0.5);
+          }
+
+          &:focus {
+            outline: none;
+            border-color: #65877a;
+          }
+        }
+
+        .new-quiz-buttons {
+          display: flex;
+          gap: 10px;
+          justify-content: flex-end;
+
+          button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+
+            &.create-quiz-button {
+              background-color: #65877a;
+              color: #eeeeee;
+
+              &:hover {
+                background-color: darken(#65877a, 5%);
+              }
+            }
+
+            &.cancel-button {
+              background-color: rgba(238, 238, 238, 0.1);
+              color: #eeeeee;
+
+              &:hover {
+                background-color: rgba(238, 238, 238, 0.15);
+              }
+            }
+          }
+        }
+      }
 
       .add-quiz-button, .add-question-button {
         display: flex;
@@ -78,7 +136,6 @@
         padding: 10px;
         width: 80%;
         min-width: 150px;
-        margin-top: 100px;
         border-radius: 8px;
         cursor: pointer;
         transition: background-color 0.2s ease;
@@ -104,12 +161,14 @@
       max-width: 800px;
       padding: 0 20px;
       margin-top: 30px;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
 
       .question-container, .answer-container {
-        margin-bottom: 40px;
+        margin-bottom: 30px;
 
         h2 {
-          margin-bottom: 20px;
+          margin-bottom: 16px;
           font-size: 24px;
           color: #eeeeee;
         }
@@ -117,12 +176,12 @@
         .question-text {
           font-size: 16px;
           line-height: 1.8;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
         }
 
-        textarea {
+        textarea, .question-input {
           width: 100%;
-          min-height: 200px;
+          min-height: 120px;
           background-color: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.1);
           border-radius: 8px;
@@ -131,7 +190,7 @@
           font-size: 16px;
           line-height: 1.6;
           resize: vertical;
-          margin-bottom: 20px;
+          margin-bottom: 16px;
 
           &:focus {
             outline: none;
@@ -139,22 +198,57 @@
           }
         }
 
-        .save-button {
+        .question-input {
+          min-height: unset;
+          height: 40px;
+          resize: none;
+        }
+
+        .input-group {
+          margin-bottom: 20px;
+
+          label {
+            display: block;
+            color: #eeeeee;
+            margin-bottom: 8px;
+            font-size: 16px;
+          }
+
+          textarea {
+            margin-bottom: 0;
+            min-height: 100px;
+          }
+
+          &:last-child textarea {
+            min-height: 80px;
+          }
+        }
+
+        .button-group {
+          display: flex;
+          gap: 12px;
+          justify-content: flex-start;
+          position: sticky;
+          bottom: 0;
+          padding: 16px 0;
+          margin-top: 20px;
+          border-top: 1px solid rgba(238, 238, 238, 0.1);
+        }
+
+        .save-button, .cancel-button {
           display: inline-flex;
           align-items: center;
           justify-content: center;
           padding: 12px 24px;
-          background: rgba(101, 135, 122, 0.2);
-          border: 1px solid rgba(101, 135, 122, 0.3);
           border-radius: 8px;
           color: #eeeeee;
           font-size: 14px;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s ease;
+          border: none;
 
           &:hover {
-            background: rgba(101, 135, 122, 0.3);
             transform: translateY(-2px);
           }
 
@@ -162,6 +256,33 @@
             transform: translateY(1px);
           }
         }
+
+        .save-button {
+          background: rgba(101, 135, 122, 0.2);
+          border: 1px solid rgba(101, 135, 122, 0.3);
+
+          &:hover {
+            background: rgba(101, 135, 122, 0.3);
+          }
+        }
+
+        .cancel-button {
+          background: rgba(238, 238, 238, 0.1);
+          border: 1px solid rgba(238, 238, 238, 0.2);
+
+          &:hover {
+            background: rgba(238, 238, 238, 0.15);
+          }
+        }
+      }
+
+      .no-selection {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #666666;
+        font-style: italic;
       }
     }
   }

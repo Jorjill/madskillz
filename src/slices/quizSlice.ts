@@ -5,54 +5,65 @@ export const quizThunks = {
   fetchQuizzes: createAsyncThunk(
     'quiz/fetchQuizzes',
     async (skillName: string) => {
-      // Use lowercase skill name to match our data
-      return sampleQuizzes[skillName.toLowerCase()] || [];
+      if (import.meta.env.VITE_DEV === 'true') {
+        return sampleQuizzes[skillName.toLowerCase()] || [];
+      }
+      return [];
     }
   ),
 
   createQuiz: createAsyncThunk(
     'quiz/createQuiz',
-    async ({ skill }: { skill: string }) => {
-      const skillKey = skill.toLowerCase();
+    async ({ skill, title = 'New Quiz' }: { skill: string; title?: string }) => {
       const newQuiz = {
         id: `quiz_${Date.now()}`,
-        title: `New Quiz ${sampleQuizzes[skillKey]?.length + 1 || 1}`,
-        questions: []
+        title: title,
+        skill: skill.toLowerCase(),
+        questions: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
-      
-      if (!sampleQuizzes[skillKey]) {
-        sampleQuizzes[skillKey] = [];
+
+      if (import.meta.env.VITE_DEV === 'true') {
+        return newQuiz;
       }
-      sampleQuizzes[skillKey].push(newQuiz);
-      
       return newQuiz;
     }
   ),
 
   createQuestion: createAsyncThunk(
     'quiz/createQuestion',
-    async ({ quizId }: { quizId: string }) => {
+    async ({ 
+      quizId, 
+      title = 'New Question',
+      text = '',
+      answer = ''
+    }: { 
+      quizId: string; 
+      title?: string;
+      text?: string;
+      answer?: string;
+    }) => {
       const newQuestion = {
         id: `question_${Date.now()}`,
-        text: 'New Question',
-        answer: '',
-        quizId
+        quizId,
+        title,
+        text,
+        answer,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
+
+      if (import.meta.env.VITE_DEV === 'true') {
+        return newQuestion;
+      }
       return newQuestion;
     }
   ),
 
   updateQuestionAnswer: createAsyncThunk(
     'quiz/updateQuestionAnswer',
-    async ({
-      quizId,
-      questionId,
-      answer,
-    }: {
-      quizId: string;
-      questionId: string;
-      answer: string;
-    }) => {
+    async ({ quizId, questionId, answer }: { quizId: string; questionId: string; answer: string }) => {
       return { quizId, questionId, answer };
     }
   ),

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './quiz.less';
 import { useDispatch, useSelector } from 'react-redux';
 import { quizThunks } from '../../slices/quizSlice';
@@ -25,7 +25,14 @@ const Quiz: React.FC = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [editedAnswer, setEditedAnswer] = useState('');
   const [editedQuestion, setEditedQuestion] = useState('');
+  const [newQuizTitle, setNewQuizTitle] = useState('');
+  const [showNewQuizInput, setShowNewQuizInput] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
+  const [isAddingQuestion, setIsAddingQuestion] = useState(false);
+  const [newQuestionTitle, setNewQuestionTitle] = useState('');
+  const [newQuestionText, setNewQuestionText] = useState('');
+  const [newQuestionAnswer, setNewQuestionAnswer] = useState('');
+  const newQuizRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (selectedSkill) {
@@ -34,10 +41,65 @@ const Quiz: React.FC = () => {
     }
   }, [selectedSkill, dispatch]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (newQuizRef.current && !newQuizRef.current.contains(event.target as Node)) {
+        setShowNewQuizInput(false);
+        setNewQuizTitle('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const handleQuizClick = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
     setShowQuestions(true);
     setSelectedQuestion(null);
+    setShowNewQuizInput(false);
+    setIsAddingQuestion(false);
+  };
+
+  const handleAddQuiz = () => {
+    setShowNewQuizInput(true);
+    setNewQuizTitle('');
+  };
+
+  const handleAddQuestion = () => {
+    setIsAddingQuestion(true);
+    setSelectedQuestion(null);
+    setNewQuestionTitle('');
+    setNewQuestionText('');
+    setNewQuestionAnswer('');
+  };
+
+  const handleCreateQuiz = () => {
+    if (selectedSkill && newQuizTitle.trim()) {
+      dispatch(quizThunks.createQuiz({ 
+        skill: selectedSkill.toLowerCase(),
+        title: newQuizTitle.trim()
+      }));
+      setShowNewQuizInput(false);
+      setNewQuizTitle('');
+    }
+  };
+
+  const handleCreateQuestion = () => {
+    if (selectedQuiz && newQuestionText.trim()) {
+      dispatch(quizThunks.createQuestion({ 
+        quizId: selectedQuiz.id,
+        title: newQuestionTitle.trim(),
+        text: newQuestionText.trim(),
+        answer: newQuestionAnswer.trim()
+      }));
+      setIsAddingQuestion(false);
+      setNewQuestionTitle('');
+      setNewQuestionText('');
+      setNewQuestionAnswer('');
+    }
   };
 
   const handleQuestionClick = (question: Question) => {
@@ -83,15 +145,45 @@ const Quiz: React.FC = () => {
                 <div className="no-quizzes">No quizzes available for this skill</div>
               )}
             </div>
-            <div className="add-quiz-button-container">
-              <div
-                className="add-quiz-button"
-                onClick={() => {
-                  dispatch(quizThunks.createQuiz({ skill: selectedSkill.toLowerCase() }));
-                }}
-              >
-                Add Quiz
-              </div>
+            <div className="add-quiz-button-container" ref={newQuizRef}>
+              {showNewQuizInput ? (
+                <div className="new-quiz-input-container">
+                  <input
+                    type="text"
+                    value={newQuizTitle}
+                    onChange={(e) => setNewQuizTitle(e.target.value)}
+                    placeholder="Enter quiz title..."
+                    className="new-quiz-input"
+                    autoFocus
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleCreateQuiz();
+                      }
+                    }}
+                  />
+                  <div className="new-quiz-buttons">
+                    <button onClick={handleCreateQuiz} className="create-quiz-button">
+                      Create
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowNewQuizInput(false);
+                        setNewQuizTitle('');
+                      }} 
+                      className="cancel-button"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="add-quiz-button"
+                  onClick={handleAddQuiz}
+                >
+                  Add Quiz
+                </div>
+              )}
             </div>
           </>
         ) : (
@@ -114,13 +206,7 @@ const Quiz: React.FC = () => {
             <div className="add-question-button-container">
               <div
                 className="add-question-button"
-                onClick={() => {
-                  if (selectedQuiz) {
-                    dispatch(quizThunks.createQuestion({
-                      quizId: selectedQuiz.id
-                    }));
-                  }
-                }}
+                onClick={handleAddQuestion}
               >
                 Add Question
               </div>
@@ -130,7 +216,48 @@ const Quiz: React.FC = () => {
       </div>
 
       <div className="quiz-content-right">
-        {selectedQuestion && (
+        {isAddingQuestion ? (
+          <div className="quiz-content-container">
+            <div className="question-container">
+              <h2>New Question</h2>
+              <div className="input-group">
+                <label>Title:</label>
+                <input
+                  type="text"
+                  value={newQuestionTitle}
+                  onChange={(e) => setNewQuestionTitle(e.target.value)}
+                  placeholder="Enter question title..."
+                  className="question-input"
+                />
+              </div>
+              <div className="input-group">
+                <label>Question:</label>
+                <textarea
+                  value={newQuestionText}
+                  onChange={(e) => setNewQuestionText(e.target.value)}
+                  placeholder="Enter question text..."
+                  className="question-text"
+                />
+              </div>
+              <div className="input-group">
+                <label>Answer:</label>
+                <textarea
+                  value={newQuestionAnswer}
+                  onChange={(e) => setNewQuestionAnswer(e.target.value)}
+                  placeholder="Enter answer..."
+                />
+              </div>
+              <div className="button-group">
+                <button className="save-button" onClick={handleCreateQuestion}>
+                  Add Question
+                </button>
+                <button className="cancel-button" onClick={() => setIsAddingQuestion(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : selectedQuestion ? (
           <div className="quiz-content-container">
             <div className="question-container">
               <h2>Question</h2>
@@ -153,6 +280,10 @@ const Quiz: React.FC = () => {
                 Save Changes
               </button>
             </div>
+          </div>
+        ) : (
+          <div className="no-selection">
+            Select a question to edit or add a new question
           </div>
         )}
       </div>
