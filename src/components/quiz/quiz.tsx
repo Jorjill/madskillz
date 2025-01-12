@@ -32,7 +32,12 @@ const Quiz: React.FC = () => {
   const [newQuestionTitle, setNewQuestionTitle] = useState('');
   const [newQuestionText, setNewQuestionText] = useState('');
   const [newQuestionAnswer, setNewQuestionAnswer] = useState('');
+  const [editingQuizId, setEditingQuizId] = useState<string | null>(null);
+  const [editingQuizTitle, setEditingQuizTitle] = useState('');
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const newQuizRef = useRef<HTMLDivElement>(null);
+  const editQuizRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (selectedSkill) {
@@ -43,24 +48,84 @@ const Quiz: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (newQuizRef.current && !newQuizRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (openMenuId) {
+        const menuButton = document.querySelector(`[data-quiz-id="${openMenuId}"]`);
+        const menuDropdown = menuButton?.nextElementSibling;
+        
+        if (!menuButton?.contains(target) && !menuDropdown?.contains(target)) {
+          setOpenMenuId(null);
+        }
+      }
+      if (newQuizRef.current && !newQuizRef.current.contains(target)) {
         setShowNewQuizInput(false);
         setNewQuizTitle('');
+      }
+      if (editingQuizId && editQuizRef.current && !editQuizRef.current.contains(target)) {
+        setEditingQuizId(null);
+        setEditingQuizTitle('');
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenuId, editingQuizId]);
 
-  const handleQuizClick = (quiz: Quiz) => {
+  const handleMenuClick = (event: React.MouseEvent, quizId: string) => {
+    event.stopPropagation();
+    setOpenMenuId(openMenuId === quizId ? null : quizId);
+  };
+
+  const handleEditClick = (event: React.MouseEvent, quiz: Quiz) => {
+    event.stopPropagation();
+    setEditingQuizId(quiz.id);
+    setEditingQuizTitle(quiz.title);
+    setOpenMenuId(null);
+  };
+
+  const handleDeleteClick = (event: React.MouseEvent, quiz: Quiz) => {
+    event.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this quiz?')) {
+      dispatch(quizThunks.deleteQuiz(quiz.id));
+      if (selectedQuiz?.id === quiz.id) {
+        setSelectedQuiz(null);
+        setShowQuestions(false);
+      }
+    }
+    setOpenMenuId(null);
+  };
+
+  const handleQuizSelect = (quiz: Quiz) => {
+    if (editingQuizId === quiz.id) return;
     setSelectedQuiz(quiz);
     setShowQuestions(true);
     setSelectedQuestion(null);
     setShowNewQuizInput(false);
-    setIsAddingQuestion(false);
+    setOpenMenuId(null);
+  };
+
+  const handleUpdateQuiz = () => {
+    if (editingQuizId && editingQuizTitle.trim()) {
+      dispatch(quizThunks.updateQuiz({ 
+        quizId: editingQuizId, 
+        title: editingQuizTitle.trim() 
+      }));
+      setEditingQuizId(null);
+      setEditingQuizTitle('');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingQuizId(null);
+    setEditingQuizTitle('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleUpdateQuiz();
+    } else if (e.key === 'Escape') {
+      handleCancelEdit();
+    }
   };
 
   const handleAddQuiz = () => {
@@ -132,13 +197,70 @@ const Quiz: React.FC = () => {
           <>
             <div className="quiz-list">
               {quizzes && quizzes.length > 0 ? (
-                quizzes.map((quiz: Quiz) => (
+                quizzes.map((quiz) => (
                   <div
                     key={quiz.id}
-                    className={`quiz-title ${selectedQuiz?.id === quiz.id ? 'selected' : ''}`}
-                    onClick={() => handleQuizClick(quiz)}
+                    className={`quiz-title ${selectedQuiz?.id === quiz.id ? 'selected' : ''} ${editingQuizId === quiz.id ? 'editing' : ''}`}
+                    onClick={() => handleQuizSelect(quiz)}
                   >
-                    {quiz.title}
+                    {editingQuizId === quiz.id ? (
+                      <div className="edit-container" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          className="edit-quiz-input"
+                          value={editingQuizTitle}
+                          onChange={(e) => setEditingQuizTitle(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          autoFocus
+                        />
+                        <div className="edit-actions">
+                          <button 
+                            className="save"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUpdateQuiz();
+                            }}
+                          >
+                            Save
+                          </button>
+                          <button 
+                            className="cancel"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancelEdit();
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="quiz-text">{quiz.title}</span>
+                        <button
+                          className="menu-button"
+                          onClick={(e) => handleMenuClick(e, quiz.id)}
+                          data-quiz-id={quiz.id}
+                        >
+                          ⋮
+                        </button>
+                        {openMenuId === quiz.id && (
+                          <div className="menu-dropdown">
+                            <button
+                              className="menu-item"
+                              onClick={(e) => handleEditClick(e, quiz)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="menu-item delete"
+                              onClick={(e) => handleDeleteClick(e, quiz)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 ))
               ) : (

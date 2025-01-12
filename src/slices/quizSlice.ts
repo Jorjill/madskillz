@@ -64,9 +64,38 @@ export const quizThunks = {
   updateQuestionAnswer: createAsyncThunk(
     'quiz/updateQuestionAnswer',
     async ({ quizId, questionId, answer }: { quizId: string; questionId: string; answer: string }) => {
+      if (import.meta.env.VITE_DEV === 'true') {
+        return { quizId, questionId, answer };
+      }
       return { quizId, questionId, answer };
     }
   ),
+
+  updateQuiz: createAsyncThunk(
+    'quiz/updateQuiz',
+    async ({ quizId, title }: { quizId: string; title: string }) => {
+      const updatedQuiz = {
+        id: quizId,
+        title,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (import.meta.env.VITE_DEV === 'true') {
+        return updatedQuiz;
+      }
+      return updatedQuiz;
+    }
+  ),
+
+  deleteQuiz: createAsyncThunk(
+    'quiz/deleteQuiz',
+    async (quizId: string) => {
+      if (import.meta.env.VITE_DEV === 'true') {
+        return quizId;
+      }
+      return quizId;
+    }
+  )
 };
 
 // Sample quizzes data structure
@@ -181,7 +210,6 @@ const quizSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // Fetch Quizzes
     builder
       .addCase(quizThunks.fetchQuizzes.pending, (state) => {
         state.loading = true;
@@ -194,37 +222,46 @@ const quizSlice = createSlice({
       .addCase(quizThunks.fetchQuizzes.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch quizzes';
-      });
+      })
 
-    // Create Quiz
-    builder
       .addCase(quizThunks.createQuiz.fulfilled, (state, action) => {
         state.quizzes.push(action.payload);
-      });
+      })
 
-    // Create Question
-    builder
       .addCase(quizThunks.createQuestion.fulfilled, (state, action) => {
         const quiz = state.quizzes.find(q => q.id === action.payload.quizId);
         if (quiz) {
+          if (!quiz.questions) {
+            quiz.questions = [];
+          }
           quiz.questions.push(action.payload);
         }
-      });
+      })
 
-    // Update Question Answer
-    builder
+      .addCase(quizThunks.updateQuiz.fulfilled, (state, action) => {
+        const index = state.quizzes.findIndex(q => q.id === action.payload.id);
+        if (index !== -1) {
+          state.quizzes[index] = {
+            ...state.quizzes[index],
+            ...action.payload
+          };
+        }
+      })
+
+      .addCase(quizThunks.deleteQuiz.fulfilled, (state, action) => {
+        state.quizzes = state.quizzes.filter(q => q.id !== action.payload);
+      })
+
       .addCase(quizThunks.updateQuestionAnswer.fulfilled, (state, action) => {
         const quiz = state.quizzes.find(q => q.id === action.payload.quizId);
         if (quiz) {
-          const question = quiz.questions.find(
-            (q: any) => q.id === action.payload.questionId
-          );
+          const question = quiz.questions?.find(q => q.id === action.payload.questionId);
           if (question) {
             question.answer = action.payload.answer;
           }
         }
       });
-  },
+  }
 });
 
 export default quizSlice.reducer;
