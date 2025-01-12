@@ -1,4 +1,9 @@
 .notes-component {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
   @keyframes slideInUp {
     from {
       opacity: 0;
@@ -11,7 +16,9 @@
   }
 
   .input-and-button {
+    flex-shrink: 0;
     display: flex;
+    padding: 20px;
     .add-button {
       display: flex;
       flex-direction: column;
@@ -53,17 +60,19 @@
   }
 
   .items-list-container {
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
     width: 100%;
+    overflow-y: auto;
 
     .notes-list-header {
+      flex-shrink: 0;
       display: flex;
       flex-direction: row;
       width: 80%;
-      margin-top: 20px;
-      margin-bottom: 20px;
+      margin: 0 auto 20px;
       justify-content: space-between;
 
       .title {
@@ -96,10 +105,12 @@
     }
 
     .items-list {
+      flex: 1;
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 80%;
+      padding-bottom: 20px;
 
       .list-box {
         background: rgba(30, 41, 59, 0.5);
