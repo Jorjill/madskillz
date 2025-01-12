@@ -199,6 +199,16 @@ interface QuizState {
   error: string | null;
 }
 
+interface Question {
+  id: string;
+  quizId: string;
+  title: string;
+  text: string;
+  answer: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const initialState: QuizState = {
   quizzes: [],
   loading: false,
@@ -230,12 +240,11 @@ const quizSlice = createSlice({
 
       .addCase(quizThunks.createQuestion.fulfilled, (state, action) => {
         const quiz = state.quizzes.find(q => q.id === action.payload.quizId);
-        if (quiz) {
-          if (!quiz.questions) {
-            quiz.questions = [];
-          }
-          quiz.questions.push(action.payload);
+        if (!quiz) return;
+        if (!quiz.questions) {
+          quiz.questions = [];
         }
+        quiz.questions.push(action.payload);
       })
 
       .addCase(quizThunks.updateQuiz.fulfilled, (state, action) => {
@@ -254,11 +263,10 @@ const quizSlice = createSlice({
 
       .addCase(quizThunks.updateQuestionAnswer.fulfilled, (state, action) => {
         const quiz = state.quizzes.find(q => q.id === action.payload.quizId);
-        if (quiz) {
-          const question = quiz.questions?.find(q => q.id === action.payload.questionId);
-          if (question) {
-            question.answer = action.payload.answer;
-          }
+        if (!quiz) return;
+        const question = quiz.questions?.find((q: Question) => q.id === action.payload.questionId);
+        if (question) {
+          question.answer = action.payload.answer;
         }
       });
   }

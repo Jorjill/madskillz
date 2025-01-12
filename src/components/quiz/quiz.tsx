@@ -37,7 +37,6 @@ const Quiz: React.FC = () => {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const newQuizRef = useRef<HTMLDivElement>(null);
   const editQuizRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (selectedSkill) {
