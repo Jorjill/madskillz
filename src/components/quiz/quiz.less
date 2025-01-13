@@ -1,547 +1,401 @@
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+// Variables
+@primary-color: #65877a;
+@text-color: #eeeeee;
+@background-dark: rgba(30, 41, 59, 0.95);
+@background-light: rgba(30, 41, 59, 0.4);
+@border-color: rgba(255, 255, 255, 0.1);
+@danger-color: #ff6b6b;
+@hover-background: rgba(255, 255, 255, 0.1);
+@danger-hover: rgba(255, 99, 99, 0.15);
+
+// Mixins
+.button-base() {
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flex-center() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-base() {
+  width: 100%;
+  background: @background-dark;
+  border: 1px solid @border-color;
+  border-radius: 4px;
+  padding: 12px;
+  color: @text-color;
+  font-size: 14px;
+  
+  &:focus {
+    outline: none;
+    border-color: @primary-color;
   }
 }
 
+// Global Styles
 .quiz-container {
   display: flex;
   height: 100%;
-  width: 100%;
+  position: relative;
+}
 
-  .sidebar-container {
-    width: 300px;
-    min-width: 300px;
-    height: 100%;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    overflow: visible;
+// Menu Dropdown Styles (Portal)
+.menu-dropdown {
+  background: @background-dark;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  min-width: 120px;
+  border: 1px solid @border-color;
+  z-index: 99999;
 
-    .quiz-list {
-      margin-top: 20px;
-      position: relative;
+  button {
+    .button-base();
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    color: @text-color;
+    font-size: 13px;
+    text-align: left;
+
+    &:hover {
+      background: @hover-background;
     }
 
-    .quiz-title, .question-title {
-      &:not(:first-child) {
-        margin-top: 30px;
-      }
-
-      cursor: pointer;
-      transition: opacity 0.2s ease;
-
+    &.delete {
+      color: @danger-color;
       &:hover {
-        opacity: 0.8;
-      }
-
-      &.selected {
-        color: #65877a;
+        background: @danger-hover;
       }
     }
+  }
+}
 
-    .add-quiz-button-container, .add-question-button-container {
-      display: flex;
-      width: 100%;
-      justify-content: center;
-      margin-top: 20px;
+// Menu Button Styles
+.menu-button {
+  .button-base();
+  background: none;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 4px;
+  font-size: 18px;
+  .flex-center();
+  opacity: 0;
 
-      .new-quiz-input-container {
-        width: 80%;
-        min-width: 150px;
+  &:hover {
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
 
-        .new-quiz-input {
-          width: 100%;
-          padding: 10px;
-          margin-bottom: 10px;
-          border: solid 1px #eeeeee;
-          border-radius: 8px;
-          background-color: rgba(255, 255, 255, 0.05);
-          color: #eeeeee;
+// Hover States
+.quiz-title:hover,
+.question-title:hover {
+  .menu-button {
+    opacity: 1;
+  }
+}
 
-          &::placeholder {
-            color: rgba(238, 238, 238, 0.5);
-          }
+// Sidebar Styles
+.sidebar-container {
+  width: 300px;
+  background: @background-light;
+  border-right: 1px solid @border-color;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 10;
 
-          &:focus {
-            outline: none;
-            border-color: #65877a;
-          }
-        }
+  // Back Button
+  .back-button {
+    padding: 16px;
+    color: @text-color;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
 
-        .new-quiz-buttons {
-          display: flex;
-          gap: 10px;
-          justify-content: flex-end;
-
-          button {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-
-            &.create-quiz-button {
-              background-color: #65877a;
-              color: #eeeeee;
-
-              &:hover {
-                background-color: darken(#65877a, 5%);
-              }
-            }
-
-            &.cancel-button {
-              background-color: rgba(238, 238, 238, 0.1);
-              color: #eeeeee;
-
-              &:hover {
-                background-color: rgba(238, 238, 238, 0.15);
-              }
-            }
-          }
-        }
-      }
-
-      .add-quiz-button, .add-question-button {
-        display: flex;
-        justify-content: center;
-        border: solid 1px #eeeeee;
-        background-color: #eeeeee;
-        color: #585858;
-        padding: 10px;
-        width: 80%;
-        min-width: 150px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-
-        &:hover {
-          background-color: #d4d4d4;
-        }
-      }
+    &:hover {
+      background: @hover-background;
     }
 
-    .quiz-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      background-color: rgba(255, 255, 255, 0.05);
-      cursor: pointer;
-      transition: all 0.2s ease;
-
-      &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-
-        .menu-button {
-          opacity: 1;
-        }
-      }
-
-      &.selected {
-        background-color: rgba(101, 135, 122, 0.2);
-        border: 1px solid rgba(101, 135, 122, 0.3);
-      }
-
-      .quiz-title {
-        flex: 1;
-        margin-right: 12px;
-        padding: 0;
-        margin-bottom: 0;
-        background: none;
-        border: none;
-        color: #eeeeee;
-        font-size: 14px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        &:hover {
-          background: none;
-        }
-      }
-
-      .quiz-menu {
-        position: relative;
-        margin-left: 8px;
-
-        .menu-button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 28px;
-          height: 28px;
-          padding: 0;
-          border: none;
-          background: transparent;
-          color: #eeeeee;
-          cursor: pointer;
-          opacity: 0;
-          transition: all 0.2s ease;
-          border-radius: 4px;
-
-          &:hover {
-            background: rgba(255, 255, 255, 0.1);
-          }
-
-          svg {
-            width: 16px;
-            height: 16px;
-          }
-        }
-
-        .menu-dropdown {
-          position: absolute;
-          top: 0;
-          left: 100%;
-          min-width: 120px;
-          margin-left: 4px;
-          background-color: #2a2a2a;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-          z-index: 9999;
-          padding: 4px;
-
-          .menu-item {
-            width: 100%;
-            padding: 8px 12px;
-            border: none;
-            background: transparent;
-            color: #eeeeee;
-            font-size: 14px;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:hover {
-              background: rgba(255, 255, 255, 0.1);
-            }
-
-            &.delete {
-              color: #ee4444;
-              &:hover {
-                background: rgba(238, 68, 68, 0.1);
-              }
-            }
-          }
-        }
-      }
+    i {
+      font-size: 20px;
     }
+  }
+
+  // Quiz List
+  .quiz-list {
+    position: relative;
 
     .quiz-title {
-      position: relative;
+      padding: 12px 16px;
+      color: @text-color;
+      cursor: pointer;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 16px;
       margin-bottom: 8px;
-      border-radius: 8px;
-      background-color: rgba(255, 255, 255, 0.05);
-      color: #eeeeee;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      background: @background-dark;
+      border: 1px solid transparent;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-
-        .menu-button {
-          opacity: 1;
-        }
+        border-color: rgba(101, 135, 122, 0.3);
       }
 
       &.selected {
-        background-color: rgba(101, 135, 122, 0.2);
-        border: 1px solid rgba(101, 135, 122, 0.3);
-      }
-
-      &.editing {
-        cursor: default;
-        background-color: rgba(101, 135, 122, 0.1);
-        border: 1px solid rgba(101, 135, 122, 0.2);
-        padding: 12px;
-
-        .edit-container {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          width: 100%;
-        }
-
-        .edit-quiz-input {
-          width: 100%;
-          padding: 8px;
-          background-color: rgba(0, 0, 0, 0.2);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-          color: #eeeeee;
-          font-size: 14px;
-
-          &:focus {
-            outline: none;
-            border-color: rgba(101, 135, 122, 0.4);
-          }
-        }
-
-        .edit-actions {
-          display: flex;
-          gap: 8px;
-
-          button {
-            flex: 1;
-            padding: 6px 8px;
-            border: none;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &.save {
-              background-color: rgba(101, 135, 122, 0.2);
-              color: #eeeeee;
-              &:hover {
-                background-color: rgba(101, 135, 122, 0.3);
-              }
-            }
-
-            &.cancel {
-              background-color: rgba(238, 68, 68, 0.1);
-              color: #ee4444;
-              &:hover {
-                background-color: rgba(238, 68, 68, 0.2);
-              }
-            }
-          }
-        }
+        background: rgba(101, 135, 122, 0.2);
+        border-color: rgba(101, 135, 122, 0.3);
       }
 
       .quiz-text {
         flex: 1;
-        margin-right: 8px;
-        font-size: 14px;
-        word-break: break-word;
-        line-height: 1.4;
+        margin-right: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
-      .menu-button {
-        padding: 4px;
-        border: none;
-        background: transparent;
-        color: #eeeeee;
-        font-size: 18px;
-        cursor: pointer;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        min-width: 24px;
-        border-radius: 4px;
+      .menu-button-container {
         position: relative;
+        z-index: 9999;
+      }
+    }
 
-        &:hover {
-          background: rgba(255, 255, 255, 0.1);
+    // Edit Container
+    .edit-container {
+      padding: 12px;
+      background: @background-light;
+      border-radius: 8px;
+      border: 1px solid rgba(101, 135, 122, 0.3);
+
+      .edit-quiz-input {
+        width: 100%;
+        background: @background-dark;
+        border: 1px solid @border-color;
+        border-radius: 4px;
+        padding: 8px;
+        color: @text-color;
+        font-size: 14px;
+        margin-bottom: 8px;
+
+        &:focus {
+          outline: none;
+          border-color: @primary-color;
         }
       }
 
-      .menu-dropdown {
-        position: absolute;
-        top: 0;
-        left: calc(100% + 4px);
-        min-width: 120px;
-        background-color: #2a2a2a;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        z-index: 9999;
-        padding: 4px;
+      .edit-actions {
+        display: flex;
+        gap: 8px;
 
-        .menu-item {
-          display: block;
-          width: 100%;
-          padding: 8px 12px;
-          border: none;
-          background: transparent;
-          color: #eeeeee;
-          font-size: 14px;
-          text-align: left;
-          cursor: pointer;
-          transition: all 0.2s ease;
+        button {
+          .button-base();
+          flex: 1;
+          padding: 6px 12px;
+          font-size: 13px;
 
-          &:hover {
-            background: rgba(255, 255, 255, 0.1);
+          &.save {
+            background: rgba(101, 135, 122, 0.2);
+            color: @text-color;
+            &:hover {
+              background: rgba(101, 135, 122, 0.3);
+            }
           }
 
-          &.delete {
-            color: #ee4444;
+          &.cancel {
+            background: rgba(255, 99, 99, 0.1);
+            color: @danger-color;
             &:hover {
-              background: rgba(238, 68, 68, 0.1);
+              background: @danger-hover;
             }
           }
         }
       }
     }
+  }
 
-    .add-quiz-button-container {
-      margin-top: 20px;
+  // Add Quiz Button
+  .add-quiz-button {
+    padding: 12px;
+    color: @text-color;
+    cursor: pointer;
+    border-radius: 6px;
+    background: rgba(101, 135, 122, 0.1);
+    text-align: center;
+    margin-top: 16px;
 
-      .add-quiz-button {
-        display: inline-flex;
-        align-items: center;
-        padding: 8px 16px;
-        background: rgba(101, 135, 122, 0.2);
-        border: 1px solid rgba(101, 135, 122, 0.3);
-        border-radius: 8px;
-        color: #eeeeee;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: rgba(101, 135, 122, 0.3);
-        }
-      }
+    &:hover {
+      background: rgba(101, 135, 122, 0.2);
     }
   }
 
-  .quiz-content-right {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
+  // New Quiz Input
+  .new-quiz-input-container {
+    margin-top: 16px;
+    padding: 16px;
+    background: @background-light;
+    border-radius: 8px;
+    border: 1px solid rgba(101, 135, 122, 0.3);
 
-    .quiz-content-container {
+    .new-quiz-input {
       width: 100%;
-      max-width: 800px;
-      padding: 0 20px;
-      margin-top: 30px;
-      height: calc(100vh - 60px);
-      overflow-y: auto;
+      background: @background-dark;
+      border: 1px solid @border-color;
+      border-radius: 4px;
+      padding: 8px;
+      color: @text-color;
+      font-size: 14px;
+      margin-bottom: 12px;
 
-      .question-container, .answer-container {
-        margin-bottom: 30px;
+      &:focus {
+        outline: none;
+        border-color: @primary-color;
+      }
+    }
 
-        h2 {
-          margin-bottom: 16px;
-          font-size: 24px;
-          color: #eeeeee;
-        }
+    .new-quiz-buttons {
+      display: flex;
+      gap: 8px;
 
-        .question-text {
-          font-size: 16px;
-          line-height: 1.8;
-          margin-bottom: 16px;
-        }
+      button {
+        .button-base();
+        flex: 1;
+        padding: 8px;
+        font-size: 13px;
 
-        textarea, .question-input {
-          width: 100%;
-          min-height: 120px;
-          background-color: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 8px;
-          padding: 16px;
-          color: #eeeeee;
-          font-size: 16px;
-          line-height: 1.6;
-          resize: vertical;
-          margin-bottom: 16px;
-
-          &:focus {
-            outline: none;
-            border-color: #65877a;
-          }
-        }
-
-        .question-input {
-          min-height: unset;
-          height: 40px;
-          resize: none;
-        }
-
-        .input-group {
-          margin-bottom: 20px;
-
-          label {
-            display: block;
-            color: #eeeeee;
-            margin-bottom: 8px;
-            font-size: 16px;
-          }
-
-          textarea {
-            margin-bottom: 0;
-            min-height: 100px;
-          }
-
-          &:last-child textarea {
-            min-height: 80px;
-          }
-        }
-
-        .button-group {
-          display: flex;
-          gap: 12px;
-          justify-content: flex-start;
-          position: sticky;
-          bottom: 0;
-          padding: 16px 0;
-          margin-top: 20px;
-          border-top: 1px solid rgba(238, 238, 238, 0.1);
-        }
-
-        .save-button, .cancel-button {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 12px 24px;
-          border-radius: 8px;
-          color: #eeeeee;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          border: none;
-
-          &:hover {
-            transform: translateY(-2px);
-          }
-
-          &:active {
-            transform: translateY(1px);
-          }
-        }
-
-        .save-button {
+        &.create-quiz-button {
           background: rgba(101, 135, 122, 0.2);
-          border: 1px solid rgba(101, 135, 122, 0.3);
-          color: #eeeeee;
-
+          color: @text-color;
           &:hover {
             background: rgba(101, 135, 122, 0.3);
           }
         }
 
-        .cancel-button {
-          background: rgba(238, 238, 238, 0.1);
-          border: 1px solid rgba(238, 238, 238, 0.2);
-          color: #eeeeee;
-
+        &.cancel-button {
+          background: rgba(255, 99, 99, 0.1);
+          color: @danger-color;
           &:hover {
-            background: rgba(238, 238, 238, 0.15);
+            background: @danger-hover;
           }
         }
       }
+    }
+  }
+}
 
-      .no-selection {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        color: #666666;
-        font-style: italic;
+// Content Area Styles
+.quiz-content-right {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+
+  .quiz-content-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+
+    h2 {
+      color: @text-color;
+      margin-bottom: 16px;
+      font-size: 24px;
+    }
+
+    .question-container,
+    .answer-container {
+      margin-bottom: 30px;
+
+      textarea {
+        .input-base();
+        min-height: 120px;
+        font-size: 16px;
+        line-height: 1.6;
+        resize: vertical;
+        margin-bottom: 16px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .question-text {
+        font-size: 16px;
+        line-height: 1.8;
       }
     }
+
+    .input-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        color: @text-color;
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+
+      textarea {
+        .input-base();
+        min-height: 100px;
+        font-size: 16px;
+        line-height: 1.6;
+        resize: vertical;
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      padding: 16px 0;
+      border-top: 1px solid rgba(238, 238, 238, 0.1);
+
+      button {
+        .button-base();
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 500;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+
+        &.save-button {
+          background: rgba(101, 135, 122, 0.2);
+          border: 1px solid rgba(101, 135, 122, 0.3);
+          color: @text-color;
+          &:hover {
+            background: rgba(101, 135, 122, 0.3);
+          }
+        }
+
+        &.cancel-button {
+          background: rgba(255, 99, 99, 0.1);
+          color: @danger-color;
+          &:hover {
+            background: @danger-hover;
+          }
+        }
+      }
+    }
+  }
+
+  .no-question-selected {
+    .flex-center();
+    height: 100%;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 16px;
   }
 }

@@ -11,7 +11,7 @@ import Notes from "../../components/notes/Notes";
 import { useNavigate } from "react-router-dom";
 import Reference from "../../components/reference/reference";
 import Quiz from "../../components/quiz/quiz";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LoadingScreen } from "../../components/loading/loading";
 import { skillsThunks } from "../../slices/skillsSlice";
 import {
@@ -26,10 +26,36 @@ export const SkillScreen = () => {
   const currentComponent = useSelector(
     (state: any) => state.page.currentComponent
   );
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(selectedSkill.title);
 
   useEffect(() => {
     dispatch<any>(notesThunks.fetchNotes());
   }, []);
+
+  useEffect(() => {
+    setEditedTitle(selectedSkill.title);
+  }, [selectedSkill.title]);
+
+  const handleTitleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleTitleSave = () => {
+    if (editedTitle.trim() !== selectedSkill.title) {
+      dispatch<any>(skillsThunks.updateSkill(selectedSkill.id, { title: editedTitle.trim() }));
+    }
+    setIsEditing(false);
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleTitleSave();
+    } else if (e.key === 'Escape') {
+      setIsEditing(false);
+      setEditedTitle(selectedSkill.title);
+    }
+  };
 
   return (
     <div className="homebox">
@@ -37,7 +63,21 @@ export const SkillScreen = () => {
       </div>
       <div className="layout-container">
         <div className="skill-title-and-delete">
-          <div className="skill-title">{selectedSkill.title}</div>
+          {isEditing ? (
+            <input
+              type="text"
+              className="skill-title-input"
+              value={editedTitle}
+              onChange={(e) => setEditedTitle(e.target.value)}
+              onBlur={handleTitleSave}
+              onKeyDown={handleTitleKeyDown}
+              autoFocus
+            />
+          ) : (
+            <div className="skill-title" onClick={handleTitleEdit}>
+              {selectedSkill.title}
+            </div>
+          )}
           <i
             className="ri-delete-bin-7-line"
             onClick={(e) => {

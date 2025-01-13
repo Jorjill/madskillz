@@ -1,5 +1,31 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+// Types
+export interface Question {
+  id: string;
+  quizId: string;
+  title: string;
+  text: string;
+  answer: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Quiz {
+  id: string;
+  title: string;
+  skill: string;
+  questions: Question[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface QuizState {
+  quizzes: Quiz[];
+  loading: boolean;
+  error: string | null;
+}
+
 // Thunks
 export const quizThunks = {
   fetchQuizzes: createAsyncThunk(
@@ -15,7 +41,7 @@ export const quizThunks = {
   createQuiz: createAsyncThunk(
     'quiz/createQuiz',
     async ({ skill, title = 'New Quiz' }: { skill: string; title?: string }) => {
-      const newQuiz = {
+      const newQuiz: Quiz = {
         id: `quiz_${Date.now()}`,
         title: title,
         skill: skill.toLowerCase(),
@@ -44,7 +70,7 @@ export const quizThunks = {
       text?: string;
       answer?: string;
     }) => {
-      const newQuestion = {
+      const newQuestion: Question = {
         id: `question_${Date.now()}`,
         quizId,
         title,
@@ -61,29 +87,41 @@ export const quizThunks = {
     }
   ),
 
-  updateQuestionAnswer: createAsyncThunk(
-    'quiz/updateQuestionAnswer',
-    async ({ quizId, questionId, answer }: { quizId: string; questionId: string; answer: string }) => {
-      if (import.meta.env.VITE_DEV === 'true') {
-        return { quizId, questionId, answer };
-      }
-      return { quizId, questionId, answer };
-    }
-  ),
-
   updateQuiz: createAsyncThunk(
     'quiz/updateQuiz',
     async ({ quizId, title }: { quizId: string; title: string }) => {
-      const updatedQuiz = {
-        id: quizId,
-        title,
+      if (import.meta.env.VITE_DEV === 'true') {
+        return { id: quizId, title };
+      }
+      return { id: quizId, title };
+    }
+  ),
+
+  updateQuestion: createAsyncThunk(
+    'quiz/updateQuestion',
+    async ({ 
+      quizId, 
+      questionId, 
+      text, 
+      answer 
+    }: { 
+      quizId: string; 
+      questionId: string; 
+      text: string; 
+      answer: string;
+    }) => {
+      const updatedQuestion: Partial<Question> = {
+        id: questionId,
+        quizId,
+        text,
+        answer,
         updatedAt: new Date().toISOString()
       };
 
       if (import.meta.env.VITE_DEV === 'true') {
-        return updatedQuiz;
+        return updatedQuestion;
       }
-      return updatedQuiz;
+      return updatedQuestion;
     }
   ),
 
@@ -95,181 +133,124 @@ export const quizThunks = {
       }
       return quizId;
     }
+  ),
+
+  deleteQuestion: createAsyncThunk(
+    'quiz/deleteQuestion',
+    async ({ quizId, questionId }: { quizId: string; questionId: string }) => {
+      if (import.meta.env.VITE_DEV === 'true') {
+        return { quizId, questionId };
+      }
+      return { quizId, questionId };
+    }
   )
 };
 
-// Sample quizzes data structure
-const sampleQuizzes: { [key: string]: any[] } = {
+// Sample data for development
+const sampleQuizzes: { [key: string]: Quiz[] } = {
   'javascript': [
     {
       id: 'js_quiz_1',
       title: 'JavaScript Basics',
+      skill: 'javascript',
       questions: [
         {
           id: 'js_q1',
-          text: 'What is the difference between let and var?',
-          answer: 'let has block scope while var has function scope. let was introduced in ES6 and provides better scoping rules for variables.'
-        },
-        {
-          id: 'js_q2',
-          text: 'Explain closures in JavaScript.',
-          answer: 'A closure is the combination of a function and the lexical environment within which that function was declared. This allows a function to access variables in its outer scope even after the outer function has returned.'
-        },
-        {
-          id: 'js_q3',
-          text: 'What is the event loop?',
-          answer: 'The event loop is a programming construct that waits for and dispatches events in a program. It works by making a request to some internal or external "event provider", then calls the relevant event handler.'
+          quizId: 'js_quiz_1',
+          title: 'Variables',
+          text: 'What are the different ways to declare variables in JavaScript?',
+          answer: 'Variables in JavaScript can be declared using: var, let, and const.',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         }
-      ]
-    },
-    {
-      id: 'js_quiz_2',
-      title: 'Advanced JavaScript',
-      questions: [
-        {
-          id: 'js_adv_q1',
-          text: 'What are Promises and how do they work?',
-          answer: 'Promises are objects representing the eventual completion or failure of an asynchronous operation. They can be in one of three states: pending, fulfilled, or rejected. They help manage asynchronous operations more elegantly than callbacks.'
-        },
-        {
-          id: 'js_adv_q2',
-          text: 'Explain prototypal inheritance.',
-          answer: 'Prototypal inheritance is a feature in JavaScript where an object can inherit properties and methods from another object. Each object has a private property which holds a link to another object called its prototype.'
-        }
-      ]
-    }
-  ],
-  'react': [
-    {
-      id: 'react_quiz_1',
-      title: 'React Fundamentals',
-      questions: [
-        {
-          id: 'react_q1',
-          text: 'What are React hooks?',
-          answer: 'Hooks are functions that allow you to "hook into" React state and lifecycle features from function components. They let you use state and other React features without writing a class component.'
-        },
-        {
-          id: 'react_q2',
-          text: 'Explain the virtual DOM.',
-          answer: 'The virtual DOM is a programming concept where an ideal, or "virtual", representation of a UI is kept in memory and synced with the "real" DOM by a library such as ReactDOM. This process is called reconciliation.'
-        }
-      ]
-    },
-    {
-      id: 'react_quiz_2',
-      title: 'React State Management',
-      questions: [
-        {
-          id: 'react_state_q1',
-          text: 'What is Redux and when should you use it?',
-          answer: 'Redux is a predictable state container for JavaScript apps. It helps you write applications that behave consistently and run in different environments. You might want to use Redux when you have complex state management needs or when multiple components need access to the same state.'
-        },
-        {
-          id: 'react_state_q2',
-          text: 'Compare useState and useReducer.',
-          answer: 'useState is a Hook that lets you add React state to function components. useReducer is usually preferable to useState when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one.'
-        }
-      ]
-    }
-  ],
-  'typescript': [
-    {
-      id: 'ts_quiz_1',
-      title: 'TypeScript Basics',
-      questions: [
-        {
-          id: 'ts_q1',
-          text: 'What are the benefits of using TypeScript?',
-          answer: 'TypeScript adds static typing to JavaScript, enabling better tooling, earlier error detection, and improved code maintainability. It also provides features like interfaces, enums, and generics.'
-        },
-        {
-          id: 'ts_q2',
-          text: 'Explain the difference between interface and type.',
-          answer: 'While interfaces and types are similar, interfaces are primarily used to describe object shapes and can be extended. Types are more flexible and can represent unions, intersections, and other advanced types.'
-        }
-      ]
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
   ]
 };
 
-interface QuizState {
-  quizzes: any[];
-  loading: boolean;
-  error: string | null;
-}
-
-interface Question {
-  id: string;
-  quizId: string;
-  title: string;
-  text: string;
-  answer: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
+// Initial state
 const initialState: QuizState = {
   quizzes: [],
   loading: false,
   error: null,
 };
 
+// Slice
 const quizSlice = createSlice({
   name: 'quiz',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Fetch quizzes
       .addCase(quizThunks.fetchQuizzes.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(quizThunks.fetchQuizzes.fulfilled, (state, action) => {
         state.loading = false;
-        state.quizzes = action.payload || [];
-        state.error = null;
+        state.quizzes = action.payload;
       })
       .addCase(quizThunks.fetchQuizzes.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch quizzes';
       })
 
+      // Create quiz
       .addCase(quizThunks.createQuiz.fulfilled, (state, action) => {
         state.quizzes.push(action.payload);
       })
 
+      // Update quiz
+      .addCase(quizThunks.updateQuiz.fulfilled, (state, action) => {
+        const index = state.quizzes.findIndex(quiz => quiz.id === action.payload.id);
+        if (index !== -1) {
+          state.quizzes[index].title = action.payload.title;
+          state.quizzes[index].updatedAt = new Date().toISOString();
+        }
+      })
+
+      // Delete quiz
+      .addCase(quizThunks.deleteQuiz.fulfilled, (state, action) => {
+        state.quizzes = state.quizzes.filter(quiz => quiz.id !== action.payload);
+      })
+
+      // Create question
       .addCase(quizThunks.createQuestion.fulfilled, (state, action) => {
         const quiz = state.quizzes.find(q => q.id === action.payload.quizId);
-        if (!quiz) return;
-        if (!quiz.questions) {
-          quiz.questions = [];
-        }
-        quiz.questions.push(action.payload);
-      })
-
-      .addCase(quizThunks.updateQuiz.fulfilled, (state, action) => {
-        const index = state.quizzes.findIndex(q => q.id === action.payload.id);
-        if (index !== -1) {
-          state.quizzes[index] = {
-            ...state.quizzes[index],
-            ...action.payload
-          };
+        if (quiz) {
+          quiz.questions.push(action.payload);
+          quiz.updatedAt = new Date().toISOString();
         }
       })
 
-      .addCase(quizThunks.deleteQuiz.fulfilled, (state, action) => {
-        state.quizzes = state.quizzes.filter(q => q.id !== action.payload);
-      })
-
-      .addCase(quizThunks.updateQuestionAnswer.fulfilled, (state, action) => {
+      // Update question
+      .addCase(quizThunks.updateQuestion.fulfilled, (state, action) => {
         const quiz = state.quizzes.find(q => q.id === action.payload.quizId);
-        if (!quiz) return;
-        const question = quiz.questions?.find((q: Question) => q.id === action.payload.questionId);
-        if (question) {
-          question.answer = action.payload.answer;
+        if (quiz) {
+          const questionIndex = quiz.questions.findIndex(q => q.id === action.payload.id);
+          if (questionIndex !== -1) {
+            quiz.questions[questionIndex] = {
+              ...quiz.questions[questionIndex],
+              ...action.payload,
+              updatedAt: new Date().toISOString()
+            };
+            quiz.updatedAt = new Date().toISOString();
+          }
+        }
+      })
+
+      // Delete question
+      .addCase(quizThunks.deleteQuestion.fulfilled, (state, action) => {
+        const quiz = state.quizzes.find(q => q.id === action.payload.quizId);
+        if (quiz) {
+          quiz.questions = quiz.questions.filter(q => q.id !== action.payload.questionId);
+          quiz.updatedAt = new Date().toISOString();
         }
       });
-  }
+  },
 });
 
 export default quizSlice.reducer;

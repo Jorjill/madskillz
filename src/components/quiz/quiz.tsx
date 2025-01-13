@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './quiz.less';
+import ReactDOM from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { quizThunks } from '../../slices/quizSlice';
 import { AppDispatch, RootState } from '../../state/store';
+import './quiz.less';
 
+// Types and Interfaces
 interface Question {
   id: string;
   text: string;
@@ -16,31 +18,72 @@ interface Quiz {
   questions: Question[];
 }
 
+// Dropdown Menu Component
+const MenuDropdown: React.FC<{
+  isOpen: boolean;
+  anchorEl: HTMLElement | null;
+  onEdit: (e: React.MouseEvent) => void;
+  onDelete: (e: React.MouseEvent) => void;
+}> = ({ isOpen, anchorEl, onEdit, onDelete }) => {
+  if (!isOpen || !anchorEl) return null;
+
+  // Calculate position based on anchor element
+  const rect = anchorEl.getBoundingClientRect();
+  
+  return ReactDOM.createPortal(
+    <div 
+      className="menu-dropdown"
+      style={{
+        position: 'fixed',
+        top: rect.top,
+        left: rect.right + 5,
+      }}
+    >
+      <button onClick={onEdit}>Edit</button>
+      <button className="delete" onClick={onDelete}>Delete</button>
+    </div>,
+    document.body
+  );
+};
+
+// Quiz Component
 const Quiz: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  
+  // Redux State
   const selectedSkill = useSelector((state: RootState) => state.skills.selectedSkill.title);
   const quizzes = useSelector((state: RootState) => state.quiz.quizzes);
   
+  // Quiz State Management
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-  const [editedAnswer, setEditedAnswer] = useState('');
-  const [editedQuestion, setEditedQuestion] = useState('');
-  const [newQuizTitle, setNewQuizTitle] = useState('');
-  const [showNewQuizInput, setShowNewQuizInput] = useState(false);
   const [showQuestions, setShowQuestions] = useState(false);
+  const [editingQuizId, setEditingQuizId] = useState<string | null>(null);
+  const [editingQuizTitle, setEditingQuizTitle] = useState('');
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+
+  // New Quiz State
+  const [showNewQuizInput, setShowNewQuizInput] = useState(false);
+  const [newQuizTitle, setNewQuizTitle] = useState('');
+  
+  // Question State Management
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [editedQuestion, setEditedQuestion] = useState('');
+  const [editedAnswer, setEditedAnswer] = useState('');
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
   const [newQuestionTitle, setNewQuestionTitle] = useState('');
   const [newQuestionText, setNewQuestionText] = useState('');
   const [newQuestionAnswer, setNewQuestionAnswer] = useState('');
-  const [editingQuizId, setEditingQuizId] = useState<string | null>(null);
-  const [editingQuizTitle, setEditingQuizTitle] = useState('');
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [openQuestionMenuId, setOpenQuestionMenuId] = useState<string | null>(null);
+  const [questionMenuAnchorEl, setQuestionMenuAnchorEl] = useState<HTMLElement | null>(null);
+
+  // Refs for DOM elements
   const newQuizRef = useRef<HTMLDivElement>(null);
   const editQuizRef = useRef<HTMLDivElement>(null);
 
+  // Effects
   useEffect(() => {
     if (selectedSkill) {
-      // Always use lowercase for consistency
       dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
     }
   }, [selectedSkill, dispatch]);
@@ -48,96 +91,59 @@ const Quiz: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (openMenuId) {
-        const menuButton = document.querySelector(`[data-quiz-id="${openMenuId}"]`);
-        const menuDropdown = menuButton?.nextElementSibling;
-        
-        if (!menuButton?.contains(target) && !menuDropdown?.contains(target)) {
+      if (openMenuId || openQuestionMenuId) {
+        const menuDropdowns = document.querySelectorAll('.menu-dropdown');
+        const menuButtons = document.querySelectorAll('.menu-button');
+        let clickedInside = false;
+
+        menuDropdowns.forEach(dropdown => {
+          if (dropdown.contains(target)) clickedInside = true;
+        });
+        menuButtons.forEach(button => {
+          if (button.contains(target)) clickedInside = true;
+        });
+
+        if (!clickedInside) {
+          setMenuAnchorEl(null);
           setOpenMenuId(null);
+          setQuestionMenuAnchorEl(null);
+          setOpenQuestionMenuId(null);
         }
-      }
-      if (newQuizRef.current && !newQuizRef.current.contains(target)) {
-        setShowNewQuizInput(false);
-        setNewQuizTitle('');
-      }
-      if (editingQuizId && editQuizRef.current && !editQuizRef.current.contains(target)) {
-        setEditingQuizId(null);
-        setEditingQuizTitle('');
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [openMenuId, editingQuizId]);
+  }, [openMenuId, openQuestionMenuId]);
 
+  // Quiz Menu Handlers
   const handleMenuClick = (event: React.MouseEvent, quizId: string) => {
     event.stopPropagation();
-    setOpenMenuId(openMenuId === quizId ? null : quizId);
-  };
-
-  const handleEditClick = (event: React.MouseEvent, quiz: Quiz) => {
-    event.stopPropagation();
-    setEditingQuizId(quiz.id);
-    setEditingQuizTitle(quiz.title);
-    setOpenMenuId(null);
-  };
-
-  const handleDeleteClick = (event: React.MouseEvent, quiz: Quiz) => {
-    event.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this quiz?')) {
-      dispatch(quizThunks.deleteQuiz(quiz.id));
-      if (selectedQuiz?.id === quiz.id) {
-        setSelectedQuiz(null);
-        setShowQuestions(false);
-      }
+    if (openMenuId === quizId) {
+      setMenuAnchorEl(null);
+      setOpenMenuId(null);
+    } else {
+      setMenuAnchorEl(event.currentTarget as HTMLElement);
+      setOpenMenuId(quizId);
     }
-    setOpenMenuId(null);
   };
 
+  const handleQuestionMenuClick = (event: React.MouseEvent, questionId: string) => {
+    event.stopPropagation();
+    if (openQuestionMenuId === questionId) {
+      setQuestionMenuAnchorEl(null);
+      setOpenQuestionMenuId(null);
+    } else {
+      setQuestionMenuAnchorEl(event.currentTarget as HTMLElement);
+      setOpenQuestionMenuId(questionId);
+    }
+  };
+
+  // Quiz CRUD Operations
   const handleQuizSelect = (quiz: Quiz) => {
-    if (editingQuizId === quiz.id) return;
     setSelectedQuiz(quiz);
     setShowQuestions(true);
-    setSelectedQuestion(null);
-    setShowNewQuizInput(false);
-    setOpenMenuId(null);
-  };
-
-  const handleUpdateQuiz = () => {
-    if (editingQuizId && editingQuizTitle.trim()) {
-      dispatch(quizThunks.updateQuiz({ 
-        quizId: editingQuizId, 
-        title: editingQuizTitle.trim() 
-      }));
-      setEditingQuizId(null);
-      setEditingQuizTitle('');
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingQuizId(null);
-    setEditingQuizTitle('');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleUpdateQuiz();
-    } else if (e.key === 'Escape') {
-      handleCancelEdit();
-    }
-  };
-
-  const handleAddQuiz = () => {
-    setShowNewQuizInput(true);
-    setNewQuizTitle('');
-  };
-
-  const handleAddQuestion = () => {
-    setIsAddingQuestion(true);
-    setSelectedQuestion(null);
-    setNewQuestionTitle('');
-    setNewQuestionText('');
-    setNewQuestionAnswer('');
+    resetQuestionState();
   };
 
   const handleCreateQuiz = () => {
@@ -146,11 +152,37 @@ const Quiz: React.FC = () => {
         skill: selectedSkill.toLowerCase(),
         title: newQuizTitle.trim()
       }));
-      setShowNewQuizInput(false);
-      setNewQuizTitle('');
+      resetNewQuizState();
     }
   };
 
+  const handleUpdateQuiz = () => {
+    if (editingQuizId && editingQuizTitle.trim()) {
+      dispatch(quizThunks.updateQuiz({ 
+        quizId: editingQuizId, 
+        title: editingQuizTitle.trim() 
+      }));
+      resetEditQuizState();
+    }
+  };
+
+  const handleEditQuiz = (quiz: Quiz) => {
+    setSelectedQuiz(quiz);
+    setEditingQuizId(quiz.id);
+    setEditingQuizTitle(quiz.title);
+  };
+
+  const handleDeleteQuiz = async (quiz: Quiz) => {
+    if (window.confirm('Are you sure you want to delete this quiz?')) {
+      await dispatch(quizThunks.deleteQuiz(quiz.id));
+      if (selectedQuiz?.id === quiz.id) {
+        resetQuizState();
+      }
+      closeMenus();
+    }
+  };
+
+  // Question CRUD Operations
   const handleCreateQuestion = () => {
     if (selectedQuiz && newQuestionText.trim()) {
       dispatch(quizThunks.createQuestion({ 
@@ -159,254 +191,330 @@ const Quiz: React.FC = () => {
         text: newQuestionText.trim(),
         answer: newQuestionAnswer.trim()
       }));
-      setIsAddingQuestion(false);
-      setNewQuestionTitle('');
-      setNewQuestionText('');
-      setNewQuestionAnswer('');
+      resetNewQuestionState();
     }
   };
 
-  const handleQuestionClick = (question: Question) => {
+  const handleEditQuestion = (question: Question) => {
     setSelectedQuestion(question);
-    setEditedAnswer(question.answer);
     setEditedQuestion(question.text);
+    setEditedAnswer(question.answer || '');
   };
 
-  const handleSaveAll = () => {
+  const handleUpdateQuestion = () => {
     if (selectedQuestion && selectedQuiz) {
-      // Save both question and answer
-      dispatch(quizThunks.updateQuestionAnswer({
+      dispatch(quizThunks.updateQuestion({
         quizId: selectedQuiz.id,
         questionId: selectedQuestion.id,
+        text: editedQuestion,
         answer: editedAnswer
       }));
+      updateSelectedQuestion();
+    }
+  };
+
+  const handleDeleteQuestion = async (question: Question) => {
+    if (selectedQuiz && window.confirm('Are you sure you want to delete this question?')) {
+      await dispatch(quizThunks.deleteQuestion({ 
+        quizId: selectedQuiz.id, 
+        questionId: question.id 
+      }));
+      if (selectedQuestion?.id === question.id) {
+        resetQuestionState();
+      }
+      closeMenus();
+    }
+  };
+
+  // State Reset Functions
+  const resetQuizState = () => {
+    setSelectedQuiz(null);
+    setShowQuestions(false);
+    resetQuestionState();
+  };
+
+  const resetEditQuizState = () => {
+    setEditingQuizId(null);
+    setEditingQuizTitle('');
+  };
+
+  const resetNewQuizState = () => {
+    setShowNewQuizInput(false);
+    setNewQuizTitle('');
+  };
+
+  const resetQuestionState = () => {
+    setSelectedQuestion(null);
+    setEditedQuestion('');
+    setEditedAnswer('');
+  };
+
+  const resetNewQuestionState = () => {
+    setIsAddingQuestion(false);
+    setNewQuestionTitle('');
+    setNewQuestionText('');
+    setNewQuestionAnswer('');
+  };
+
+  // Utility Functions
+  const closeMenus = () => {
+    setMenuAnchorEl(null);
+    setOpenMenuId(null);
+    setQuestionMenuAnchorEl(null);
+    setOpenQuestionMenuId(null);
+  };
+
+  const updateSelectedQuestion = () => {
+    if (selectedQuestion) {
       const updatedQuestion = {
         ...selectedQuestion,
-        text: editedQuestion
+        text: editedQuestion,
+        answer: editedAnswer
       };
       setSelectedQuestion(updatedQuestion);
     }
   };
 
-  return (
-    <div className="quiz-container">
-      <div className="sidebar-container">
-        {!showQuestions ? (
-          // Show quiz list
-          <>
-            <div className="quiz-list">
-              {quizzes && quizzes.length > 0 ? (
-                quizzes.map((quiz) => (
-                  <div
-                    key={quiz.id}
-                    className={`quiz-title ${selectedQuiz?.id === quiz.id ? 'selected' : ''} ${editingQuizId === quiz.id ? 'editing' : ''}`}
-                    onClick={() => handleQuizSelect(quiz)}
-                  >
-                    {editingQuizId === quiz.id ? (
-                      <div className="edit-container" onClick={(e) => e.stopPropagation()}>
-                        <input
-                          className="edit-quiz-input"
-                          value={editingQuizTitle}
-                          onChange={(e) => setEditingQuizTitle(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                          autoFocus
-                        />
-                        <div className="edit-actions">
-                          <button 
-                            className="save"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUpdateQuiz();
-                            }}
-                          >
-                            Save
-                          </button>
-                          <button 
-                            className="cancel"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCancelEdit();
-                            }}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="quiz-text">{quiz.title}</span>
-                        <button
-                          className="menu-button"
-                          onClick={(e) => handleMenuClick(e, quiz.id)}
-                          data-quiz-id={quiz.id}
-                        >
-                          ⋮
-                        </button>
-                        {openMenuId === quiz.id && (
-                          <div className="menu-dropdown">
-                            <button
-                              className="menu-item"
-                              onClick={(e) => handleEditClick(e, quiz)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="menu-item delete"
-                              onClick={(e) => handleDeleteClick(e, quiz)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="no-quizzes">No quizzes available for this skill</div>
-              )}
+  // Event Handlers
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleUpdateQuiz();
+    } else if (e.key === 'Escape') {
+      resetEditQuizState();
+    }
+  };
+
+  // Render Methods
+  const renderQuestions = () => {
+    if (!selectedQuiz) return null;
+    return (
+      <div className="quiz-list">
+        {selectedQuiz.questions.map((question) => (
+          <div
+            key={question.id}
+            className={`quiz-title ${selectedQuestion?.id === question.id ? 'selected' : ''}`}
+            onClick={() => handleEditQuestion(question)}
+          >
+            <span className="question-text">{question.text}</span>
+            <div className="menu-button-container">
+              <button
+                className="menu-button"
+                onClick={(e) => handleQuestionMenuClick(e, question.id)}
+                data-question-id={question.id}
+              >
+                ⋮
+              </button>
+              <MenuDropdown
+                isOpen={openQuestionMenuId === question.id}
+                anchorEl={questionMenuAnchorEl}
+                onEdit={() => handleEditQuestion(question)}
+                onDelete={() => handleDeleteQuestion(question)}
+              />
             </div>
-            <div className="add-quiz-button-container" ref={newQuizRef}>
-              {showNewQuizInput ? (
-                <div className="new-quiz-input-container">
+          </div>
+        ))}
+        <div className="add-quiz-button" onClick={() => setIsAddingQuestion(true)}>
+          + Add Question
+        </div>
+      </div>
+    );
+  };
+
+  const renderQuizList = () => (
+    <>
+      <div className="quiz-list">
+        {quizzes && quizzes.length > 0 ? (
+          quizzes.map((quiz) => (
+            <div
+              key={quiz.id}
+              className={`quiz-title ${selectedQuiz?.id === quiz.id ? 'selected' : ''}`}
+            >
+              {editingQuizId === quiz.id ? (
+                <div className="edit-container" ref={editQuizRef}>
                   <input
                     type="text"
-                    value={newQuizTitle}
-                    onChange={(e) => setNewQuizTitle(e.target.value)}
-                    placeholder="Enter quiz title..."
-                    className="new-quiz-input"
+                    value={editingQuizTitle}
+                    onChange={(e) => setEditingQuizTitle(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     autoFocus
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleCreateQuiz();
-                      }
-                    }}
+                    className="edit-quiz-input"
                   />
-                  <div className="new-quiz-buttons">
-                    <button onClick={handleCreateQuiz} className="create-quiz-button">
-                      Create
+                  <div className="edit-actions">
+                    <button className="save" onClick={handleUpdateQuiz}>
+                      Save
                     </button>
-                    <button 
-                      onClick={() => {
-                        setShowNewQuizInput(false);
-                        setNewQuizTitle('');
-                      }} 
-                      className="cancel-button"
-                    >
+                    <button className="cancel" onClick={resetEditQuizState}>
                       Cancel
                     </button>
                   </div>
                 </div>
               ) : (
-                <div
-                  className="add-quiz-button"
-                  onClick={handleAddQuiz}
-                >
-                  Add Quiz
-                </div>
+                <>
+                  <span 
+                    className="quiz-text"
+                    onClick={() => handleQuizSelect(quiz)}
+                  >
+                    {quiz.title}
+                  </span>
+                  <div className="menu-button-container">
+                    <button
+                      className="menu-button"
+                      onClick={(e) => handleMenuClick(e, quiz.id)}
+                      data-quiz-id={quiz.id}
+                    >
+                      ⋮
+                    </button>
+                    <MenuDropdown
+                      isOpen={openMenuId === quiz.id}
+                      anchorEl={menuAnchorEl}
+                      onEdit={() => handleEditQuiz(quiz)}
+                      onDelete={() => handleDeleteQuiz(quiz)}
+                    />
+                  </div>
+                </>
               )}
             </div>
-          </>
+          ))
         ) : (
-          // Show questions list
+          <div className="no-quizzes">No quizzes available for this skill</div>
+        )}
+      </div>
+      {renderNewQuizInput()}
+    </>
+  );
+
+  const renderNewQuizInput = () => (
+    showNewQuizInput ? (
+      <div className="new-quiz-input-container" ref={newQuizRef}>
+        <input
+          type="text"
+          value={newQuizTitle}
+          onChange={(e) => setNewQuizTitle(e.target.value)}
+          placeholder="Enter quiz title..."
+          className="new-quiz-input"
+          autoFocus
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') {
+              handleCreateQuiz();
+            }
+          }}
+        />
+        <div className="new-quiz-buttons">
+          <button onClick={handleCreateQuiz} className="create-quiz-button">
+            Create
+          </button>
+          <button onClick={resetNewQuizState} className="cancel-button">
+            Cancel
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div className="add-quiz-button" onClick={() => setShowNewQuizInput(true)}>
+        + Add Quiz
+      </div>
+    )
+  );
+
+  const renderQuestionContent = () => {
+    if (isAddingQuestion) {
+      return (
+        <div className="quiz-content-container">
+          <div className="question-container">
+            <h2>New Question</h2>
+            <div className="input-group">
+              <label>Question:</label>
+              <textarea
+                value={newQuestionText}
+                onChange={(e) => setNewQuestionText(e.target.value)}
+                placeholder="Enter question text..."
+                className="question-text"
+              />
+            </div>
+            <div className="input-group">
+              <label>Answer:</label>
+              <textarea
+                value={newQuestionAnswer}
+                onChange={(e) => setNewQuestionAnswer(e.target.value)}
+                placeholder="Enter answer..."
+              />
+            </div>
+            <div className="button-group">
+              <button className="save-button" onClick={handleCreateQuestion}>
+                Create Question
+              </button>
+              <button className="cancel-button" onClick={resetNewQuestionState}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (selectedQuestion) {
+      return (
+        <div className="quiz-content-container">
+          <div className="question-container">
+            <h2>Question</h2>
+            <textarea
+              value={editedQuestion}
+              onChange={(e) => setEditedQuestion(e.target.value)}
+              placeholder="Enter your question..."
+              className="question-text"
+              style={{ minHeight: '100px' }}
+            />
+          </div>
+          <div className="answer-container">
+            <h2>Answer</h2>
+            <textarea
+              value={editedAnswer}
+              onChange={(e) => setEditedAnswer(e.target.value)}
+              placeholder="Enter your answer..."
+            />
+            <div className="button-group">
+              <button className="save-button" onClick={handleUpdateQuestion}>
+                Save Changes
+              </button>
+              <button 
+                className="cancel-button" 
+                onClick={() => {
+                  setSelectedQuestion(null);
+                  setEditedQuestion('');
+                  setEditedAnswer('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="no-question-selected">
+        <p>Select a question to view or edit</p>
+      </div>
+    );
+  };
+
+  // Main Render
+  return (
+    <div className="quiz-container">
+      <div className="sidebar-container">
+        {!showQuestions ? (
+          renderQuizList()
+        ) : (
           <>
             <div className="back-button" onClick={() => setShowQuestions(false)}>
               <i className="ri-arrow-left-line" /> Back to Quizzes
             </div>
-            {selectedQuiz?.questions.map((question: Question) => (
-              <div
-                key={question.id}
-                className={`question-title ${
-                  selectedQuestion?.id === question.id ? 'selected' : ''
-                }`}
-                onClick={() => handleQuestionClick(question)}
-              >
-                {question.text}
-              </div>
-            ))}
-            <div className="add-question-button-container">
-              <div
-                className="add-question-button"
-                onClick={handleAddQuestion}
-              >
-                Add Question
-              </div>
-            </div>
+            {renderQuestions()}
           </>
         )}
       </div>
-
       <div className="quiz-content-right">
-        {isAddingQuestion ? (
-          <div className="quiz-content-container">
-            <div className="question-container">
-              <h2>New Question</h2>
-              <div className="input-group">
-                <label>Title:</label>
-                <input
-                  type="text"
-                  value={newQuestionTitle}
-                  onChange={(e) => setNewQuestionTitle(e.target.value)}
-                  placeholder="Enter question title..."
-                  className="question-input"
-                />
-              </div>
-              <div className="input-group">
-                <label>Question:</label>
-                <textarea
-                  value={newQuestionText}
-                  onChange={(e) => setNewQuestionText(e.target.value)}
-                  placeholder="Enter question text..."
-                  className="question-text"
-                />
-              </div>
-              <div className="input-group">
-                <label>Answer:</label>
-                <textarea
-                  value={newQuestionAnswer}
-                  onChange={(e) => setNewQuestionAnswer(e.target.value)}
-                  placeholder="Enter answer..."
-                />
-              </div>
-              <div className="button-group">
-                <button className="save-button" onClick={handleCreateQuestion}>
-                  Add Question
-                </button>
-                <button className="cancel-button" onClick={() => setIsAddingQuestion(false)}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : selectedQuestion ? (
-          <div className="quiz-content-container">
-            <div className="question-container">
-              <h2>Question</h2>
-              <textarea
-                value={editedQuestion}
-                onChange={(e) => setEditedQuestion(e.target.value)}
-                placeholder="Enter your question..."
-                className="question-text"
-                style={{ minHeight: '100px' }}
-              />
-            </div>
-            <div className="answer-container">
-              <h2>Answer</h2>
-              <textarea
-                value={editedAnswer}
-                onChange={(e) => setEditedAnswer(e.target.value)}
-                placeholder="Enter your answer..."
-              />
-              <button className="save-button" onClick={handleSaveAll}>
-                Save Changes
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="no-selection">
-            Select a question to edit or add a new question
-          </div>
-        )}
+        {renderQuestionContent()}
       </div>
     </div>
   );

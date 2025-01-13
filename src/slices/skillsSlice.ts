@@ -103,6 +103,29 @@ export const skillsThunks = {
       console.error("Failed to delete skill:", error);
     }
   },
+  updateSkill: (id: string, updatedSkill: Partial<skill>) => async (dispatch: any) => {
+    try {
+      if (import.meta.env.VITE_DEV === "true") {
+        // In development mode, use offline data
+        const skills = JSON.parse(localStorage.getItem('skills') || '[]');
+        const index = skills.findIndex((s: skill) => s.id === id);
+        if (index !== -1) {
+          skills[index] = { ...skills[index], ...updatedSkill };
+          localStorage.setItem('skills', JSON.stringify(skills));
+          dispatch(skillsThunks.fetchSkills());
+        }
+      } else {
+        await axios.patch(
+          `${import.meta.env.VITE_API_URL}/skills/${id}`,
+          updatedSkill,
+          getAuthHeaders()
+        );
+        dispatch(skillsThunks.fetchSkills());
+      }
+    } catch (error) {
+      console.error("Failed to update skill:", error);
+    }
+  }
 };
 
 export const selectSkills = (state: { skills: skillsState }) =>
