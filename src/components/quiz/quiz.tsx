@@ -61,7 +61,15 @@ const Quiz: React.FC = () => {
   const [editingQuizTitle, setEditingQuizTitle] = useState('');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
-
+  const [isQuizStarted, setIsQuizStarted] = useState(false);
+  const [selectedQuestionCount, setSelectedQuestionCount] = useState<number>(0);
+  const [quizQuestions, setQuizQuestions] = useState<Question[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [isQuizFinished, setIsQuizFinished] = useState(false);
+  const [userAnswers, setUserAnswers] = useState<string[]>([]);
+  
   // New Quiz State
   const [showNewQuizInput, setShowNewQuizInput] = useState(false);
   const [newQuizTitle, setNewQuizTitle] = useState('');
@@ -143,7 +151,12 @@ const Quiz: React.FC = () => {
   const handleQuizSelect = (quiz: Quiz) => {
     setSelectedQuiz(quiz);
     setShowQuestions(true);
-    resetQuestionState();
+    setIsQuizStarted(false);
+    setEditedQuestion('');
+    setEditedAnswer('');
+    setSelectedQuestion(null);
+    setSelectedQuestionCount(quiz.questions.length);
+    setQuizQuestions([]);
   };
 
   const handleCreateQuiz = () => {
@@ -180,6 +193,56 @@ const Quiz: React.FC = () => {
       }
       closeMenus();
     }
+  };
+
+  const handleStartQuiz = () => {
+    if (selectedQuiz) {
+      const shuffledQuestions = [...selectedQuiz.questions]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, selectedQuestionCount);
+      
+      setQuizQuestions(shuffledQuestions);
+      setIsQuizStarted(true);
+      setCurrentQuestionIndex(0);
+      setUserAnswer('');
+      setShowAnswer(false);
+      setIsQuizFinished(false);
+      setUserAnswers([]);
+    }
+  };
+
+  const handleQuestionCountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const count = parseInt(e.target.value);
+    setSelectedQuestionCount(count);
+  };
+
+  const handleSubmitAnswer = () => {
+    setShowAnswer(true);
+    setUserAnswers(prev => [...prev, userAnswer]);
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < quizQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setUserAnswer('');
+      setShowAnswer(false);
+    } else {
+      setIsQuizFinished(true);
+    }
+  };
+
+  const handleQuitQuiz = () => {
+    setIsQuizStarted(false);
+    setQuizQuestions([]);
+    setCurrentQuestionIndex(0);
+    setUserAnswer('');
+    setShowAnswer(false);
+    setIsQuizFinished(false);
+    setUserAnswers([]);
+  };
+
+  const handleRestartQuiz = () => {
+    handleStartQuiz();
   };
 
   // Question CRUD Operations
@@ -313,8 +376,13 @@ const Quiz: React.FC = () => {
             </div>
           </div>
         ))}
-        <div className="add-quiz-button" onClick={() => setIsAddingQuestion(true)}>
-          + Add Question
+        <div className="add-quiz-button" onClick={() => {
+          setIsAddingQuestion(true)
+          setSelectedQuestion(null);
+          setEditedQuestion('');
+          setEditedAnswer('');
+          }}>
+          + Add question
         </div>
       </div>
     );
@@ -416,58 +484,22 @@ const Quiz: React.FC = () => {
   );
 
   const renderQuestionContent = () => {
-    if (isAddingQuestion) {
-      return (
-        <div className="quiz-content-container">
-          <div className="question-container">
-            <h2>New Question</h2>
-            <div className="input-group">
-              <label>Question:</label>
-              <textarea
-                value={newQuestionText}
-                onChange={(e) => setNewQuestionText(e.target.value)}
-                placeholder="Enter question text..."
-                className="question-text"
-              />
-            </div>
-            <div className="input-group">
-              <label>Answer:</label>
-              <textarea
-                value={newQuestionAnswer}
-                onChange={(e) => setNewQuestionAnswer(e.target.value)}
-                placeholder="Enter answer..."
-              />
-            </div>
-            <div className="button-group">
-              <button className="save-button" onClick={handleCreateQuestion}>
-                Create Question
-              </button>
-              <button className="cancel-button" onClick={resetNewQuestionState}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     if (selectedQuestion) {
       return (
         <div className="quiz-content-container">
           <div className="question-container">
             <h2>Question</h2>
             <textarea
-              value={editedQuestion}
+              value={editedQuestion || selectedQuestion.text}
               onChange={(e) => setEditedQuestion(e.target.value)}
               placeholder="Enter your question..."
               className="question-text"
-              style={{ minHeight: '100px' }}
             />
           </div>
           <div className="answer-container">
             <h2>Answer</h2>
             <textarea
-              value={editedAnswer}
+              value={editedAnswer || selectedQuestion.answer}
               onChange={(e) => setEditedAnswer(e.target.value)}
               placeholder="Enter your answer..."
             />
@@ -490,10 +522,180 @@ const Quiz: React.FC = () => {
         </div>
       );
     }
+    if(isAddingQuestion) {
+      return (
+        <div className="quiz-content-container">
+          <div className="question-container">
+            <h2>Question</h2>
+            <textarea
+              value={newQuestionText}
+              onChange={(e) => setNewQuestionText(e.target.value)}
+              placeholder="Enter your question..."
+              className="question-text"
+            />
+          </div>
+          <div className="answer-container">
+            <h2>Answer</h2>
+            <textarea
+              value={newQuestionAnswer}
+              onChange={(e) => setNewQuestionAnswer(e.target.value)}
+              placeholder="Enter your answer..."
+            />
+            <div className="button-group">
+              <button className="save-button" onClick={handleCreateQuestion}>
+                Save Changes
+              </button>
+              <button 
+                className="cancel-button" 
+                onClick={() => {
+                  setIsAddingQuestion(false);
+                  resetNewQuestionState();
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (!selectedQuiz) {
+      return <div className="no-question-selected">Select a quiz to view questions</div>;
+    }
+
+    if (!isQuizStarted) {
+      const maxQuestions = selectedQuiz.questions.length;
+      const questionOptions = Array.from({ length: maxQuestions }, (_, i) => i + 1);
+
+      return (
+        <div className="quiz-content-container">
+          <div className="quiz-start-container">
+            <h2>{selectedQuiz.title}</h2>
+            <p className="quiz-info">
+              This quiz contains {maxQuestions} question{maxQuestions !== 1 ? 's' : ''}.
+            </p>
+            <div className="question-count-selector">
+              <label htmlFor="questionCount">Number of questions:</label>
+              <select 
+                id="questionCount" 
+                value={selectedQuestionCount}
+                onChange={handleQuestionCountChange}
+                className="question-count-select"
+              >
+                {questionOptions.map(num => (
+                  <option key={num} value={num}>
+                    {num} question{num !== 1 ? 's' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button 
+              className="start-quiz-button" 
+              onClick={handleStartQuiz}
+              disabled={selectedQuestionCount === 0}
+            >
+              Start Quiz
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (isQuizFinished) {
+      return (
+        <div className="quiz-results-container">
+          <h2>Quiz Results</h2>
+          <div className="results-summary">
+            <p>You've completed {selectedQuiz.title}!</p>
+            <p>Total Questions: {quizQuestions.length}</p>
+          </div>
+
+          <div className="answers-review">
+            {quizQuestions.map((question, index) => (
+              <div key={question.id} className="answer-review-item">
+                <div className="question">
+                  <span className="question-number">Question {index + 1}</span>
+                  <p>{question.text}</p>
+                </div>
+                <div className="answers">
+                  <div className="user-answer">
+                    <h4>Your Answer:</h4>
+                    <p>{userAnswers[index]}</p>
+                  </div>
+                  <div className="correct-answer">
+                    <h4>Correct Answer:</h4>
+                    <p>{question.answer}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="results-actions">
+            <button className="restart-button" onClick={handleRestartQuiz}>
+              Restart Quiz
+            </button>
+            <button className="quit-button" onClick={handleQuitQuiz}>
+              Exit to Quiz Selection
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    const currentQuestion = quizQuestions[currentQuestionIndex];
+    const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
 
     return (
-      <div className="no-question-selected">
-        <p>Select a question to view or edit</p>
+      <div className="quiz-active-container">
+        <div className="quiz-header">
+          <h2>Question {currentQuestionIndex + 1} of {quizQuestions.length}</h2>
+          <button className="quit-button" onClick={handleQuitQuiz}>
+            Quit Quiz
+          </button>
+        </div>
+
+        <div className="question-display">
+          <div className="question-text">
+            {currentQuestion.text}
+          </div>
+        </div>
+
+        <div className="answer-input-container">
+          <textarea
+            value={userAnswer}
+            onChange={(e) => setUserAnswer(e.target.value)}
+            placeholder="Type your answer here..."
+            disabled={showAnswer}
+          />
+          {showAnswer ? (
+            <>
+              <div className="correct-answer">
+                <h3>Correct Answer:</h3>
+                <p>{currentQuestion.answer}</p>
+              </div>
+              <button 
+                className="next-button"
+                onClick={handleNextQuestion}
+              >
+                {currentQuestionIndex === quizQuestions.length - 1 ? 'Finish Quiz' : 'Next Question'}
+              </button>
+            </>
+          ) : (
+            <button 
+              className="submit-button"
+              onClick={handleSubmitAnswer}
+              disabled={!userAnswer.trim()}
+            >
+              Submit Answer
+            </button>
+          )}
+        </div>
+
+        <div className="progress-bar-container">
+          <div className="progress-bar" style={{ width: `${progress}%` }} />
+        </div>
       </div>
     );
   };
