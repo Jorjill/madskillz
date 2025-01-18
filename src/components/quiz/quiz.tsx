@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { quizThunks } from '../../slices/quizSlice';
-import { AppDispatch, RootState } from '../../state/store';
-import './quiz.less';
+import React, { useState, useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { quizThunks, quizActions } from "../../slices/quizSlice";
+import { AppDispatch, RootState } from "../../state/store";
+import "./quiz.less";
 
 // Types and Interfaces
 interface Question {
@@ -29,18 +29,20 @@ const MenuDropdown: React.FC<{
 
   // Calculate position based on anchor element
   const rect = anchorEl.getBoundingClientRect();
-  
+
   return ReactDOM.createPortal(
-    <div 
+    <div
       className="menu-dropdown"
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: rect.top,
         left: rect.right + 5,
       }}
     >
       <button onClick={onEdit}>Edit</button>
-      <button className="delete" onClick={onDelete}>Delete</button>
+      <button className="delete" onClick={onDelete}>
+        Delete
+      </button>
     </div>,
     document.body
   );
@@ -49,41 +51,49 @@ const MenuDropdown: React.FC<{
 // Quiz Component
 const Quiz: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  
+
   // Redux State
-  const selectedSkill = useSelector((state: RootState) => state.skills.selectedSkill.title);
+  const selectedSkill = useSelector(
+    (state: RootState) => state.skills.selectedSkill.title
+  );
   const quizzes = useSelector((state: RootState) => state.quiz.quizzes);
-  
+  const selectedQuiz = useSelector(
+    (state: RootState) => state.quiz.selectedQuiz
+  );
+
   // Quiz State Management
-  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
   const [showQuestions, setShowQuestions] = useState(false);
   const [editingQuizId, setEditingQuizId] = useState<string | null>(null);
-  const [editingQuizTitle, setEditingQuizTitle] = useState('');
+  const [editingQuizTitle, setEditingQuizTitle] = useState("");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const [isQuizStarted, setIsQuizStarted] = useState(false);
   const [selectedQuestionCount, setSelectedQuestionCount] = useState<number>(0);
   const [quizQuestions, setQuizQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswer, setUserAnswer] = useState('');
+  const [userAnswer, setUserAnswer] = useState("");
   const [showAnswer, setShowAnswer] = useState(false);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
-  
+
   // New Quiz State
   const [showNewQuizInput, setShowNewQuizInput] = useState(false);
-  const [newQuizTitle, setNewQuizTitle] = useState('');
-  
+  const [newQuizTitle, setNewQuizTitle] = useState("");
+
   // Question State Management
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-  const [editedQuestion, setEditedQuestion] = useState('');
-  const [editedAnswer, setEditedAnswer] = useState('');
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
+    null
+  );
+  const [editedQuestion, setEditedQuestion] = useState("");
+  const [editedAnswer, setEditedAnswer] = useState("");
   const [isAddingQuestion, setIsAddingQuestion] = useState(false);
-  const [newQuestionTitle, setNewQuestionTitle] = useState('');
-  const [newQuestionText, setNewQuestionText] = useState('');
-  const [newQuestionAnswer, setNewQuestionAnswer] = useState('');
-  const [openQuestionMenuId, setOpenQuestionMenuId] = useState<string | null>(null);
-  const [questionMenuAnchorEl, setQuestionMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [newQuestionText, setNewQuestionText] = useState("");
+  const [newQuestionAnswer, setNewQuestionAnswer] = useState("");
+  const [openQuestionMenuId, setOpenQuestionMenuId] = useState<string | null>(
+    null
+  );
+  const [questionMenuAnchorEl, setQuestionMenuAnchorEl] =
+    useState<HTMLElement | null>(null);
 
   // Refs for DOM elements
   const newQuizRef = useRef<HTMLDivElement>(null);
@@ -100,14 +110,14 @@ const Quiz: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       if (openMenuId || openQuestionMenuId) {
-        const menuDropdowns = document.querySelectorAll('.menu-dropdown');
-        const menuButtons = document.querySelectorAll('.menu-button');
+        const menuDropdowns = document.querySelectorAll(".menu-dropdown");
+        const menuButtons = document.querySelectorAll(".menu-button");
         let clickedInside = false;
 
-        menuDropdowns.forEach(dropdown => {
+        menuDropdowns.forEach((dropdown) => {
           if (dropdown.contains(target)) clickedInside = true;
         });
-        menuButtons.forEach(button => {
+        menuButtons.forEach((button) => {
           if (button.contains(target)) clickedInside = true;
         });
 
@@ -120,8 +130,8 @@ const Quiz: React.FC = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openMenuId, openQuestionMenuId]);
 
   // Quiz Menu Handlers
@@ -136,7 +146,10 @@ const Quiz: React.FC = () => {
     }
   };
 
-  const handleQuestionMenuClick = (event: React.MouseEvent, questionId: string) => {
+  const handleQuestionMenuClick = (
+    event: React.MouseEvent,
+    questionId: string
+  ) => {
     event.stopPropagation();
     if (openQuestionMenuId === questionId) {
       setQuestionMenuAnchorEl(null);
@@ -149,49 +162,72 @@ const Quiz: React.FC = () => {
 
   // Quiz CRUD Operations
   const handleQuizSelect = (quiz: Quiz) => {
-    setSelectedQuiz(quiz);
+    dispatch(quizActions.selectQuiz(quiz));
     setShowQuestions(true);
     setIsQuizStarted(false);
-    setEditedQuestion('');
-    setEditedAnswer('');
+    setEditedQuestion("");
+    setEditedAnswer("");
     setSelectedQuestion(null);
-    setSelectedQuestionCount(quiz.questions.length);
+    setSelectedQuestionCount(
+      quiz.questions !== null ? quiz.questions.length : 0
+    );
     setQuizQuestions([]);
   };
 
-  const handleCreateQuiz = () => {
+  const handleCreateQuiz = async () => {
     if (selectedSkill && newQuizTitle.trim()) {
-      dispatch(quizThunks.createQuiz({ 
-        skill: selectedSkill.toLowerCase(),
-        title: newQuizTitle.trim()
-      }));
-      resetNewQuizState();
+      try {
+        await dispatch(
+          quizThunks.createQuiz({
+            skill: selectedSkill,
+            title: newQuizTitle.trim(),
+            questions: [],
+          })
+        );
+
+        resetNewQuizState();
+
+        // Refresh the quiz list
+        await dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
+      } catch (error) {
+        console.error("Failed to create quiz:", error);
+      }
     }
   };
 
-  const handleUpdateQuiz = () => {
+  const handleUpdateQuiz = async () => {
     if (editingQuizId && editingQuizTitle.trim()) {
-      dispatch(quizThunks.updateQuiz({ 
-        quizId: editingQuizId, 
-        title: editingQuizTitle.trim() 
-      }));
-      resetEditQuizState();
+      try {
+        await dispatch(
+          quizThunks.updateQuiz(
+            editingQuizId,
+            { title: editingQuizTitle.trim() }
+          )
+        );
+        resetEditQuizState();
+        dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
+      } catch (error) {
+        console.error("Failed to update quiz:", error);
+      }
     }
   };
 
   const handleEditQuiz = (quiz: Quiz) => {
-    setSelectedQuiz(quiz);
     setEditingQuizId(quiz.id);
     setEditingQuizTitle(quiz.title);
   };
 
   const handleDeleteQuiz = async (quiz: Quiz) => {
-    if (window.confirm('Are you sure you want to delete this quiz?')) {
-      await dispatch(quizThunks.deleteQuiz(quiz.id));
-      if (selectedQuiz?.id === quiz.id) {
-        resetQuizState();
+    if (window.confirm("Are you sure you want to delete this quiz?")) {
+      try {
+        await dispatch(quizThunks.deleteQuiz(quiz.id, selectedSkill.toLowerCase()));
+        if (selectedQuiz?.id === quiz.id) {
+          resetQuizState();
+        }
+        closeMenus();
+      } catch (error) {
+        console.error("Failed to delete quiz:", error);
       }
-      closeMenus();
     }
   };
 
@@ -200,31 +236,33 @@ const Quiz: React.FC = () => {
       const shuffledQuestions = [...selectedQuiz.questions]
         .sort(() => Math.random() - 0.5)
         .slice(0, selectedQuestionCount);
-      
+
       setQuizQuestions(shuffledQuestions);
       setIsQuizStarted(true);
       setCurrentQuestionIndex(0);
-      setUserAnswer('');
+      setUserAnswer("");
       setShowAnswer(false);
       setIsQuizFinished(false);
       setUserAnswers([]);
     }
   };
 
-  const handleQuestionCountChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleQuestionCountChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const count = parseInt(e.target.value);
     setSelectedQuestionCount(count);
   };
 
   const handleSubmitAnswer = () => {
     setShowAnswer(true);
-    setUserAnswers(prev => [...prev, userAnswer]);
+    setUserAnswers((prev) => [...prev, userAnswer]);
   };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < quizQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setUserAnswer('');
+      setCurrentQuestionIndex((prev) => prev + 1);
+      setUserAnswer("");
       setShowAnswer(false);
     } else {
       setIsQuizFinished(true);
@@ -235,7 +273,7 @@ const Quiz: React.FC = () => {
     setIsQuizStarted(false);
     setQuizQuestions([]);
     setCurrentQuestionIndex(0);
-    setUserAnswer('');
+    setUserAnswer("");
     setShowAnswer(false);
     setIsQuizFinished(false);
     setUserAnswers([]);
@@ -246,77 +284,100 @@ const Quiz: React.FC = () => {
   };
 
   // Question CRUD Operations
-  const handleCreateQuestion = () => {
+  const handleCreateQuestion = async () => {
     if (selectedQuiz && newQuestionText.trim()) {
-      dispatch(quizThunks.createQuestion({ 
-        quizId: selectedQuiz.id,
-        title: newQuestionTitle.trim(),
-        text: newQuestionText.trim(),
-        answer: newQuestionAnswer.trim()
-      }));
-      resetNewQuestionState();
+      try {
+        // Create the question
+        await dispatch(
+          quizThunks.createQuestion({
+            quizId: selectedQuiz.id,
+            text: newQuestionText.trim(),
+            answer: newQuestionAnswer.trim(),
+          })
+        );
+        resetNewQuestionState();
+        await dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
+        renderQuestions();
+      } catch (error) {
+        console.error("Failed to create question:", error);
+      }
     }
   };
 
   const handleEditQuestion = (question: Question) => {
     setSelectedQuestion(question);
     setEditedQuestion(question.text);
-    setEditedAnswer(question.answer || '');
+    setEditedAnswer(question.answer || "");
   };
 
-  const handleUpdateQuestion = () => {
+  const handleUpdateQuestion = async () => {
     if (selectedQuestion && selectedQuiz) {
-      dispatch(quizThunks.updateQuestion({
-        quizId: selectedQuiz.id,
-        questionId: selectedQuestion.id,
-        text: editedQuestion,
-        answer: editedAnswer
-      }));
-      updateSelectedQuestion();
+      try {
+        await dispatch(
+          quizThunks.updateQuestion({
+            quizId: selectedQuiz.id,
+            questionId: selectedQuestion.id,
+            text: editedQuestion,
+            answer: editedAnswer,
+          })
+        );
+        updateSelectedQuestion();
+        dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
+      } catch (error) {
+        console.error("Failed to update question:", error);
+      }
     }
   };
 
   const handleDeleteQuestion = async (question: Question) => {
-    if (selectedQuiz && window.confirm('Are you sure you want to delete this question?')) {
-      await dispatch(quizThunks.deleteQuestion({ 
-        quizId: selectedQuiz.id, 
-        questionId: question.id 
-      }));
-      if (selectedQuestion?.id === question.id) {
-        resetQuestionState();
+    if (
+      selectedQuiz &&
+      window.confirm("Are you sure you want to delete this question?")
+    ) {
+      try {
+        await dispatch(
+          quizThunks.deleteQuestion({
+            quizId: selectedQuiz.id,
+            questionId: question.id,
+          })
+        );
+        if (selectedQuestion?.id === question.id) {
+          resetQuestionState();
+        }
+        closeMenus();
+        dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
+      } catch (error) {
+        console.error("Failed to delete question:", error);
       }
-      closeMenus();
     }
   };
 
   // State Reset Functions
   const resetQuizState = () => {
-    setSelectedQuiz(null);
     setShowQuestions(false);
     resetQuestionState();
   };
 
   const resetEditQuizState = () => {
     setEditingQuizId(null);
-    setEditingQuizTitle('');
+    setEditingQuizTitle("");
   };
 
   const resetNewQuizState = () => {
     setShowNewQuizInput(false);
-    setNewQuizTitle('');
+    setNewQuizTitle("");
   };
 
   const resetQuestionState = () => {
     setSelectedQuestion(null);
-    setEditedQuestion('');
-    setEditedAnswer('');
+    setEditedQuestion("");
+    setEditedAnswer("");
   };
 
   const resetNewQuestionState = () => {
     setIsAddingQuestion(false);
-    setNewQuestionTitle('');
-    setNewQuestionText('');
-    setNewQuestionAnswer('');
+    setNewQuestionText("");
+    setNewQuestionAnswer("");
   };
 
   // Utility Functions
@@ -332,7 +393,7 @@ const Quiz: React.FC = () => {
       const updatedQuestion = {
         ...selectedQuestion,
         text: editedQuestion,
-        answer: editedAnswer
+        answer: editedAnswer,
       };
       setSelectedQuestion(updatedQuestion);
     }
@@ -340,9 +401,9 @@ const Quiz: React.FC = () => {
 
   // Event Handlers
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleUpdateQuiz();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       resetEditQuizState();
     }
   };
@@ -352,36 +413,42 @@ const Quiz: React.FC = () => {
     if (!selectedQuiz) return null;
     return (
       <div className="quiz-list">
-        {selectedQuiz.questions.map((question) => (
-          <div
-            key={question.id}
-            className={`quiz-title ${selectedQuestion?.id === question.id ? 'selected' : ''}`}
-            onClick={() => handleEditQuestion(question)}
-          >
-            <span className="question-text">{question.text}</span>
-            <div className="menu-button-container">
-              <button
-                className="menu-button"
-                onClick={(e) => handleQuestionMenuClick(e, question.id)}
-                data-question-id={question.id}
-              >
-                ⋮
-              </button>
-              <MenuDropdown
-                isOpen={openQuestionMenuId === question.id}
-                anchorEl={questionMenuAnchorEl}
-                onEdit={() => handleEditQuestion(question)}
-                onDelete={() => handleDeleteQuestion(question)}
-              />
+        {selectedQuiz.questions &&
+          selectedQuiz.questions.map((question) => (
+            <div
+              key={question.id}
+              className={`quiz-title ${
+                selectedQuestion?.id === question.id ? "selected" : ""
+              }`}
+              onClick={() => handleEditQuestion(question)}
+            >
+              <span className="question-text">{question.text}</span>
+              <div className="menu-button-container">
+                <button
+                  className="menu-button"
+                  onClick={(e) => handleQuestionMenuClick(e, question.id)}
+                  data-question-id={question.id}
+                >
+                  ⋮
+                </button>
+                <MenuDropdown
+                  isOpen={openQuestionMenuId === question.id}
+                  anchorEl={questionMenuAnchorEl}
+                  onEdit={() => handleEditQuestion(question)}
+                  onDelete={() => handleDeleteQuestion(question)}
+                />
+              </div>
             </div>
-          </div>
-        ))}
-        <div className="add-quiz-button" onClick={() => {
-          setIsAddingQuestion(true)
-          setSelectedQuestion(null);
-          setEditedQuestion('');
-          setEditedAnswer('');
-          }}>
+          ))}
+        <div
+          className="add-quiz-button"
+          onClick={() => {
+            setIsAddingQuestion(true);
+            setSelectedQuestion(null);
+            setEditedQuestion("");
+            setEditedAnswer("");
+          }}
+        >
           + Add question
         </div>
       </div>
@@ -395,7 +462,9 @@ const Quiz: React.FC = () => {
           quizzes.map((quiz) => (
             <div
               key={quiz.id}
-              className={`quiz-title ${selectedQuiz?.id === quiz.id ? 'selected' : ''}`}
+              className={`quiz-title ${
+                selectedQuiz?.id === quiz.id ? "selected" : ""
+              }`}
             >
               {editingQuizId === quiz.id ? (
                 <div className="edit-container" ref={editQuizRef}>
@@ -418,7 +487,7 @@ const Quiz: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <span 
+                  <span
                     className="quiz-text"
                     onClick={() => handleQuizSelect(quiz)}
                   >
@@ -451,7 +520,7 @@ const Quiz: React.FC = () => {
     </>
   );
 
-  const renderNewQuizInput = () => (
+  const renderNewQuizInput = () =>
     showNewQuizInput ? (
       <div className="new-quiz-input-container" ref={newQuizRef}>
         <input
@@ -462,7 +531,7 @@ const Quiz: React.FC = () => {
           className="new-quiz-input"
           autoFocus
           onKeyPress={(e) => {
-            if (e.key === 'Enter') {
+            if (e.key === "Enter") {
               handleCreateQuiz();
             }
           }}
@@ -477,11 +546,13 @@ const Quiz: React.FC = () => {
         </div>
       </div>
     ) : (
-      <div className="add-quiz-button" onClick={() => setShowNewQuizInput(true)}>
+      <div
+        className="add-quiz-button"
+        onClick={() => setShowNewQuizInput(true)}
+      >
         + Add Quiz
       </div>
-    )
-  );
+    );
 
   const renderQuestionContent = () => {
     if (selectedQuestion) {
@@ -507,12 +578,12 @@ const Quiz: React.FC = () => {
               <button className="save-button" onClick={handleUpdateQuestion}>
                 Save Changes
               </button>
-              <button 
-                className="cancel-button" 
+              <button
+                className="cancel-button"
                 onClick={() => {
                   setSelectedQuestion(null);
-                  setEditedQuestion('');
-                  setEditedAnswer('');
+                  setEditedQuestion("");
+                  setEditedAnswer("");
                 }}
               >
                 Cancel
@@ -522,7 +593,7 @@ const Quiz: React.FC = () => {
         </div>
       );
     }
-    if(isAddingQuestion) {
+    if (isAddingQuestion) {
       return (
         <div className="quiz-content-container">
           <div className="question-container">
@@ -545,8 +616,8 @@ const Quiz: React.FC = () => {
               <button className="save-button" onClick={handleCreateQuestion}>
                 Save Changes
               </button>
-              <button 
-                className="cancel-button" 
+              <button
+                className="cancel-button"
                 onClick={() => {
                   setIsAddingQuestion(false);
                   resetNewQuestionState();
@@ -561,37 +632,46 @@ const Quiz: React.FC = () => {
     }
 
     if (!selectedQuiz) {
-      return <div className="no-question-selected">Select a quiz to view questions</div>;
+      return (
+        <div className="no-question-selected">
+          Select a quiz to view questions
+        </div>
+      );
     }
 
     if (!isQuizStarted) {
-      const maxQuestions = selectedQuiz.questions.length;
-      const questionOptions = Array.from({ length: maxQuestions }, (_, i) => i + 1);
+      const maxQuestions =
+        selectedQuiz.questions && selectedQuiz.questions.length;
+      const questionOptions = Array.from(
+        { length: maxQuestions },
+        (_, i) => i + 1
+      );
 
       return (
         <div className="quiz-content-container">
           <div className="quiz-start-container">
             <h2>{selectedQuiz.title}</h2>
             <p className="quiz-info">
-              This quiz contains {maxQuestions} question{maxQuestions !== 1 ? 's' : ''}.
+              This quiz contains {maxQuestions} question
+              {maxQuestions !== 1 ? "s" : ""}.
             </p>
             <div className="question-count-selector">
               <label htmlFor="questionCount">Number of questions:</label>
-              <select 
-                id="questionCount" 
+              <select
+                id="questionCount"
                 value={selectedQuestionCount}
                 onChange={handleQuestionCountChange}
                 className="question-count-select"
               >
-                {questionOptions.map(num => (
+                {questionOptions.map((num) => (
                   <option key={num} value={num}>
-                    {num} question{num !== 1 ? 's' : ''}
+                    {num} question{num !== 1 ? "s" : ""}
                   </option>
                 ))}
               </select>
             </div>
-            <button 
-              className="start-quiz-button" 
+            <button
+              className="start-quiz-button"
               onClick={handleStartQuiz}
               disabled={selectedQuestionCount === 0}
             >
@@ -650,16 +730,16 @@ const Quiz: React.FC = () => {
     return (
       <div className="quiz-active-container">
         <div className="quiz-header">
-          <h2>Question {currentQuestionIndex + 1} of {quizQuestions.length}</h2>
+          <h2>
+            Question {currentQuestionIndex + 1} of {quizQuestions.length}
+          </h2>
           <button className="quit-button" onClick={handleQuitQuiz}>
             Quit Quiz
           </button>
         </div>
 
         <div className="question-display">
-          <div className="question-text">
-            {currentQuestion.text}
-          </div>
+          <div className="question-text">{currentQuestion.text}</div>
         </div>
 
         <div className="answer-input-container">
@@ -675,15 +755,14 @@ const Quiz: React.FC = () => {
                 <h3>Correct Answer:</h3>
                 <p>{currentQuestion.answer}</p>
               </div>
-              <button 
-                className="next-button"
-                onClick={handleNextQuestion}
-              >
-                {currentQuestionIndex === quizQuestions.length - 1 ? 'Finish Quiz' : 'Next Question'}
+              <button className="next-button" onClick={handleNextQuestion}>
+                {currentQuestionIndex === quizQuestions.length - 1
+                  ? "Finish Quiz"
+                  : "Next Question"}
               </button>
             </>
           ) : (
-            <button 
+            <button
               className="submit-button"
               onClick={handleSubmitAnswer}
               disabled={!userAnswer.trim()}
@@ -708,16 +787,17 @@ const Quiz: React.FC = () => {
           renderQuizList()
         ) : (
           <>
-            <div className="back-button" onClick={() => setShowQuestions(false)}>
+            <div
+              className="back-button"
+              onClick={() => setShowQuestions(false)}
+            >
               <i className="ri-arrow-left-line" /> Back to Quizzes
             </div>
             {renderQuestions()}
           </>
         )}
       </div>
-      <div className="quiz-content-right">
-        {renderQuestionContent()}
-      </div>
+      <div className="quiz-content-right">{renderQuestionContent()}</div>
     </div>
   );
 };
