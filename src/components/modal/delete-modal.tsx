@@ -1,3 +1,4 @@
+import React from "react";
 import "./delete-modal.less";
 
 interface DeleteModalProps {
@@ -7,24 +8,26 @@ interface DeleteModalProps {
 }
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({
-    onClose,
-    onConfirm,
-    noteTitle,
-  }) => (
-    <div className="delete-modal">
-      <div className="modal-content">
-        <span className="close-button" onClick={onClose}>&times;</span>
-        <div className="modal-header">
-          <h4 className="modal-title">Confirm Deletion</h4>
-        </div>
-        <div className="modal-body">
-          <p>Are you sure you want to delete the note "{noteTitle}"?</p>
-        </div>
-        <div className="modal-footer">
-          <button className="modal-button cancel" onClick={onClose}>Cancel</button>
-          <button className="modal-button confirm" onClick={onConfirm}>Delete</button>
-        </div>
+  onClose,
+  onConfirm,
+  noteTitle,
+}) => (
+  <div className="delete-modal">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h2 className="modal-title">Delete Confirmation</h2>
+        <button className="close-button" onClick={onClose} aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div className="modal-body">
+        <p>Are you sure you want to delete <strong>"{noteTitle}"</strong>?</p>
+        <p className="warning-text">This action cannot be undone.</p>
+      </div>
+      <div className="modal-footer">
+        <button className="modal-button cancel" onClick={onClose}>Cancel</button>
+        <button className="modal-button delete" onClick={onConfirm}>Delete</button>
       </div>
     </div>
-  );
-  
+  </div>
+);
