@@ -50,7 +50,7 @@ const MenuDropdown: React.FC<{
 
 // Quiz Component
 const Quiz: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch: AppDispatch = useDispatch<AppDispatch>();
 
   // Redux State
   const selectedSkill = useSelector(
@@ -75,6 +75,7 @@ const Quiz: React.FC = () => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
+  const [answerResults, setAnswerResults] = useState<Array<{ result: string; reason: string }>>([]);
 
   // New Quiz State
   const [showNewQuizInput, setShowNewQuizInput] = useState(false);
@@ -244,6 +245,7 @@ const Quiz: React.FC = () => {
       setShowAnswer(false);
       setIsQuizFinished(false);
       setUserAnswers([]);
+      setAnswerResults([]);
     }
   };
 
@@ -254,9 +256,30 @@ const Quiz: React.FC = () => {
     setSelectedQuestionCount(count);
   };
 
-  const handleSubmitAnswer = () => {
+  const handleSubmitAnswer = async () => {
+    if (!userAnswer.trim()) return;
+
+    try {
+      const currentQuestion = quizQuestions[currentQuestionIndex];
+      const result = await dispatch(quizThunks.submitAnswer({
+        id: currentQuestion.id,
+        question: currentQuestion.text,
+        answer: currentQuestion.answer,
+        providedAnswer: userAnswer.trim()
+      }));
+
+      const finalResult = result.payload || result;
+      console.log('Answer Result:', finalResult); // Debug log
+
+      // Store both the answer and its result
+      setUserAnswers(prev => [...prev, userAnswer]);
+      setAnswerResults(prev => [...prev, finalResult]);
+
+    } catch (error) {
+      console.error('Failed to submit answer:', error);
+    }
+
     setShowAnswer(true);
-    setUserAnswers((prev) => [...prev, userAnswer]);
   };
 
   const handleNextQuestion = () => {
@@ -277,6 +300,7 @@ const Quiz: React.FC = () => {
     setShowAnswer(false);
     setIsQuizFinished(false);
     setUserAnswers([]);
+    setAnswerResults([]);
   };
 
   const handleRestartQuiz = () => {
@@ -670,33 +694,65 @@ const Quiz: React.FC = () => {
     }
 
     if (isQuizFinished) {
+      // Calculate percentage of correct answers
+      console.log('All Results:', answerResults); // Debug log
+      
+      const correctAnswers = answerResults.filter(result => {
+        console.log('Checking result:', result); // Debug log
+        return result && result.result && result.result.toUpperCase() === 'PASS';
+      }).length;
+      
+      const totalQuestions = answerResults.length;
+      const correctPercentage = totalQuestions > 0 
+        ? (correctAnswers / totalQuestions) * 100 
+        : 0;
+
+      console.log(`Correct: ${correctAnswers}, Total: ${totalQuestions}, Percentage: ${correctPercentage}%`); // Debug log
+
+      const isPassed = correctPercentage >= 80;
+      
       return (
         <div className="quiz-results-container">
           <h2>Quiz Results</h2>
-          <div className="results-summary">
+          <div className="quiz-summary">
             <p>You've completed {selectedQuiz.title}!</p>
             <p>Total Questions: {quizQuestions.length}</p>
+            <div className="result-status">
+              <p>Correct Answers: {correctAnswers} out of {totalQuestions} ({correctPercentage.toFixed(1)}%)</p>
+              <p className={`status ${isPassed ? 'pass' : 'fail'}`}>
+                Status: {isPassed ? 'PASS' : 'FAIL'}
+              </p>
+            </div>
           </div>
 
           <div className="answers-review">
-            {quizQuestions.map((question, index) => (
-              <div key={question.id} className="answer-review-item">
-                <div className="question">
-                  <span className="question-number">Question {index + 1}</span>
-                  <p>{question.text}</p>
-                </div>
-                <div className="answers">
-                  <div className="user-answer">
-                    <h4>Your Answer:</h4>
-                    <p>{userAnswers[index]}</p>
+            {quizQuestions.map((question, index) => {
+              const apiResult = answerResults[index];
+              return (
+                <div key={question.id} className="answer-review-item">
+                  <div className="question">
+                    <span className="question-number">Question {index + 1}</span>
+                    <p>{question.text}</p>
                   </div>
-                  <div className="correct-answer">
-                    <h4>Correct Answer:</h4>
-                    <p>{question.answer}</p>
+                  <div className="answers">
+                    <div className="user-answer">
+                      <h4>Your Answer:</h4>
+                      <p>{userAnswers[index]}</p>
+                      {apiResult && (
+                        <div className={`api-result ${apiResult.result.toLowerCase()}`}>
+                          <span className="result">{apiResult.result}</span>
+                          <p className="reason">{apiResult.reason}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="correct-answer">
+                      <h4>Correct Answer:</h4>
+                      <p>{question.answer}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="results-actions">

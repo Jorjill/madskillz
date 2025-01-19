@@ -70,6 +70,11 @@ const getAuthHeaders = () => {
   };
 };
 
+export interface AnswerResult {
+  result: "PASS" | "FAIL";
+  reason: string;
+}
+
 export const quizThunks = {
   fetchQuizzes: (skillName: string) => async (dispatch: any, getState: any) => {
     dispatch(quizActions.setLoading(true));
@@ -261,6 +266,35 @@ export const quizThunks = {
       // dispatch(quizActions.selectQuiz(response.data));
     } catch (error) {
       dispatch(quizActions.setError(error instanceof Error ? error.message : "Failed to delete question"));
+    }
+  },
+
+  submitAnswer: ({
+    id,
+    question,
+    answer,
+    providedAnswer,
+  }: {
+    id: string;
+    question: string;
+    answer: string;
+    providedAnswer: string;
+  }) => async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/general-question/answer`,
+        {
+          id,
+          question,
+          answer,
+          providedAnswer,
+        },
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to submit answer:", error);
+      throw error;
     }
   },
 };
