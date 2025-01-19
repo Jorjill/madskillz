@@ -236,7 +236,7 @@ export const quizThunks = {
         `${import.meta.env.VITE_API_URL}/quizzes/${params.quizId}`,
         getAuthHeaders()
       );
-      dispatch(quizActions.selectQuiz(response.data));
+      // dispatch(quizActions.selectQuiz(response.data));
     } catch (error) {
       dispatch(quizActions.setError(error instanceof Error ? error.message : "Failed to update question"));
     }

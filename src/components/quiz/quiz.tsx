@@ -297,7 +297,6 @@ const Quiz: React.FC = () => {
         );
         resetNewQuestionState();
         await dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
-        renderQuestions();
       } catch (error) {
         console.error("Failed to create question:", error);
       }
@@ -321,8 +320,7 @@ const Quiz: React.FC = () => {
             answer: editedAnswer,
           })
         );
-        updateSelectedQuestion();
-        dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
+        await dispatch(quizThunks.fetchQuizzes(selectedSkill.toLowerCase()));
       } catch (error) {
         console.error("Failed to update question:", error);
       }
