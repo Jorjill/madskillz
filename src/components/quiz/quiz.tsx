@@ -386,17 +386,6 @@ const Quiz: React.FC = () => {
     setOpenQuestionMenuId(null);
   };
 
-  const updateSelectedQuestion = () => {
-    if (selectedQuestion) {
-      const updatedQuestion = {
-        ...selectedQuestion,
-        text: editedQuestion,
-        answer: editedAnswer,
-      };
-      setSelectedQuestion(updatedQuestion);
-    }
-  };
-
   // Event Handlers
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {

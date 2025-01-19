@@ -232,7 +232,7 @@ export const quizThunks = {
         );
       }
       // Refresh the quiz to get updated questions
-      const response = await axios.get(
+      await axios.get(
         `${import.meta.env.VITE_API_URL}/quizzes/${params.quizId}`,
         getAuthHeaders()
       );
