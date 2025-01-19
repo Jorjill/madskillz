@@ -168,9 +168,7 @@ const Quiz: React.FC = () => {
     setEditedQuestion("");
     setEditedAnswer("");
     setSelectedQuestion(null);
-    setSelectedQuestionCount(
-      quiz.questions !== null ? quiz.questions.length : 0
-    );
+    setSelectedQuestionCount(quiz.questions ? quiz.questions.length : 0);
     setQuizQuestions([]);
   };
 
@@ -233,11 +231,13 @@ const Quiz: React.FC = () => {
 
   const handleStartQuiz = () => {
     if (selectedQuiz) {
-      const shuffledQuestions = [...selectedQuiz.questions]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, selectedQuestionCount);
-
-      setQuizQuestions(shuffledQuestions);
+      // Create a copy of the questions array and shuffle it
+      const shuffledQuestions = [...selectedQuiz.questions].sort(() => Math.random() - 0.5);
+      
+      // Take only the number of questions selected by the user
+      const selectedQuestions = shuffledQuestions.slice(0, selectedQuestionCount);
+      
+      setQuizQuestions(selectedQuestions);
       setIsQuizStarted(true);
       setCurrentQuestionIndex(0);
       setUserAnswer("");
