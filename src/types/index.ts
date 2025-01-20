@@ -6,6 +6,7 @@ export interface BaseItem {
 }
 
 export interface Skill extends BaseItem {
+  createdAt: string | number | Date;
   name: string;
   description: string;
   proficiencyLevel: ProficiencyLevel;

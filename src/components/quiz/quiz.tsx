@@ -295,6 +295,7 @@ const Quiz: React.FC = () => {
       if(selectedQuiz) {
         dispatch(quizThunks.saveQuizResult({
           quiz_name: selectedQuiz.title,
+          skill: selectedSkill,
           status: correctAnswers / answerResults.length >= 0.8 ? 'PASS' : 'FAIL',
           correct_answers: correctAnswers,
           total_questions: answerResults.length

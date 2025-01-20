@@ -9,6 +9,7 @@ import storageSession from "redux-persist/lib/storage/session";
 import practiceReducer from "../slices/practiceSlice";
 import testReducer from "../slices/testSlice";
 import quizReducer from "../slices/quizSlice";
+import quizResultsReducer from "../slices/quizResultsSlice";
 import thunk, { ThunkDispatch } from 'redux-thunk';
 
 // Persist configuration
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   practice: practiceReducer,
   test: testReducer,
   quiz: quizReducer,
+  quizResults: quizResultsReducer,
 });
 
 // Define the RootState type to represent the overall shape of your Redux store state

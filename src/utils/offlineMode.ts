@@ -49,6 +49,7 @@ const initializeOfflineData = () => {
         description: 'Modern JavaScript programming',
         proficiencyLevel: 'expert',
         tags: ['programming', 'web'],
+        createdAt: new Date().toISOString()
       },
       {
         id: '2',
@@ -56,6 +57,7 @@ const initializeOfflineData = () => {
         description: 'Frontend development with React',
         proficiencyLevel: 'advanced',
         tags: ['frontend', 'web'],
+        createdAt: new Date().toISOString()
       },
       {
         id: '3',
@@ -63,6 +65,7 @@ const initializeOfflineData = () => {
         description: 'Typed JavaScript development',
         proficiencyLevel: 'intermediate',
         tags: ['programming', 'web'],
+        createdAt: new Date().toISOString()
       },
     ];
     setStorageData(SKILLS_KEY, sampleSkills);

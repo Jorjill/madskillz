@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { getAuthHeaders } from "../utils/auth";
 
 export interface Question {
   id: string;
@@ -57,18 +58,6 @@ const quizSlice = createSlice({
 });
 
 export const quizActions = quizSlice.actions;
-
-const getAuthHeaders = () => {
-  const idToken = localStorage.getItem("idToken");
-  if (!idToken) {
-    throw new Error("No token found. User might not be authenticated.");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${idToken}`,
-    },
-  };
-};
 
 export interface AnswerResult {
   result: "PASS" | "FAIL";
@@ -271,11 +260,13 @@ export const quizThunks = {
 
   saveQuizResult: ({
     quiz_name,
+    skill,
     status,
     correct_answers,
     total_questions,
   }: {
     quiz_name: string;
+    skill: string;
     status: string;
     correct_answers: number;
     total_questions: number;
@@ -285,6 +276,7 @@ export const quizThunks = {
         `${import.meta.env.VITE_API_URL}/quiz-results`,
         {
           quiz_name,
+          skill,
           status,
           correct_answers,
           total_questions,
