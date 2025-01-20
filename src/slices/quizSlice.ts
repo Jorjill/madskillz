@@ -269,6 +269,35 @@ export const quizThunks = {
     }
   },
 
+  saveQuizResult: ({
+    quiz_name,
+    status,
+    correct_answers,
+    total_questions,
+  }: {
+    quiz_name: string;
+    status: string;
+    correct_answers: number;
+    total_questions: number;
+  }) => async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/quiz-results`,
+        {
+          quiz_name,
+          status,
+          correct_answers,
+          total_questions,
+        },
+        getAuthHeaders()
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to save quiz result:", error);
+      throw error;
+    }
+  },
+
   submitAnswer: ({
     id,
     question,

@@ -289,6 +289,19 @@ const Quiz: React.FC = () => {
       setShowAnswer(false);
     } else {
       setIsQuizFinished(true);
+      const correctAnswers = answerResults.filter(result => 
+        result && result.result && result.result.toUpperCase() === 'PASS'
+      ).length;
+      if(selectedQuiz) {
+        dispatch(quizThunks.saveQuizResult({
+          quiz_name: selectedQuiz.title,
+          status: correctAnswers / answerResults.length >= 0.8 ? 'PASS' : 'FAIL',
+          correct_answers: correctAnswers,
+          total_questions: answerResults.length
+        })).catch(error => {
+          console.error('Failed to save quiz results:', error);
+        });
+      }
     }
   };
 
