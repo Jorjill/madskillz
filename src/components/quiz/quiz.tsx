@@ -768,10 +768,9 @@ const Quiz: React.FC = () => {
       // Calculate percentage of correct answers
       console.log('All Results:', answerResults); // Debug log
       
-      const correctAnswers = answerResults.filter(result => {
-        console.log('Checking result:', result); // Debug log
-        return result && result.result && result.result.toUpperCase() === 'PASS';
-      }).length;
+      const correctAnswers = answerResults.filter(result => 
+        result && result.result && result.result.toUpperCase() === 'PASS'
+      ).length;
       
       const totalQuestions = answerResults.length;
       const correctPercentage = totalQuestions > 0 
@@ -856,18 +855,60 @@ const Quiz: React.FC = () => {
           <div className="question-text">{currentQuestion.text}</div>
         </div>
 
+        <div className="mode-switch">
+          <label>
+            <input
+              type="checkbox"
+              checked={isCodeMode}
+              onChange={(e) => setIsCodeMode(e.target.checked)}
+              disabled={showAnswer}
+            />
+            Code Mode
+          </label>
+        </div>
+
         <div className="answer-input-container">
-          <textarea
-            value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
-            placeholder="Type your answer here..."
-            disabled={showAnswer}
-          />
+          {isCodeMode ? (
+            <Editor
+              height="200px"
+              defaultLanguage="javascript"
+              value={userAnswer}
+              onChange={(value) => setUserAnswer(value || '')}
+              options={{
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                fontSize: 14,
+                readOnly: showAnswer
+              }}
+              className="monaco-editor-instance"
+            />
+          ) : (
+            <textarea
+              value={userAnswer}
+              onChange={(e) => setUserAnswer(e.target.value)}
+              placeholder="Type your answer here..."
+              disabled={showAnswer}
+            />
+          )}
           {showAnswer ? (
             <>
               <div className="correct-answer">
                 <h3>Correct Answer:</h3>
-                <p>{currentQuestion.answer}</p>
+                {isCodeMode ? (
+                  <Editor
+                    height="200px"
+                    defaultLanguage="javascript"
+                    value={currentQuestion.answer}
+                    options={{
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                      fontSize: 14,
+                      readOnly: true
+                    }}
+                  />
+                ) : (
+                  <p>{currentQuestion.answer}</p>
+                )}
               </div>
               <button className="next-button" onClick={handleNextQuestion}>
                 {currentQuestionIndex === quizQuestions.length - 1

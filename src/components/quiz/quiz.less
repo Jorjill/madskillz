@@ -538,11 +538,52 @@
     }
   }
 
+  .mode-switch {
+    display: inline-flex;
+    padding: 8px 12px;
+    background: rgba(101, 135, 122, 0.1);
+    border: 1px solid rgba(101, 135, 122, 0.2);
+    border-radius: 6px;
+    margin-bottom: 20px;
+    align-self: flex-start;
+    
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: @text-color;
+      font-size: 14px;
+      user-select: none;
+      
+      input[type="checkbox"] {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: @primary-color;
+
+        &:disabled {
+          cursor: not-allowed;
+          opacity: 0.6;
+        }
+      }
+    }
+  }
+
   .answer-input-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 20px;
+
+    .monaco-editor-instance {
+      min-height: 200px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
 
     textarea {
       .input-base();
@@ -576,6 +617,13 @@
         color: @text-color;
         font-size: 16px;
         line-height: 1.6;
+        white-space: pre-wrap;
+      }
+
+      .monaco-editor {
+        margin-top: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
       }
     }
 
@@ -990,45 +1038,5 @@
     height: 100%;
     color: rgba(255, 255, 255, 0.4);
     font-size: 16px;
-  }
-}
-
-// Adding styles for the mode switch
-.answer-container {
-  margin-bottom: 30px;
-
-  textarea {
-    .input-base();
-    min-height: 120px;
-    font-size: 16px;
-    line-height: 1.6;
-    resize: vertical;
-    margin-bottom: 16px;
-    background: rgba(255, 255, 255, 0.05);
-  }
-
-  .question-text {
-    font-size: 16px;
-    line-height: 1.8;
-  }
-
-  .mode-switch {
-    margin-bottom: 10px;
-    
-    label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      
-      input[type="checkbox"] {
-        cursor: pointer;
-      }
-    }
-  }
-  
-  .monaco-editor {
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
 }
