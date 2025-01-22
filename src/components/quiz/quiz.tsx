@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { quizThunks, quizActions } from "../../slices/quizSlice";
 import { AppDispatch, RootState } from "../../state/store";
 import "./quiz.less";
+import Editor from "@monaco-editor/react";
 
 // Types and Interfaces
 interface Question {
@@ -95,6 +96,7 @@ const Quiz: React.FC = () => {
   );
   const [questionMenuAnchorEl, setQuestionMenuAnchorEl] =
     useState<HTMLElement | null>(null);
+  const [isCodeMode, setIsCodeMode] = useState(false);
 
   // Refs for DOM elements
   const newQuizRef = useRef<HTMLDivElement>(null);
@@ -134,6 +136,13 @@ const Quiz: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [openMenuId, openQuestionMenuId]);
+
+  useEffect(() => {
+    if (selectedQuestion) {
+      setEditedQuestion(selectedQuestion.text);
+      setEditedAnswer(selectedQuestion.answer);
+    }
+  }, [selectedQuestion]);
 
   // Quiz Menu Handlers
   const handleMenuClick = (event: React.MouseEvent, quizId: string) => {
@@ -586,7 +595,7 @@ const Quiz: React.FC = () => {
           <div className="question-container">
             <h2>Question</h2>
             <textarea
-              value={editedQuestion || selectedQuestion.text}
+              value={editedQuestion}
               onChange={(e) => setEditedQuestion(e.target.value)}
               placeholder="Enter your question..."
               className="question-text"
@@ -594,11 +603,35 @@ const Quiz: React.FC = () => {
           </div>
           <div className="answer-container">
             <h2>Answer</h2>
-            <textarea
-              value={editedAnswer || selectedQuestion.answer}
-              onChange={(e) => setEditedAnswer(e.target.value)}
-              placeholder="Enter your answer..."
-            />
+            <div className="mode-switch">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isCodeMode}
+                  onChange={(e) => setIsCodeMode(e.target.checked)}
+                />
+                Code Mode
+              </label>
+            </div>
+            {isCodeMode ? (
+              <Editor
+                height="200px"
+                defaultLanguage="javascript"
+                value={editedAnswer}
+                onChange={(value) => setEditedAnswer(value || '')}
+                options={{
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  fontSize: 14,
+                }}
+              />
+            ) : (
+              <textarea
+                value={editedAnswer}
+                onChange={(e) => setEditedAnswer(e.target.value)}
+                placeholder="Enter your answer..."
+              />
+            )}
             <div className="button-group">
               <button className="save-button" onClick={handleUpdateQuestion}>
                 Save Changes
@@ -632,11 +665,35 @@ const Quiz: React.FC = () => {
           </div>
           <div className="answer-container">
             <h2>Answer</h2>
-            <textarea
-              value={newQuestionAnswer}
-              onChange={(e) => setNewQuestionAnswer(e.target.value)}
-              placeholder="Enter your answer..."
-            />
+            <div className="mode-switch">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isCodeMode}
+                  onChange={(e) => setIsCodeMode(e.target.checked)}
+                />
+                Code Mode
+              </label>
+            </div>
+            {isCodeMode ? (
+              <Editor
+                height="200px"
+                defaultLanguage="javascript"
+                value={newQuestionAnswer}
+                onChange={(value) => setNewQuestionAnswer(value || '')}
+                options={{
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  fontSize: 14,
+                }}
+              />
+            ) : (
+              <textarea
+                value={newQuestionAnswer}
+                onChange={(e) => setNewQuestionAnswer(e.target.value)}
+                placeholder="Enter your answer..."
+              />
+            )}
             <div className="button-group">
               <button className="save-button" onClick={handleCreateQuestion}>
                 Save Changes
