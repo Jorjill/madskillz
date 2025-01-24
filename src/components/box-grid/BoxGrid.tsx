@@ -47,7 +47,7 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
     }
   };
 
-  const defaultImage = "src/assets/1.png"; // Add a default image path
+  const defaultImage = "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Graduation%20cap/3D/graduation_cap_3d.png"; // Academic cap as default image
 
   return (
     <div className="box-grid">
