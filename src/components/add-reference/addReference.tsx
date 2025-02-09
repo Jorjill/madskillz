@@ -30,6 +30,19 @@ export const AddReference: React.FC = () => {
             ["bold", "italic", "underline"],
             ["image", "code-block"],
           ],
+          clipboard: {
+            matchVisual: false
+          },
+          keyboard: {
+            bindings: {
+              'list autofill': {
+                prefix: /^\d+\./,
+                handler: function() {
+                  return true; // Prevents auto-formatting
+                }
+              }
+            }
+          }
         },
       });
 

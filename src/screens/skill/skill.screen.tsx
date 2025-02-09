@@ -83,7 +83,7 @@ export const SkillScreen = () => {
             onClick={(e) => {
               e.stopPropagation();
               dispatch<any>(skillsThunks.deleteSkill(selectedSkill.id));
-              navigate("/");
+              navigate("/home");
             }}
           ></i>
         </div>
