@@ -54,6 +54,12 @@ const quizSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
+    resetQuizState: (state) => {
+      state.quizzes = [];
+      state.selectedQuiz = null;
+      state.loading = false;
+      state.error = null;
+    }
   },
 });
 
@@ -322,5 +328,5 @@ export const quizThunks = {
 
 export const selectQuizState = (state: { quiz: QuizState }) => state.quiz;
 
-export const { setQuizzes, selectQuiz, setLoading, setError } = quizSlice.actions;
+export const { setQuizzes, selectQuiz, setLoading, setError, resetQuizState } = quizSlice.actions;
 export default quizSlice.reducer;

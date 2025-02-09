@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { resetQuizState } from "./quizSlice";
 
 export interface skill {
   id?: string;
@@ -10,27 +11,44 @@ export interface skill {
 export interface skillsState {
   skills: skill[];
   selectedSkill: skill;
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: skillsState = {
   skills: [],
   selectedSkill: { id: "", title: "", imageurl: "" },
+  loading: false,
+  error: null,
 };
 
 const skillsSlice = createSlice({
   name: "skills",
   initialState,
   reducers: {
-    addSkills: (state, actions) => {
-      state.skills = actions.payload;
+    setSkills: (state, action) => {
+      state.skills = action.payload;
+      state.loading = false;
+      state.error = null;
     },
-    selectSkill: (state, actions) => {
-      state.selectedSkill = actions.payload;
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.error = action.payload;
+      state.loading = false;
+    },
+    selectSkill: (state, action) => {
+      state.selectedSkill = action.payload;
+    },
+    deselectSkill: (state) => {
+      state.selectedSkill = initialState.selectedSkill;
     },
   },
 });
 
 export const skillsActions = skillsSlice.actions;
+export const { setSkills, setLoading, setError, selectSkill, deselectSkill } = skillsSlice.actions;
 
 const getAuthHeaders = () => {
   const idToken = localStorage.getItem("idToken");
@@ -45,40 +63,23 @@ const getAuthHeaders = () => {
 };
 
 export const skillsThunks = {
-  // @ts-ignore
   fetchSkills: () => async (dispatch: any) => {
+    dispatch(skillsActions.setLoading(true));
     try {
-      if (import.meta.env.VITE_DEV === "true") {
-        // In development mode, use offline data
-        const offlineSkills = [
-          {
-            id: '1',
-            title: 'javascript',
-            imageurl: '/images/javascript.png'
-          },
-          {
-            id: '2',
-            title: 'react',
-            imageurl: '/images/react.png'
-          },
-          {
-            id: '3',
-            title: 'typescript',
-            imageurl: '/images/typescript.png'
-          }
-        ];
-        dispatch(skillsActions.addSkills(offlineSkills));
-      } else {
-        // In production mode, use API
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/skills`,
-          getAuthHeaders()
-        );
-        dispatch(skillsActions.addSkills(response.data));
-      }
+      const skills = import.meta.env.VITE_DEV === "true"
+        ? []
+        : (await axios.get(
+            `${import.meta.env.VITE_API_URL}/skills`,
+            getAuthHeaders()
+          )).data;
+      dispatch(skillsActions.setSkills(skills));
     } catch (error) {
-      console.error("Failed to fetch skills:", error);
+      dispatch(skillsActions.setError((error as Error).message));
     }
+  },
+  selectSkill: (skill: skill) => async (dispatch: any) => {
+    dispatch(resetQuizState());
+    dispatch(skillsActions.selectSkill(skill));
   },
   addSkill: (newSkill: skill) => async (dispatch: any) => {
     try {
@@ -131,5 +132,4 @@ export const skillsThunks = {
 export const selectSkills = (state: { skills: skillsState }) =>
   state.skills.skills;
 
-export const { selectSkill, addSkills } = skillsSlice.actions;
 export default skillsSlice.reducer;

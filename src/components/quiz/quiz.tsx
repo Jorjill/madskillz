@@ -952,7 +952,7 @@ const Quiz: React.FC = () => {
           </>
         )}
       </div>
-      <div className="quiz-content-right">{renderQuestionContent()}</div>
+      {selectedQuiz && <div className="quiz-content-right">{renderQuestionContent()}</div>}
     </div>
   );
 };

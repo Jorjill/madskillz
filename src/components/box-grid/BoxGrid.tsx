@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from "react-router-dom";
 import './BoxGrid.less';
-import { selectSkill, skill, skillsThunks } from '../../slices/skillsSlice';
+import {
+  skillsThunks,
+  selectSkill,
+  skill,
+} from "../../slices/skillsSlice";
 import { AppDispatch } from '../../state/store';
 
 interface BoxGridProps {

@@ -20,10 +20,14 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useDispatch } from 'react-redux';
+import { deselectSkill } from '../../slices/skillsSlice';
+import { resetQuizState } from '../../slices/quizSlice';
 import './Navigation.less';
 
 const Navigation: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -34,6 +38,12 @@ const Navigation: React.FC = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleHome = () => {
+    dispatch(deselectSkill());
+    dispatch(resetQuizState());
+    navigate('/home');
   };
 
   const handleProfile = () => {
@@ -69,7 +79,7 @@ const Navigation: React.FC = () => {
             edge="start"
             color="inherit"
             aria-label="home"
-            onClick={() => navigate('/home')}
+            onClick={handleHome}
             sx={{ mr: 2 }}
           >
             <HomeIcon />
