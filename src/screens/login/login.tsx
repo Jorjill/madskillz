@@ -3,7 +3,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  onIdTokenChanged,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +11,7 @@ import { isOfflineMode, setOfflineMode } from "../../utils/offlineMode";
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./login.less";
 import img from "../../assets/mskillz.png";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -23,25 +23,11 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
-
-  const storeToken = async (user: any) => {
-    if (user) {
-      const idToken = await user.getIdToken();
-      localStorage.setItem("idToken", idToken);
-    } else {
-      localStorage.removeItem("idToken");
-    }
-  };
+  const { storeToken } = useAuth();
 
   useEffect(() => {
     console.log("Offline mode:", import.meta.env.VITE_DEV);
-    if (!offline) {
-      const unsubscribe = onIdTokenChanged(auth, (user) => {
-        storeToken(user);
-      });
-      return () => unsubscribe();
-    }
-  }, [offline]);
+  }, []);
 
   const handleOfflineToggle = () => {
     const newOfflineMode = !offline;

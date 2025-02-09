@@ -12,6 +12,7 @@ import { isOfflineMode, getMockUser } from "./utils/offlineMode";
 interface AuthContextProps {
   user: User | null;
   idToken: string | null;
+  storeToken: (user: User | null) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -27,9 +28,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const storeToken = async (user: User | null) => {
     if (user) {
-      const idToken = await user.getIdToken();
-      setIdToken(idToken);
-      localStorage.setItem("idToken", idToken);
+      try {
+        const idToken = await user.getIdToken(true); // Force token refresh
+        setIdToken(idToken);
+        localStorage.setItem("idToken", idToken);
+      } catch (error) {
+        console.error("Error refreshing token:", error);
+        setIdToken(null);
+        localStorage.removeItem("idToken");
+      }
     } else {
       setIdToken(null);
       localStorage.removeItem("idToken");
@@ -46,17 +53,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
+      console.log("Token changed, updating user and token");
       setUser(user);
       await storeToken(user);
     });
 
-    return () => {
-      unsubscribe();
-    };
+    // Force an initial token refresh
+    if (auth.currentUser) {
+      storeToken(auth.currentUser);
+    }
+
+    return () => unsubscribe();
   }, [offlineMode]);
 
   return (
-    <AuthContext.Provider value={{ user, idToken }}>
+    <AuthContext.Provider value={{ user, idToken, storeToken }}>
       {children}
     </AuthContext.Provider>
   );

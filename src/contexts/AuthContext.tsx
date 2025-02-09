@@ -8,6 +8,7 @@ interface User {
   metadata?: {
     creationTime?: string;
   };
+  getIdToken: (forceRefresh?: boolean) => Promise<string>;
 }
 
 interface AuthContextType {
@@ -15,6 +16,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   loading: boolean;
+  storeToken: (user: User | null) => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,6 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       metadata: {
         creationTime: new Date().toISOString(),
       },
+      getIdToken: async () => 'mock-token',
     };
     setUser(mockUser);
     setLoading(false);
@@ -48,6 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         metadata: {
           creationTime: new Date().toISOString(),
         },
+        getIdToken: async () => 'mock-token',
       };
       setUser(mockUser);
     } catch (error) {
@@ -71,11 +75,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const storeToken = async (user: User | null) => {
+    try {
+      if (user) {
+        const token = await user.getIdToken(true); // Force refresh the token
+        localStorage.setItem('authToken', token);
+        return token;
+      } else {
+        localStorage.removeItem('authToken');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error storing token:', error);
+      localStorage.removeItem('authToken');
+      throw error;
+    }
+  };
+
   const value = {
     user,
     signIn,
     signOut,
-    loading
+    loading,
+    storeToken
   };
 
   return (
