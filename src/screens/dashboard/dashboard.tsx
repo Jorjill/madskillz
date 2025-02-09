@@ -24,16 +24,12 @@ import {
   Speed,
   Grade,
   Psychology,
-  Stars,
   Whatshot,
   LocalFireDepartment,
   WorkspacePremium,
-  EmojiObjects,
   MilitaryTech,
-  AutoGraph,
-  AccessTime,
-  CalendarMonth,
   TrendingUp,
+  Info as InfoIcon
 } from '@mui/icons-material';
 import { motion, useAnimation } from 'framer-motion';
 import { useSpring, animated, config } from 'react-spring';
@@ -63,12 +59,6 @@ import { keyframes } from '@emotion/react';
 import { RootState } from '../../state/store';
 import { quizResultsThunks } from '../../slices/quizResultsSlice';
 
-interface SkillMasteryData {
-  totalScore: number;
-  count: number;
-  passCount: number;
-}
-
 interface Achievement {
   title: string;
   icon: JSX.Element;
@@ -80,14 +70,6 @@ interface StatsNumberProps {
   value: number;
   suffix?: string;
   duration?: number;
-}
-
-interface SkillStats {
-  totalScore: number;
-  attempts: number;
-  highestScore: number;
-  passCount: number;
-  lastAttempt: string;
 }
 
 const glowAnimation = keyframes`
@@ -183,44 +165,6 @@ const calculatePerformanceTrendsData = (quizResults: any[]) => {
   }));
 };
 
-const calculateSkillPerformanceData = (quizResults: any[]) => {
-  if (!quizResults?.length) return [];
-
-  const skillStats: Record<string, SkillStats> = {};
-
-  quizResults.forEach(result => {
-    if (!skillStats[result.skill]) {
-      skillStats[result.skill] = {
-        totalScore: 0,
-        attempts: 0,
-        highestScore: 0,
-        passCount: 0,
-        lastAttempt: result.created_at
-      };
-    }
-    
-    const score = (result.correct_answers / result.total_questions) * 100;
-    skillStats[result.skill].totalScore += score;
-    skillStats[result.skill].attempts += 1;
-    skillStats[result.skill].highestScore = Math.max(skillStats[result.skill].highestScore, score);
-    skillStats[result.skill].passCount += result.status === 'PASS' ? 1 : 0;
-    
-    if (new Date(result.created_at) > new Date(skillStats[result.skill].lastAttempt)) {
-      skillStats[result.skill].lastAttempt = result.created_at;
-    }
-  });
-
-  return Object.entries(skillStats)
-    .map(([skill, stats]) => ({
-      skill,
-      averageScore: Math.round(stats.totalScore / stats.attempts),
-      highestScore: Math.round(stats.highestScore),
-      attempts: stats.attempts,
-      passRate: Math.round((stats.passCount / stats.attempts) * 100),
-      lastAttempt: stats.lastAttempt
-    }))
-    .sort((a, b) => b.averageScore - a.averageScore);
-};
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -253,69 +197,83 @@ const Dashboard: React.FC = () => {
   const skillMasteryData = useMemo(() => {
     if (!quizResults?.length) return [];
 
-    const skillMastery: Record<string, SkillMasteryData> = {};
+    const skillStats: Record<string, {
+      correctAnswers: number,
+      totalQuestions: number,
+      attempts: number,
+      passCount: number
+    }> = {};
+
     quizResults.forEach(result => {
-      if (!skillMastery[result.skill]) {
-        skillMastery[result.skill] = {
-          totalScore: 0,
-          count: 0,
+      if (!skillStats[result.skill]) {
+        skillStats[result.skill] = {
+          correctAnswers: 0,
+          totalQuestions: 0,
+          attempts: 0,
           passCount: 0
         };
       }
-      skillMastery[result.skill].totalScore += (result.correct_answers / result.total_questions) * 100;
-      skillMastery[result.skill].count += 1;
+      
+      skillStats[result.skill].correctAnswers += result.correct_answers;
+      skillStats[result.skill].totalQuestions += result.total_questions;
+      skillStats[result.skill].attempts += 1;
       if (result.status === 'PASS') {
-        skillMastery[result.skill].passCount += 1;
+        skillStats[result.skill].passCount += 1;
       }
     });
 
-    return Object.entries(skillMastery).map(([skill, data]) => ({
-      skill,
-      masteryLevel: (data.totalScore / data.count) * (data.passCount / data.count),
-      passRate: (data.passCount / data.count) * 100
-    }));
+    const skillsData = Object.entries(skillStats)
+      .map(([skill, data]) => {
+        const passRate = (data.passCount / data.attempts) * 100;
+        const isMastered = data.correctAnswers >= 1000 && passRate >= 80;
+        
+        const questionsWeight = Math.min(data.totalQuestions, 1000) / 1000 * 40;
+        const passRateWeight = passRate * 0.6;
+        const rating = passRateWeight + questionsWeight;
+
+        const masteryProgress = Math.min(
+          100,
+          Math.min(
+            (data.correctAnswers / 1000) * 100,
+            passRate
+          )
+        );
+
+        return {
+          skill,
+          correctAnswers: data.correctAnswers,
+          totalQuestions: data.totalQuestions,
+          passRate,
+          masteryLevel: masteryProgress,
+          isMastered,
+          rating
+        };
+      })
+      .sort((a, b) => b.rating - a.rating);
+
+    return skillsData;
   }, [quizResults]);
 
   const performanceTrends = useMemo(() => 
     calculatePerformanceTrendsData(quizResults), [quizResults]
   );
 
-  const skillPerformance = useMemo(() => 
-    calculateSkillPerformanceData(quizResults), [quizResults]
-  );
-
-  const uniqueSkills = useMemo(() => 
-    new Set(quizResults.map(q => q.skill)).size, [quizResults]
-  );
-
-  const perfectScores = useMemo(() => 
-    quizResults.filter(q => q.correct_answers === q.total_questions).length, [quizResults]
-  );
-
-  const consecutivePerfectScores = useMemo(() => 
-    quizResults.reduce((acc, curr, i, arr) => {
-      if (i === 0 && curr.correct_answers === curr.total_questions) return 1;
-      if (curr.correct_answers === curr.total_questions && arr[i-1]?.correct_answers === arr[i-1]?.total_questions) {
-        return acc + 1;
-      }
-      return curr.correct_answers === curr.total_questions ? 1 : 0;
-    }, 0), [quizResults]
-  );
-
   const achievements: Achievement[] = useMemo(() => {
     const achievements: Achievement[] = [];
+
+    // Streak Achievements
     if (currentStreak >= 2) achievements.push({ 
       title: 'Momentum', 
       icon: <LocalFireDepartment sx={{ fontSize: 40 }} />,
       description: '2+ day streak',
-      color: '#FFA726'
+      color: '#FF9800'
     });
 
     if (currentStreak >= 5) achievements.push({ 
       title: 'On Fire', 
       icon: <Whatshot sx={{ fontSize: 40 }} />,
       description: '5+ day streak',
-      color: '#FF7043'
+      color: '#FF5722'
     });
 
     if (currentStreak >= 10) achievements.push({ 
@@ -339,131 +297,103 @@ const Dashboard: React.FC = () => {
       color: '#9C27B0'
     });
 
-    if (consecutivePerfectScores >= 2) achievements.push({ 
-      title: 'Double Perfect', 
-      icon: <Grade sx={{ fontSize: 40 }} />,
-      description: '2 perfect scores in a row',
+    // Question Count Achievements
+    const totalQuestions = skillMasteryData.reduce((sum, skill) => sum + skill.totalQuestions, 0);
+    
+    if (totalQuestions >= 100) achievements.push({
+      title: 'Century',
+      icon: <Psychology sx={{ fontSize: 40 }} />,
+      description: '100+ questions answered',
       color: '#2196F3'
     });
 
-    if (consecutivePerfectScores >= 5) achievements.push({ 
-      title: 'Perfect Pentathlon', 
-      icon: <Stars sx={{ fontSize: 40 }} />,
-      description: '5 perfect scores in a row',
-      color: '#3F51B5'
+    if (totalQuestions >= 500) achievements.push({
+      title: 'Scholar',
+      icon: <Grade sx={{ fontSize: 40 }} />,
+      description: '500+ questions answered',
+      color: '#03A9F4'
     });
 
-    if (consecutivePerfectScores >= 10) achievements.push({ 
-      title: 'Perfect Decathlon', 
-      icon: <AutoGraph sx={{ fontSize: 40 }} />,
-      description: '10 perfect scores in a row',
-      color: '#673AB7'
-    });
-
-    if (consecutivePerfectScores >= 100) achievements.push({ 
-      title: 'Perfect Century', 
-      icon: <EmojiObjects sx={{ fontSize: 40 }} />,
-      description: '100 perfect scores in a row',
-      color: '#009688'
-    });
-
-    if (uniqueSkills >= 3) achievements.push({ 
-      title: 'Versatile', 
-      icon: <Psychology sx={{ fontSize: 40 }} />,
-      description: '3+ different skills practiced',
-      color: '#4CAF50'
-    });
-
-    if (perfectScores >= 5) achievements.push({ 
-      title: 'Excellence', 
-      icon: <Speed sx={{ fontSize: 40 }} />,
-      description: '5+ perfect scores',
-      color: '#FF4081'
-    });
-
-    if (averageScore >= 80) achievements.push({ 
-      title: 'High Achiever', 
-      icon: <TrendingUp sx={{ fontSize: 40 }} />,
-      description: 'Average score above 80%',
+    if (totalQuestions >= 1000) achievements.push({
+      title: 'Knowledge Seeker',
+      icon: <WorkspacePremium sx={{ fontSize: 40 }} />,
+      description: '1000+ questions answered',
       color: '#00BCD4'
     });
 
-    if (averageScore >= 90) achievements.push({ 
-      title: 'Expert', 
+    if (totalQuestions >= 5000) achievements.push({
+      title: 'Grand Scholar',
+      icon: <EmojiEvents sx={{ fontSize: 40 }} />,
+      description: '5000+ questions answered',
+      color: '#009688'
+    });
+
+    // Skill Rating Achievements
+    const highestRatedSkill = skillMasteryData[0]; // Already sorted by rating
+    if (highestRatedSkill && highestRatedSkill.rating >= 70) achievements.push({
+      title: 'Rising Star',
+      icon: <TrendingUp sx={{ fontSize: 40 }} />,
+      description: 'Achieve 70+ rating in any skill',
+      color: '#4CAF50'
+    });
+
+    if (highestRatedSkill && highestRatedSkill.rating >= 85) achievements.push({
+      title: 'Expert',
       icon: <Psychology sx={{ fontSize: 40 }} />,
-      description: 'Average score above 90%',
-      color: '#1976D2'
+      description: 'Achieve 85+ rating in any skill',
+      color: '#8BC34A'
     });
 
-    if (averageScore >= 95) achievements.push({ 
-      title: 'Grandmaster', 
+    if (highestRatedSkill && highestRatedSkill.rating >= 95) achievements.push({
+      title: 'Grandmaster',
       icon: <WorkspacePremium sx={{ fontSize: 40 }} />,
-      description: 'Average score above 95%',
-      color: '#303F9F'
+      description: 'Achieve 95+ rating in any skill',
+      color: '#CDDC39'
     });
 
-    const skillMasteryMap: Record<string, { totalScore: number; count: number }> = {};
-    quizResults.forEach(result => {
-      if (!skillMasteryMap[result.skill]) {
-        skillMasteryMap[result.skill] = {
-          totalScore: 0,
-          count: 0
-        };
-      }
-      skillMasteryMap[result.skill].totalScore += (result.correct_answers / result.total_questions * 100);
-      skillMasteryMap[result.skill].count += 1;
-    });
-
-    const masteredSkills = Object.entries(skillMasteryMap).filter(
-      ([_, data]) => (data.totalScore / data.count) >= 90
-    ).length;
-
-    if (masteredSkills >= 1) achievements.push({ 
-      title: 'Specialist', 
-      icon: <Stars sx={{ fontSize: 40 }} />,
-      description: 'Mastered first skill (90%+ avg)',
-      color: '#7B1FA2'
-    });
-
-    if (masteredSkills >= 3) achievements.push({ 
-      title: 'Triple Threat', 
-      icon: <AutoGraph sx={{ fontSize: 40 }} />,
-      description: 'Mastered 3 skills (90%+ avg)',
-      color: '#512DA8'
-    });
-
-    if (masteredSkills >= 5) achievements.push({ 
-      title: 'Polymath', 
-      icon: <EmojiObjects sx={{ fontSize: 40 }} />,
-      description: 'Mastered 5 skills (90%+ avg)',
-      color: '#1A237E'
-    });
-
-    const totalQuizzes = quizResults.length;
+    // Mastery Achievements
+    const masteredSkills = skillMasteryData.filter(skill => skill.isMastered).length;
     
-    if (totalQuizzes >= 10) achievements.push({ 
-      title: 'Dedicated', 
-      icon: <AccessTime sx={{ fontSize: 40 }} />,
-      description: 'Completed 10+ quizzes',
-      color: '#00796B'
+    if (masteredSkills >= 1) achievements.push({
+      title: 'First Mastery',
+      icon: <Grade sx={{ fontSize: 40 }} />,
+      description: 'Master your first skill (1000+ correct answers, 80%+ pass rate)',
+      color: '#FFC107'
     });
 
-    if (totalQuizzes >= 50) achievements.push({ 
-      title: 'Quiz Master', 
-      icon: <CalendarMonth sx={{ fontSize: 40 }} />,
-      description: 'Completed 50+ quizzes',
-      color: '#004D40'
+    if (masteredSkills >= 3) achievements.push({
+      title: 'Triple Threat',
+      icon: <WorkspacePremium sx={{ fontSize: 40 }} />,
+      description: 'Master 3+ skills',
+      color: '#FF9800'
     });
 
-    if (totalQuizzes >= 100) achievements.push({ 
-      title: 'Quiz Legend', 
-      icon: <MilitaryTech sx={{ fontSize: 40 }} />,
-      description: 'Completed 100+ quizzes',
-      color: '#006064'
+    if (masteredSkills >= 5) achievements.push({
+      title: 'Polymath',
+      icon: <EmojiEvents sx={{ fontSize: 40 }} />,
+      description: 'Master 5+ skills',
+      color: '#FF5722'
+    });
+
+    // Perfect Score Achievements
+    const consecutivePerfectScores = quizResults.reduce((acc, curr, i, arr) => {
+      if (i === 0 && curr.correct_answers === curr.total_questions) return 1;
+      if (curr.correct_answers === curr.total_questions && 
+          arr[i-1]?.correct_answers === arr[i-1]?.total_questions) {
+        return acc + 1;
+      }
+      return curr.correct_answers === curr.total_questions ? 1 : 0;
+    }, 0);
+
+    if (consecutivePerfectScores >= 3) achievements.push({
+      title: 'Perfect Streak',
+      icon: <Grade sx={{ fontSize: 40 }} />,
+      description: '3+ consecutive perfect scores',
+      color: '#795548'
     });
 
     return achievements;
-  }, [currentStreak, consecutivePerfectScores, uniqueSkills, perfectScores, averageScore, quizResults]);
+  }, [currentStreak, skillMasteryData, quizResults]);
 
   const learningVelocity = useMemo(() => {
     if (!quizResults || quizResults.length < 2) return { velocity: 0, trend: 'neutral' };
@@ -658,7 +588,7 @@ const Dashboard: React.FC = () => {
                 <Typography variant="h5" gutterBottom sx={{ color: customColors.text, mb: 3 }}>
                   Skills Ranking
                 </Typography>
-                {skillPerformance.map((skill, index) => (
+                {skillMasteryData.map((skill, index) => (
                   <motion.div
                     key={skill.skill}
                     initial={{ x: -20, opacity: 0 }}
@@ -671,13 +601,13 @@ const Dashboard: React.FC = () => {
                           #{index + 1} {skill.skill}
                         </Typography>
                         <Typography variant="h6" sx={{ color: customColors.primary }}>
-                          {skill.averageScore}%
+                          {skill.rating.toFixed(1)}
                         </Typography>
                       </Box>
                       <Box sx={{ position: 'relative', mb: 1 }}>
                         <LinearProgress
                           variant="determinate"
-                          value={skill.averageScore}
+                          value={skill.rating}
                           sx={{
                             height: 10,
                             borderRadius: 5,
@@ -686,21 +616,6 @@ const Dashboard: React.FC = () => {
                               bgcolor: customColors.primary,
                               borderRadius: 5,
                             }
-                          }}
-                        />
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: index * 0.1 + 0.2 }}
-                          style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: `${skill.highestScore}%`,
-                            transform: 'translate(-50%, -50%)',
-                            width: 3,
-                            height: 16,
-                            backgroundColor: customColors.primary,
-                            borderRadius: 2,
                           }}
                         />
                       </Box>
@@ -714,19 +629,19 @@ const Dashboard: React.FC = () => {
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             <Grade sx={{ fontSize: '1rem', color: customColors.primary }} />
                             <Typography variant="caption">
-                              Best: {skill.highestScore}%
+                              Pass Rate: {skill.passRate.toFixed(1)}%
                             </Typography>
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             <CheckCircleIcon sx={{ fontSize: '1rem', color: customColors.success }} />
                             <Typography variant="caption">
-                              Pass Rate: {skill.passRate}%
+                              Questions: {skill.totalQuestions}
                             </Typography>
                           </Box>
                         </Box>
-                        <Typography variant="caption">
-                          {skill.attempts} attempts
-                        </Typography>
+                        <Tooltip title="Rating = (Pass Rate × 0.6) + (Questions ÷ 1000 × 40)" placement="top">
+                          <InfoIcon sx={{ fontSize: '1rem', color: customColors.text, cursor: 'help' }} />
+                        </Tooltip>
                       </Box>
                     </Box>
                   </motion.div>
@@ -827,9 +742,12 @@ const Dashboard: React.FC = () => {
                 <Grade sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Skills Mastered</Typography>
                 <StatsNumber 
-                  value={skillMasteryData.filter(skill => skill.masteryLevel > 80).length} 
+                  value={skillMasteryData.filter(skill => skill.isMastered).length} 
                   suffix={` / ${skillMasteryData.length}`}
                 />
+                <Typography variant="caption" sx={{ color: customColors.text, display: 'block', mt: 1 }}>
+                  Requires 1000+ correct answers and 80%+ pass rate
+                </Typography>
               </MotionPaper>
             </motion.div>
           </Grid>
@@ -936,17 +854,42 @@ const Dashboard: React.FC = () => {
                         tick={{ fill: customColors.text }}
                       />
                       <Radar
-                        name="Mastery Level"
+                        name="Mastery Progress"
                         dataKey="masteryLevel"
                         stroke={customColors.primary}
                         fill={customColors.primary}
                         fillOpacity={0.6}
                       />
                       <RechartsTooltip 
-                        contentStyle={{ 
-                          backgroundColor: customColors.backgroundDark,
-                          border: `1px solid ${customColors.border}`,
-                          color: customColors.text
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <Box sx={{ 
+                                bgcolor: customColors.backgroundDark,
+                                p: 2,
+                                border: `1px solid ${customColors.border}`,
+                                borderRadius: 1
+                              }}>
+                                <Typography sx={{ color: customColors.text }}>
+                                  {data.skill}
+                                </Typography>
+                                <Typography sx={{ color: customColors.text }}>
+                                  Correct Answers: {data.correctAnswers}/1000
+                                </Typography>
+                                <Typography sx={{ color: customColors.text }}>
+                                  Pass Rate: {data.passRate.toFixed(1)}%
+                                </Typography>
+                                <Typography sx={{ 
+                                  color: data.isMastered ? customColors.success : customColors.text,
+                                  fontWeight: 'bold'
+                                }}>
+                                  {data.isMastered ? 'MASTERED' : 'IN PROGRESS'}
+                                </Typography>
+                              </Box>
+                            );
+                          }
+                          return null;
                         }}
                       />
                     </RadarChart>
