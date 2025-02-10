@@ -80,6 +80,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (user) {
         const token = await user.getIdToken(true); // Force refresh the token
         localStorage.setItem('authToken', token);
+        
+        // Set up a timer to refresh the token before it expires
+        setTimeout(async () => {
+          if (user) {
+            await storeToken(user);
+          }
+        }, 45 * 60 * 1000); // Refresh every 45 minutes
+        
         return token;
       } else {
         localStorage.removeItem('authToken');
