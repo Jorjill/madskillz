@@ -270,12 +270,14 @@ export const quizThunks = {
     status,
     correct_answers,
     total_questions,
+    answerResults,
   }: {
     quiz_name: string;
     skill: string;
     status: string;
     correct_answers: number;
     total_questions: number;
+    answerResults: Array<{ result: string; reason: string }>;
   }) => async () => {
     try {
       const response = await axios.post(
@@ -286,6 +288,7 @@ export const quizThunks = {
           status,
           correct_answers,
           total_questions,
+          answerResults,
         },
         getAuthHeaders()
       );

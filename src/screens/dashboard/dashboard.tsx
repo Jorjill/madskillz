@@ -1,22 +1,21 @@
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch } from '../../state/store';
+import { AppDispatch, RootState } from '../../state/store';
 import {
   Box,
-  Grid,
   Typography,
-  Card,
+  Grid,
   Paper,
-  Tooltip,
   LinearProgress,
+  Tooltip,
   Container
 } from '@mui/material';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
-import TimelineDot from '@mui/lab/TimelineDot';
 import {
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
@@ -29,35 +28,42 @@ import {
   WorkspacePremium,
   MilitaryTech,
   TrendingUp,
-  Info as InfoIcon
+  Info as InfoIcon,
+  Assessment as AssessmentIcon
 } from '@mui/icons-material';
 import { motion, useAnimation } from 'framer-motion';
-import { useSpring, animated, config } from 'react-spring';
-import CountUp from 'react-countup';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
-  Legend,
   ResponsiveContainer,
   RadarChart,
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
+  Legend
 } from 'recharts';
-import { customColors } from '../../theme/colors';
-import { styled } from '@mui/material/styles';
 import { keyframes } from '@emotion/react';
-import { RootState } from '../../state/store';
 import { quizResultsThunks } from '../../slices/quizResultsSlice';
+import ReactMarkdown from 'react-markdown';
+import { customColors } from '../../theme/colors';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+
+const MotionBox = motion(Box);
+const MotionPaper = motion(Paper);
+
+const glowAnimation = keyframes`
+  0% { box-shadow: 0 0 5px ${customColors.primary}33; }
+  50% { box-shadow: 0 0 20px ${customColors.primary}66; }
+  100% { box-shadow: 0 0 5px ${customColors.primary}33; }
+`;
 
 interface Achievement {
   title: string;
@@ -66,50 +72,8 @@ interface Achievement {
   color: string;
 }
 
-interface StatsNumberProps {
-  value: number;
-  suffix?: string;
-  duration?: number;
-}
-
-const glowAnimation = keyframes`
-  0% { box-shadow: 0 0 5px ${customColors.primary}33; }
-  50% { box-shadow: 0 0 20px ${customColors.primary}66; }
-  100% { box-shadow: 0 0 5px ${customColors.primary}33; }
-`;
-
-const BaseMotionCard = motion.create(Card);
-const BaseMotionPaper = motion.create(Paper);
-
-const MotionCard = styled(BaseMotionCard)`
-  &:hover {
-    animation: ${glowAnimation} 2s infinite;
-  }
-`;
-
-const MotionPaper = styled(BaseMotionPaper)`
-  &:hover {
-    animation: ${glowAnimation} 2s infinite;
-  }
-`;
-
-const StatsNumber: React.FC<StatsNumberProps> = ({ value, suffix = '', duration = 2 }) => {
-  useSpring({
-    from: { number: 0 },
-    to: { number: value },
-    config: config.molasses,
-  });
-
-  return (
-    <animated.div style={{ fontSize: '2rem', color: customColors.primary }}>
-      <CountUp end={value} duration={duration} suffix={suffix} />
-    </animated.div>
-  );
-};
-
-
 const calculateStreaks = (quizResults: any[]) => {
-  if (!quizResults?.length) return { currentStreak: 0, maxStreak: 0 };
+  if (!Array.isArray(quizResults) || !quizResults?.length) return { currentStreak: 0, maxStreak: 0 };
 
   const sortedResults = [...quizResults]
     .sort((a, b) => 
@@ -170,6 +134,21 @@ const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const controls = useAnimation();
   const quizResults = useSelector((state: RootState) => state.quizResults.results);
+  const performanceSummary = useSelector((state: RootState) => state.quizResults.performanceSummary);
+  const loading = useSelector((state: RootState) => state.quizResults.loading);
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+        staggerChildren: 0.1
+      }
+    }
+  };
 
   useEffect(() => {
     void dispatch(quizResultsThunks.fetchResults());
@@ -195,18 +174,18 @@ const Dashboard: React.FC = () => {
   );
 
   const skillMasteryData = useMemo(() => {
-    if (!quizResults?.length) return [];
+    if (!Array.isArray(quizResults) || !quizResults.length) return [];
 
     const skillStats: Record<string, {
-      correctAnswers: number,
-      totalQuestions: number,
-      attempts: number,
+      correctAnswers: number;
+      totalQuestions: number;
+      attempts: number;
       passCount: number
     }> = {};
 
     quizResults.forEach(result => {
-      if (!skillStats[result.skill]) {
-        skillStats[result.skill] = {
+      if (!skillStats[result?.skill]) {
+        skillStats[result?.skill] = {
           correctAnswers: 0,
           totalQuestions: 0,
           attempts: 0,
@@ -214,11 +193,11 @@ const Dashboard: React.FC = () => {
         };
       }
       
-      skillStats[result.skill].correctAnswers += result.correct_answers;
-      skillStats[result.skill].totalQuestions += result.total_questions;
-      skillStats[result.skill].attempts += 1;
-      if (result.status === 'PASS') {
-        skillStats[result.skill].passCount += 1;
+      skillStats[result?.skill].correctAnswers += result?.correct_answers;
+      skillStats[result?.skill].totalQuestions += result?.total_questions;
+      skillStats[result?.skill].attempts += 1;
+      if (result?.status === 'PASS') {
+        skillStats[result?.skill].passCount += 1;
       }
     });
 
@@ -260,6 +239,10 @@ const Dashboard: React.FC = () => {
 
   const achievements: Achievement[] = useMemo(() => {
     const achievements: Achievement[] = [];
+    
+    if (!Array.isArray(quizResults)) {
+      return achievements;
+    }
 
     // Streak Achievements
     if (currentStreak >= 2) achievements.push({ 
@@ -396,7 +379,9 @@ const Dashboard: React.FC = () => {
   }, [currentStreak, skillMasteryData, quizResults]);
 
   const learningVelocity = useMemo(() => {
-    if (!quizResults || quizResults.length < 2) return { velocity: 0, trend: 'neutral' };
+    if (!Array.isArray(quizResults) || quizResults.length < 2) {
+      return { velocity: 0, trend: 'neutral' };
+    }
 
     const recentScores = [...quizResults]
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -414,7 +399,7 @@ const Dashboard: React.FC = () => {
   }, [quizResults]);
 
   const studyPatterns = useMemo(() => {
-    if (!quizResults || quizResults.length === 0) return [];
+    if (!quizResults || !Array.isArray(quizResults) || quizResults.length === 0) return [];
 
     const hourCounts = new Array(24).fill(0);
     quizResults.forEach(quiz => {
@@ -466,9 +451,32 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ width: '100%', mt: 4 }}>
+          <LinearProgress 
+            sx={{ 
+              height: 8, 
+              borderRadius: 4,
+              backgroundColor: 'rgba(0,0,0,0.05)',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: 4
+              }
+            }} 
+          />
+        </Box>
+      </Container>
+    );
+  }
+
   return (
-    <Box className="dashboard-container">
-      <Container maxWidth="xl">
+    <Container maxWidth="xl" className="dashboard-container">
+      <MotionBox
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <motion.div
@@ -578,7 +586,7 @@ const Dashboard: React.FC = () => {
 
           <Grid item xs={12}>
             <motion.div variants={cardVariants}>
-              <MotionCard
+              <MotionBox
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -646,7 +654,7 @@ const Dashboard: React.FC = () => {
                     </Box>
                   </motion.div>
                 ))}
-              </MotionCard>
+              </MotionBox>
             </motion.div>
           </Grid>
 
@@ -668,7 +676,7 @@ const Dashboard: React.FC = () => {
               >
                 <LocalFireDepartment sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Current Streak</Typography>
-                <StatsNumber value={currentStreak} suffix=" days" />
+                <Typography variant="h4" sx={{ color: customColors.primary }}>{currentStreak} days</Typography>
               </MotionPaper>
             </motion.div>
           </Grid>
@@ -689,7 +697,7 @@ const Dashboard: React.FC = () => {
               >
                 <EmojiEvents sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Best Streak</Typography>
-                <StatsNumber value={maxStreak} suffix=" days" />
+                <Typography variant="h4" sx={{ color: customColors.primary }}>{maxStreak} days</Typography>
               </MotionPaper>
             </motion.div>
           </Grid>
@@ -741,10 +749,7 @@ const Dashboard: React.FC = () => {
               >
                 <Grade sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Skills Mastered</Typography>
-                <StatsNumber 
-                  value={skillMasteryData.filter(skill => skill.isMastered).length} 
-                  suffix={` / ${skillMasteryData.length}`}
-                />
+                <Typography variant="h4" sx={{ color: customColors.primary }}>{skillMasteryData.filter(skill => skill.isMastered).length} / {skillMasteryData.length}</Typography>
                 <Typography variant="caption" sx={{ color: customColors.text, display: 'block', mt: 1 }}>
                   Requires 1000+ correct answers and 80%+ pass rate
                 </Typography>
@@ -754,7 +759,7 @@ const Dashboard: React.FC = () => {
 
           <Grid item xs={12} md={6}>
             <motion.div variants={cardVariants}>
-              <MotionCard
+              <MotionBox
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -779,13 +784,13 @@ const Dashboard: React.FC = () => {
                 <Typography variant="body2" sx={{ color: customColors.text }}>
                   Your recent performance compared to overall average
                 </Typography>
-              </MotionCard>
+              </MotionBox>
             </motion.div>
           </Grid>
 
           <Grid item xs={12} md={6}>
             <motion.div variants={cardVariants}>
-              <MotionCard
+              <MotionBox
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -802,11 +807,11 @@ const Dashboard: React.FC = () => {
                       <XAxis 
                         dataKey="hour" 
                         stroke={customColors.text}
-                        tick={{ fill: customColors.text }}
+                        tick={{ fill: customColors.textSecondary }}
                       />
                       <YAxis 
                         stroke={customColors.text}
-                        tick={{ fill: customColors.text }}
+                        tick={{ fill: customColors.textSecondary }}
                       />
                       <RechartsTooltip 
                         contentStyle={{ 
@@ -825,13 +830,99 @@ const Dashboard: React.FC = () => {
                     </AreaChart>
                   </ResponsiveContainer>
                 </Box>
-              </MotionCard>
+              </MotionBox>
             </motion.div>
           </Grid>
 
           <Grid item xs={12} md={6}>
             <motion.div variants={chartVariants}>
-              <MotionCard
+              <MotionBox
+                sx={{ 
+                  bgcolor: customColors.backgroundLight,
+                  borderRadius: 2,
+                  p: 3,
+                  border: `1px solid ${customColors.border}`,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)',
+                    borderColor: `${customColors.primary}4D`
+                  }
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  gutterBottom 
+                  sx={{ 
+                    color: customColors.text,
+                    fontWeight: 600,
+                    fontSize: '1.1rem',
+                    mb: 3,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}
+                >
+                  <AssessmentIcon sx={{ color: customColors.primary }} />
+                  Performance Summary
+                </Typography>
+                {performanceSummary ? (
+                  <Box
+                    sx={{
+                      color: customColors.text,
+                      fontSize: '0.875rem',
+                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                      lineHeight: 1.8,
+                      mb: 2,
+                      letterSpacing: '0.01em',
+                      '& p': {
+                        mb: 2
+                      },
+                      '& p:last-child': {
+                        mb: 0
+                      },
+                      '& ul, & ol': {
+                        mt: 1,
+                        mb: 2,
+                        pl: 3
+                      },
+                      '& li': {
+                        mb: 1
+                      }
+                    }}
+                  >
+                    <ReactMarkdown>
+                      {performanceSummary}
+                    </ReactMarkdown>
+                  </Box>
+                ) : (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      color: customColors.text,
+                      fontSize: '0.875rem',
+                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
+                    }}
+                  >
+                    <InfoIcon sx={{ color: customColors.primary, fontSize: '1.1rem' }} />
+                    <Typography sx={{ 
+                      fontSize: '0.875rem',
+                      lineHeight: 1.8,
+                      letterSpacing: '0.01em'
+                    }}>
+                      No performance summary available yet. Take more quizzes to get detailed insights!
+                    </Typography>
+                  </Box>
+                )}
+              </MotionBox>
+            </motion.div>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <motion.div variants={chartVariants}>
+              <MotionBox
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -895,13 +986,13 @@ const Dashboard: React.FC = () => {
                     </RadarChart>
                   </ResponsiveContainer>
                 </Box>
-              </MotionCard>
+              </MotionBox>
             </motion.div>
           </Grid>
 
           <Grid item xs={12} md={6}>
             <motion.div variants={chartVariants}>
-              <MotionCard
+              <MotionBox
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -919,11 +1010,11 @@ const Dashboard: React.FC = () => {
                       <XAxis 
                         dataKey="date" 
                         stroke={customColors.text}
-                        tick={{ fill: customColors.text }}
+                        tick={{ fill: customColors.textSecondary }}
                       />
                       <YAxis 
                         stroke={customColors.text}
-                        tick={{ fill: customColors.text }}
+                        tick={{ fill: customColors.textSecondary }}
                       />
                       <RechartsTooltip 
                         contentStyle={{ 
@@ -954,13 +1045,13 @@ const Dashboard: React.FC = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 </Box>
-              </MotionCard>
+              </MotionBox>
             </motion.div>
           </Grid>
 
           <Grid item xs={12}>
             <motion.div variants={cardVariants}>
-              <MotionCard
+              <MotionBox
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -971,7 +1062,7 @@ const Dashboard: React.FC = () => {
                   Recent Activity
                 </Typography>
                 <Timeline>
-                  {quizResults.slice(0, 5).map((result, index) => (
+                  {(Array.isArray(quizResults) ? quizResults.slice(0, 5) : []).map((result, index) => (
                     <motion.div
                       key={result.id}
                       initial={{ x: -20, opacity: 0 }}
@@ -987,9 +1078,8 @@ const Dashboard: React.FC = () => {
                             <TimelineDot 
                               sx={{ 
                                 bgcolor: result.status === 'PASS' 
-                                  ? customColors.primary 
-                                  : customColors.danger,
-                                cursor: 'pointer'
+                                  ? customColors.success 
+                                  : customColors.danger
                               }}
                             >
                               {result.status === 'PASS' ? <CheckCircleIcon /> : <CancelIcon />}
@@ -1007,7 +1097,7 @@ const Dashboard: React.FC = () => {
                             <Typography variant="h6" component="span" sx={{ color: customColors.text }}>
                               {result.quiz_name}
                             </Typography>
-                            <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                            <Typography sx={{ color: customColors.textSecondary }}>
                               {result.skill} - {result.correct_answers}/{result.total_questions} correct
                             </Typography>
                             <Box sx={{ mt: 1 }}>
@@ -1038,12 +1128,12 @@ const Dashboard: React.FC = () => {
                     </motion.div>
                   ))}
                 </Timeline>
-              </MotionCard>
+              </MotionBox>
             </motion.div>
           </Grid>
         </Grid>
-      </Container>
-    </Box>
+      </MotionBox>
+    </Container>
   );
 };
 

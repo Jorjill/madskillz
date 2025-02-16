@@ -307,7 +307,8 @@ const Quiz: React.FC = () => {
           skill: selectedSkill,
           status: correctAnswers / answerResults.length >= 0.8 ? 'PASS' : 'FAIL',
           correct_answers: correctAnswers,
-          total_questions: answerResults.length
+          total_questions: answerResults.length,
+          answerResults: answerResults
         })).catch(error => {
           console.error('Failed to save quiz results:', error);
         });
@@ -765,9 +766,6 @@ const Quiz: React.FC = () => {
     }
 
     if (isQuizFinished) {
-      // Calculate percentage of correct answers
-      console.log('All Results:', answerResults); // Debug log
-      
       const correctAnswers = answerResults.filter(result => 
         result && result.result && result.result.toUpperCase() === 'PASS'
       ).length;
