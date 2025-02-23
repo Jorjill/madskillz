@@ -29,7 +29,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const storeToken = async (user: User | null) => {
     if (user) {
       try {
+        console.log("Attempting to refresh token...");
         const idToken = await user.getIdToken(true); // Force token refresh
+        console.log("Token refreshed successfully");
         setIdToken(idToken);
         localStorage.setItem("idToken", idToken);
       } catch (error) {
@@ -38,12 +40,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem("idToken");
       }
     } else {
+      console.log("No user, clearing token");
       setIdToken(null);
       localStorage.removeItem("idToken");
     }
   };
 
   useEffect(() => {
+    console.log("AuthProvider effect running, offlineMode:", offlineMode);
+    
     if (offlineMode) {
       const mockUser = getMockUser() as any;
       setUser(mockUser);
@@ -52,18 +57,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
+    // Check and refresh token immediately if there's a current user
+    const initializeToken = async () => {
+      const currentUser = auth.currentUser;
+      console.log("Initial auth check - currentUser:", currentUser?.email);
+      if (currentUser) {
+        console.log("Performing initial token refresh");
+        await storeToken(currentUser);
+      }
+    };
+    initializeToken();
+
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
-      console.log("Token changed, updating user and token");
+      console.log("onIdTokenChanged triggered - user:", user?.email);
       setUser(user);
       await storeToken(user);
     });
 
-    // Force an initial token refresh
-    if (auth.currentUser) {
-      storeToken(auth.currentUser);
-    }
-
-    return () => unsubscribe();
+    return () => {
+      console.log("Cleaning up auth listener");
+      unsubscribe();
+    };
   }, [offlineMode]);
 
   return (
