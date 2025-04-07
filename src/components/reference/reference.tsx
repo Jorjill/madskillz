@@ -87,7 +87,7 @@ const Reference: React.FC = () => {
   return (
     <div className="reference-container">
       <div className="sidebar-container">
-        {sortedTopics?.map((topic: any, index: any) => (
+        {sortedTopics?.filter((topic: any) => topic.title).map((topic: any, index: any) => (
           <div
             className="topic-title"
             key={index}
@@ -119,8 +119,8 @@ const Reference: React.FC = () => {
           <EditTopic id={selectedTopic.id} />
         ) : (
           <div className="reference-content-container">
-            <div className="reference-title-container">
-              <h1>{selectedTopic?.title}</h1>
+            <div className={`reference-title-container ${!selectedTopic?.title ? 'no-title' : ''}`}>
+              {selectedTopic?.title && <h1>{selectedTopic.title}</h1>}
               <i
                 className="ri-edit-line"
                 onClick={() => {
