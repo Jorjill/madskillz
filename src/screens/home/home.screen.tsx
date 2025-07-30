@@ -1,19 +1,24 @@
+import React, { useEffect, useCallback } from "react";
 import { useSelector } from "react-redux";
 import "./home.screen.less";
 import { selectSkills, skillsThunks } from "../../slices/skillsSlice";
-import { useEffect } from "react";
 import { deselectNote } from "../../slices/notesSlice";
 import { useDispatch } from "../../hooks";
 import BoxGrid from "../../components/box-grid/BoxGrid";
 
-export const HomeScreen = () => {
+export const HomeScreen = React.memo(() => {
   const itemsList = useSelector(selectSkills);
   const dispatch = useDispatch();
   
-  useEffect(() => {
+  // Memoize dispatch calls
+  const initializeScreen = useCallback(() => {
     dispatch(skillsThunks.fetchSkills());
     dispatch(deselectNote());
   }, [dispatch]);
+
+  useEffect(() => {
+    initializeScreen();
+  }, [initializeScreen]);
 
   return (
     <div className="homescreen">
@@ -22,4 +27,4 @@ export const HomeScreen = () => {
       </div>
     </div>
   );
-};
+});

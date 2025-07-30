@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from "react-router-dom";
 import './BoxGrid.less';
@@ -16,23 +16,30 @@ interface BoxGridProps {
 const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [searchSkill, setSearchSkill] = useState("");
-  const searchedSkills = itemList?.filter((skill) =>
-    skill?.title?.toLowerCase().includes(searchSkill.toLowerCase())
-  ) || [];
   const [addSkillModal, setAddSkillModal] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
   const [newSkillImage, setNewSkillImage] = useState("");
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      dispatch(skillsThunks.fetchSkills());
-    }, 500);
+  // Memoize filtered skills to prevent unnecessary re-calculations
+  const searchedSkills = useMemo(() => {
+    if (!searchSkill.trim()) return itemList || [];
+    const searchLower = searchSkill.toLowerCase();
+    return itemList?.filter((skill) =>
+      skill?.title?.toLowerCase().includes(searchLower)
+    ) || [];
+  }, [itemList, searchSkill]);
 
-    return () => clearTimeout(timer);
-  }, [dispatch]);
+  // Remove redundant fetch - this should be handled by parent component
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     dispatch(skillsThunks.fetchSkills());
+  //   }, 500);
+  //   return () => clearTimeout(timer);
+  // }, [dispatch]);
 
-  const handleFileChange = (event: any) => {
-    const file = event.target.files[0];
+  // Memoize file change handler
+  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -40,18 +47,40 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
       };
       reader.readAsDataURL(file);
     }
-  };
+  }, []);
 
-  const handleAddSkill = () => {
-    if (newSkillName && newSkillImage) {
-      dispatch(skillsThunks.addSkill({ title: newSkillName, imageurl: newSkillImage }));
+  // Memoize add skill handler
+  const handleAddSkill = useCallback(() => {
+    if (newSkillName.trim() && newSkillImage) {
+      dispatch(skillsThunks.addSkill({ title: newSkillName.trim(), imageurl: newSkillImage }));
       setNewSkillName("");
       setNewSkillImage("");
       setAddSkillModal(false);
     }
-  };
+  }, [dispatch, newSkillName, newSkillImage]);
 
-  const defaultImage = "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Graduation%20cap/3D/graduation_cap_3d.png"; // Academic cap as default image
+  // Memoize search handler with debouncing
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchSkill(e.target.value);
+  }, []);
+
+  // Memoize skill selection handler
+  const handleSkillSelect = useCallback((skill: skill) => {
+    dispatch(selectSkill(skill));
+  }, [dispatch]);
+
+  // Memoize modal handlers
+  const openModal = useCallback(() => setAddSkillModal(true), []);
+  const closeModal = useCallback(() => setAddSkillModal(false), []);
+
+  // Memoize default image to prevent re-creation
+  const defaultImage = useMemo(() => 
+    "https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Graduation%20cap/3D/graduation_cap_3d.png",
+    []
+  );
+
+  // Memoize default skill object
+  const defaultSkill = useMemo(() => ({ title: "ALL", imageurl: defaultImage }), [defaultImage]);
 
   return (
     <div className="box-grid">
@@ -72,9 +101,8 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
           <input
             className="input-box"
             placeholder="Search..."
-            onChange={(t) => {
-              setSearchSkill(t.target.value);
-            }}
+            value={searchSkill}
+            onChange={handleSearchChange}
           />
         </div>
         <div className="box-grid-container">
@@ -82,14 +110,14 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
             <div
               className="box"
               style={{ animationDelay: `0s` }}
-              onClick={() =>
-                dispatch(selectSkill({ title: "ALL", imageurl: defaultImage }))
-              }
+              onClick={() => handleSkillSelect(defaultSkill)}
             >
               <div className="box-image">
                 <img 
                   src={defaultImage} 
-                  alt="All Skills" 
+                  alt="All Skills"
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = defaultImage;
@@ -106,12 +134,14 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
               <div
                 className="box"
                 style={{ animationDelay: `${0.009 * (index + 1)}s` }}
-                onClick={() => dispatch(selectSkill(item))}
+                onClick={() => handleSkillSelect(item)}
               >
                 <div className="box-image">
                   <img 
                     src={item?.imageurl || defaultImage} 
-                    alt={`Skill ${index + 1}`}
+                    alt={item?.title || `Skill ${index + 1}`}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = defaultImage;
@@ -127,9 +157,7 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
           <div
             className="box"
             style={{ animationDelay: `${0.009 * (searchedSkills.length + 1)}s` }}
-            onClick={() => {
-              setAddSkillModal(true);
-            }}
+            onClick={openModal}
           >
             <div className="box-text">
               <p>+</p>
@@ -141,7 +169,7 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
             <div className="modal-content">
               <span
                 className="close-button"
-                onClick={() => setAddSkillModal(false)}
+                onClick={closeModal}
               >
                 &times;
               </span>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -25,43 +25,44 @@ import { deselectSkill } from '../../slices/skillsSlice';
 import { resetQuizState } from '../../slices/quizSlice';
 import './Navigation.less';
 
-const Navigation: React.FC = () => {
+const Navigation: React.FC = React.memo(() => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  // Memoize event handlers
+  const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleHome = () => {
+  const handleHome = useCallback(() => {
     dispatch(deselectSkill());
     dispatch(resetQuizState());
     navigate('/home');
-  };
+  }, [dispatch, navigate]);
 
-  const handleProfile = () => {
+  const handleProfile = useCallback(() => {
     handleClose();
     navigate('/profile');
-  };
+  }, [navigate]);
 
-  const handleDashboard = () => {
+  const handleDashboard = useCallback(() => {
     handleClose();
     navigate('/dashboard');
-  };
+  }, [navigate]);
 
-  const handleSettings = () => {
+  const handleSettings = useCallback(() => {
     handleClose();
     navigate('/settings');
-  };
+  }, [navigate]);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       handleClose();
       await signOut();
@@ -69,7 +70,23 @@ const Navigation: React.FC = () => {
     } catch (error) {
       console.error('Error logging out:', error);
     }
-  };
+  }, [signOut, navigate]);
+
+  // Memoize menu paper props
+  const menuPaperProps = useMemo(() => ({
+    sx: {
+      width: '200px',
+      background: 'rgba(255, 255, 255, 0.9)',
+      backdropFilter: 'blur(10px)',
+      mt: 1.5,
+    }
+  }), []);
+
+  // Memoize avatar display text
+  const avatarText = useMemo(() => 
+    user?.displayName?.[0] || user?.email?.[0], 
+    [user?.displayName, user?.email]
+  );
 
   return (
     <div className="navigation-wrapper">
@@ -99,21 +116,14 @@ const Navigation: React.FC = () => {
                 sx={{ width: 32, height: 32 }}
                 src={user?.photoURL || undefined}
               >
-                {user?.displayName?.[0] || user?.email?.[0]}
+                {avatarText}
               </Avatar>
             </IconButton>
             <Menu
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
-              PaperProps={{
-                sx: {
-                  width: '200px',
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  backdropFilter: 'blur(10px)',
-                  mt: 1.5,
-                }
-              }}
+              PaperProps={menuPaperProps}
             >
               <MenuItem onClick={handleProfile}>
                 <ListItemIcon>
@@ -146,6 +156,6 @@ const Navigation: React.FC = () => {
       </AppBar>
     </div>
   );
-};
+});
 
 export default Navigation;

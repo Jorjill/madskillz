@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Button, Typography, Box, Container, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -6,18 +6,27 @@ import {
 } from 'react-icons/fa';
 import './Landing.less';
 
-// Add Plus Jakarta Sans font
-const fontLink = document.createElement('link');
-fontLink.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
-fontLink.rel = 'stylesheet';
-document.head.appendChild(fontLink);
+// Add Plus Jakarta Sans font only once
+if (!document.querySelector('link[href*="Plus+Jakarta+Sans"]')) {
+  const fontLink = document.createElement('link');
+  fontLink.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
+  fontLink.rel = 'stylesheet';
+  document.head.appendChild(fontLink);
+}
 
-const Landing: React.FC = () => {
+const Landing: React.FC = React.memo(() => {
   const navigate = useNavigate();
 
+  // Memoize navigation handlers
+  const handleSignIn = useCallback(() => navigate('/login'), [navigate]);
+  const handleGetStarted = useCallback(() => navigate('/login'), [navigate]);
+  const handleLearnMore = useCallback(() => {
+    const featuresSection = document.getElementById('features');
+    featuresSection?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
-
-  const features = [
+  // Memoize static data to prevent re-creation on every render
+  const features = useMemo(() => [
     {
       icon: <FaChartLine />,
       title: 'Progress Tracking',
@@ -33,9 +42,9 @@ const Landing: React.FC = () => {
       title: 'Achievement System',
       description: 'Earn badges and rewards'
     }
-  ];
+  ], []);
 
-  const pricingPlans = [
+  const pricingPlans = useMemo(() => [
     {
       title: 'Free',
       price: '$0',
@@ -45,7 +54,7 @@ const Landing: React.FC = () => {
         'Basic progress tracking'
       ],
       buttonText: 'Get Started',
-      buttonVariant: 'outlined'
+      buttonVariant: 'outlined' as const
     },
     {
       title: 'Pro',
@@ -57,13 +66,16 @@ const Landing: React.FC = () => {
         'AI generated quizzes'
       ],
       buttonText: 'Upgrade Now',
-      buttonVariant: 'contained',
+      buttonVariant: 'contained' as const,
       highlighted: true
     }
-  ];
+  ], []);
+
+  // Memoize inline styles
+  const pageStyle = useMemo(() => ({ backgroundColor: '#07203d', minHeight: '100vh' }), []);
 
   return (
-    <div className="landing-page" style={{ backgroundColor: '#07203d', minHeight: '100vh' }}>
+    <div className="landing-page" style={pageStyle}>
       <Container maxWidth="lg" className="content">
         <nav className="nav-bar">
           <div className="logo-container animate-fade-in">
@@ -73,7 +85,7 @@ const Landing: React.FC = () => {
             <Button
               variant="outlined"
               className="sign-in-button"
-              onClick={() => navigate('/login')}
+              onClick={handleSignIn}
             >
               Sign In
             </Button>
@@ -94,17 +106,14 @@ const Landing: React.FC = () => {
             <Button
               variant="contained"
               className="get-started-button"
-              onClick={() => navigate('/login')}
+              onClick={handleGetStarted}
             >
               Get Started
             </Button>
             <Button
               variant="outlined"
               className="learn-more-button"
-              onClick={() => {
-                const featuresSection = document.getElementById('features');
-                featuresSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={handleLearnMore}
             >
               Learn More
             </Button>
@@ -161,9 +170,8 @@ const Landing: React.FC = () => {
                       ))}
                     </ul>
                     <Button 
-                      variant={plan.buttonVariant as 'outlined' | 'contained'} 
+                      variant={plan.buttonVariant} 
                       className="action-button"
-                      disabled={false}
                     >
                       {plan.buttonText}
                     </Button>
@@ -184,6 +192,6 @@ const Landing: React.FC = () => {
       </Container>
     </div>
   );
-};
+});
 
 export default Landing;
