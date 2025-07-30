@@ -62,31 +62,6 @@ export const SkillScreen = () => {
       <div className="top-nav">
       </div>
       <div className="layout-container">
-        <div className="skill-title-and-delete">
-          {isEditing ? (
-            <input
-              type="text"
-              className="skill-title-input"
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              onBlur={handleTitleSave}
-              onKeyDown={handleTitleKeyDown}
-              autoFocus
-            />
-          ) : (
-            <div className="skill-title" onClick={handleTitleEdit}>
-              {selectedSkill.title}
-            </div>
-          )}
-          <i
-            className="ri-delete-bin-7-line"
-            onClick={(e) => {
-              e.stopPropagation();
-              dispatch<any>(skillsThunks.deleteSkill(selectedSkill.id));
-              navigate("/home");
-            }}
-          ></i>
-        </div>
 
         <header className="navbar">
           <nav className="nav-bar">
