@@ -15,19 +15,9 @@ interface BoxGridProps {
 
 const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
   const dispatch = useDispatch<AppDispatch>();
-  const [searchSkill, setSearchSkill] = useState("");
   const [addSkillModal, setAddSkillModal] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
   const [newSkillImage, setNewSkillImage] = useState("");
-
-  // Memoize filtered skills to prevent unnecessary re-calculations
-  const searchedSkills = useMemo(() => {
-    if (!searchSkill.trim()) return itemList || [];
-    const searchLower = searchSkill.toLowerCase();
-    return itemList?.filter((skill) =>
-      skill?.title?.toLowerCase().includes(searchLower)
-    ) || [];
-  }, [itemList, searchSkill]);
 
   // Remove redundant fetch - this should be handled by parent component
   // useEffect(() => {
@@ -58,11 +48,6 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
       setAddSkillModal(false);
     }
   }, [dispatch, newSkillName, newSkillImage]);
-
-  // Memoize search handler with debouncing
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchSkill(e.target.value);
-  }, []);
 
   // Memoize skill selection handler
   const handleSkillSelect = useCallback((skill: skill) => {
@@ -97,14 +82,6 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
         <div className="aurora" />
       </div>
       <div className="content-wrapper">
-        <div className="input-box-container">
-          <input
-            className="input-box"
-            placeholder="Search..."
-            value={searchSkill}
-            onChange={handleSearchChange}
-          />
-        </div>
         <div className="box-grid-container">
           <Link to="/skills" key={0}>
             <div
@@ -129,7 +106,7 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
               </div>
             </div>
           </Link>
-          {searchedSkills.map((item, index) => (
+          {itemList.map((item, index) => (
             <Link to="/skills" key={index + 1}>
               <div
                 className="box"
@@ -156,7 +133,7 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
           ))}
           <div
             className="box"
-            style={{ animationDelay: `${0.009 * (searchedSkills.length + 1)}s` }}
+            style={{ animationDelay: `${0.009 * (itemList.length + 1)}s` }}
             onClick={openModal}
           >
             <div className="box-text">
