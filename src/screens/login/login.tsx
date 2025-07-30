@@ -23,7 +23,14 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
-  const { storeToken } = useAuth();
+  const { storeToken, user, loading } = useAuth();
+
+  // Auto-redirect to skills screen if user is already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/home', { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     console.log("Offline mode:", import.meta.env.VITE_DEV);

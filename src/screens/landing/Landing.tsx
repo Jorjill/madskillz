@@ -1,9 +1,10 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import { Button, Typography, Box, Container, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { 
   FaChartLine, FaBrain, FaTrophy, FaCheck 
 } from 'react-icons/fa';
+import { useAuth } from '../../contexts/AuthContext';
 import './Landing.less';
 
 // Add Plus Jakarta Sans font only once
@@ -16,6 +17,14 @@ if (!document.querySelector('link[href*="Plus+Jakarta+Sans"]')) {
 
 const Landing: React.FC = React.memo(() => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  // Auto-redirect to skills screen if user is already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/home', { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   // Memoize navigation handlers
   const handleSignIn = useCallback(() => navigate('/login'), [navigate]);
