@@ -10,27 +10,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a1f2c 0%, #0a0f1d 100%);
+  background-color: #07203d;
   font-family: 'Plus Jakarta Sans', sans-serif;
   position: relative;
-  overflow: hidden;
-
-  .star-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-      radial-gradient(1px 1px at 20px 30px, #fff 100%, transparent),
-      radial-gradient(1px 1px at 40px 70px, #fff 100%, transparent),
-      radial-gradient(1px 1px at 50px 160px, #fff 100%, transparent),
-      radial-gradient(1px 1px at 80px 120px, #fff 100%, transparent),
-      radial-gradient(1px 1px at 110px 130px, #fff 100%, transparent),
-      radial-gradient(1px 1px at 140px 80px, #fff 100%, transparent);
-    opacity: 0.4;
-    z-index: 0;
-  }
 
   .login-container {
     width: 100%;
@@ -46,7 +28,7 @@
     border-radius: 24px;
     padding: 2.5rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.5s ease-out;
+
 
     .logo {
       width: 120px;
@@ -277,13 +259,4 @@
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+

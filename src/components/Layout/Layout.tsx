@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           p: 3,
           mt: 8, // Add margin top to account for the fixed AppBar
           width: '100%',
-          backgroundColor: '#0a1929',
+          backgroundColor: '#07203d',
         }}
       >
         {children}

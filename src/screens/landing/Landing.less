@@ -1,9 +1,8 @@
 .landing-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a1929 0%, #1a2942 100%);
+  background-color: #07203d;
   color: #ffffff;
   position: relative;
-  overflow: hidden;
 
   // Custom variables for the new color scheme
   @primary-dark: #0a1929;    // Dark blue
@@ -13,59 +12,6 @@
   @silver-dark: #8892b0;     // Darker silver
   @text-primary: #ffffff;
   @text-secondary: rgba(224, 231, 255, 0.8);  // Silverish text
-
-  .star-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .background-effects {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-
-    .cosmic-background {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 50% 50%, 
-        rgba(58, 142, 230, 0.1) 0%,
-        rgba(26, 41, 66, 0.2) 50%,
-        rgba(10, 25, 41, 0.3) 100%
-      );
-    }
-
-    .galaxy {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 20%, rgba(58, 142, 230, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(224, 231, 255, 0.1) 0%, transparent 50%);
-      animation: galaxySpin 30s linear infinite;
-    }
-
-    .nebula {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(45deg, 
-        rgba(58, 142, 230, 0.1) 0%,
-        rgba(224, 231, 255, 0.05) 50%,
-        rgba(10, 25, 41, 0.1) 100%
-      );
-      filter: blur(50px);
-    }
-  }
 
   .content {
     position: relative;
@@ -975,28 +921,5 @@
   .delay-3 { animation-delay: 0.6s; }
   .delay-4 { animation-delay: 0.8s; }
 
-  @keyframes galaxySpin {
-    0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
-    50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); }
-    100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
-  }
 
-  @keyframes nebulaPulse {
-    0%, 100% { opacity: 0.4; transform: scale(1); filter: hue-rotate(0deg); }
-    50% { opacity: 0.6; transform: scale(1.2); filter: hue-rotate(45deg); }
-  }
-
-  @keyframes meteorShower {
-    0% { transform: translate(100%, -100%) rotate(45deg); opacity: 0; }
-    10% { opacity: 1; }
-    20% { opacity: 1; }
-    30% { transform: translate(-100%, 100%) rotate(45deg); opacity: 0; }
-    100% { transform: translate(-100%, 100%) rotate(45deg); opacity: 0; }
-  }
-
-  @keyframes auroraWave {
-    0% { transform: translateX(-50%) translateY(0) skewX(0deg); filter: hue-rotate(0deg); }
-    50% { transform: translateX(-30%) translateY(-20px) skewX(-5deg); filter: hue-rotate(90deg); }
-    100% { transform: translateX(-50%) translateY(0) skewX(0deg); filter: hue-rotate(180deg); }
-  }
 }

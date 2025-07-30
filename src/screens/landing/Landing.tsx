@@ -63,7 +63,7 @@ const Landing: React.FC = () => {
   ];
 
   return (
-    <div className="landing-page" style={{ backgroundColor: '#0a1929', minHeight: '100vh' }}>
+    <div className="landing-page" style={{ backgroundColor: '#07203d', minHeight: '100vh' }}>
       <Container maxWidth="lg" className="content">
         <nav className="nav-bar">
           <div className="logo-container animate-fade-in">
