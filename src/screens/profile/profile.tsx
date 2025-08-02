@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Paper, Avatar, Grid, Chip, Button } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../AuthProvider';
 import { getAllSkills, getAllNotes, getAllReferences } from '../../utils/offlineMode';
 
 const Profile: React.FC = () => {

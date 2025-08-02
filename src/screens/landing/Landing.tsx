@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   FaChartLine, FaBrain, FaTrophy, FaCheck 
 } from 'react-icons/fa';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../AuthProvider';
 import './Landing.less';
 
 // Add Plus Jakarta Sans font only once

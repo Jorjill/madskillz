@@ -19,7 +19,7 @@ import {
   Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../AuthProvider';
 import { useDispatch } from 'react-redux';
 import { deselectSkill } from '../../slices/skillsSlice';
 import { resetQuizState } from '../../slices/quizSlice';

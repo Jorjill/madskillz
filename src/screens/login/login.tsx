@@ -11,7 +11,7 @@ import { isOfflineMode, setOfflineMode } from "../../utils/offlineMode";
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 import "./login.less";
 import img from "../../assets/mskillz.png";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../AuthProvider";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");

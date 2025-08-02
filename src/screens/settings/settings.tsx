@@ -16,7 +16,7 @@ import {
   DialogActions,
   Alert,
 } from '@mui/material';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../AuthProvider';
 import { isOfflineMode, setOfflineMode } from '../../utils/offlineMode';
 
 const Settings: React.FC = () => {

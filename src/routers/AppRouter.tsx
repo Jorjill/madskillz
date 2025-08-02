@@ -8,12 +8,9 @@ import Profile from "../screens/profile/profile";
 import Settings from "../screens/settings/settings";
 import Layout from "../components/Layout";
 import Landing from "../screens/landing/Landing";
-import { AuthProvider } from "../contexts/AuthContext";
-
 export const AppRouter = () => {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -68,7 +65,6 @@ export const AppRouter = () => {
             }
           />
         </Routes>
-      </Router>
-    </AuthProvider>
+    </Router>
   );
 };
