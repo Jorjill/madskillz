@@ -42,11 +42,45 @@
     }
   }
 
+  .note-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+
+    .back-button {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+      }
+
+      i {
+        font-size: 16px;
+      }
+    }
+  }
+
   h1 {
     font-size: 36px;
     font-weight: bold;
     margin-bottom: 50px;
-    margin-top: 50px;
+    margin-top: 0;
   }
 
   .note-content {

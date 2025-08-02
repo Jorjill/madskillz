@@ -7,7 +7,7 @@ import {
   selectNote,
   selectNotesBySkill,
 } from "../../slices/notesSlice";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DeleteModal } from "../modal/delete-modal";
 
 export const NotesList: React.FC = () => {
@@ -19,11 +19,37 @@ export const NotesList: React.FC = () => {
   const reactNotes = useSelector((state) =>
     selectNotesBySkill(state, selectedSkill)
   );
+  const isNoteSelected = useSelector(
+    (state: any) => state.notes.isNoteSelected
+  );
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [showDeleteConfirmation, setShowDeleteConfirmation] =
     useState<boolean>(false);
   const [noteToDelete, setNoteToDelete] = useState<string>("");
   const [deleteNoteId, setDeleteNoteId] = useState<string | undefined>("");
+
+  // Store scroll position when a note is selected
+  useEffect(() => {
+    if (isNoteSelected && scrollContainerRef.current) {
+      const scrollPosition = scrollContainerRef.current.scrollTop;
+      sessionStorage.setItem(`notesListScrollPosition_${selectedSkill}`, scrollPosition.toString());
+    }
+  }, [isNoteSelected, selectedSkill]);
+
+  // Restore scroll position when returning to notes list
+  useEffect(() => {
+    if (!isNoteSelected && scrollContainerRef.current) {
+      const savedScrollPosition = sessionStorage.getItem(`notesListScrollPosition_${selectedSkill}`);
+      if (savedScrollPosition) {
+        setTimeout(() => {
+          if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = parseInt(savedScrollPosition);
+          }
+        }, 0);
+      }
+    }
+  }, [isNoteSelected, selectedSkill]);
 
   const handleCloseDeleteConfirmation = () => {
     setShowDeleteConfirmation(false);
@@ -76,7 +102,7 @@ export const NotesList: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="items-list-container">
+      <div className="items-list-container" ref={scrollContainerRef}>
         <div className="items-list">
           {filteredAndSortedNotes.map((item, index) => (
             <div
@@ -84,6 +110,11 @@ export const NotesList: React.FC = () => {
               key={index}
               style={{ animationDelay: `${0.06 * index}s` }}
               onClick={() => {
+                // Store current scroll position before selecting note
+                if (scrollContainerRef.current) {
+                  const scrollPosition = scrollContainerRef.current.scrollTop;
+                  sessionStorage.setItem(`notesListScrollPosition_${selectedSkill}`, scrollPosition.toString());
+                }
                 dispatch(selectNote(item.notes_title));
               }}
             >
