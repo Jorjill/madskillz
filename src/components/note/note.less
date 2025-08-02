@@ -48,26 +48,34 @@
     align-items: center;
     width: 100%;
     margin-bottom: 20px;
+    position: relative;
 
     .back-button {
+      position: sticky;
+      top: 20px;
       align-self: flex-start;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(101, 135, 122, 0.2);
+      border: 1px solid rgba(101, 135, 122, 0.3);
       color: #ffffff;
-      padding: 8px 16px;
-      border-radius: 6px;
+      padding: 10px 16px;
+      border-radius: 5px;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 500;
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 20px;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      z-index: 1000;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
-        transform: translateY(-1px);
+        background: rgba(101, 135, 122, 0.3);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(1px);
       }
 
       i {

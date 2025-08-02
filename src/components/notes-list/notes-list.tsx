@@ -108,7 +108,6 @@ export const NotesList: React.FC = () => {
             <div
               className="list-box"
               key={index}
-              style={{ animationDelay: `${0.06 * index}s` }}
               onClick={() => {
                 // Store current scroll position before selecting note
                 if (scrollContainerRef.current) {
