@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { apiClient } from "../utils/apiClient";
 import { resetQuizState } from "./quizSlice";
 
 export interface skill {
@@ -50,17 +50,7 @@ const skillsSlice = createSlice({
 export const skillsActions = skillsSlice.actions;
 export const { setSkills, setLoading, setError, selectSkill, deselectSkill } = skillsSlice.actions;
 
-const getAuthHeaders = () => {
-  const idToken = localStorage.getItem("idToken");
-  if (!idToken) {
-    throw new Error("No token found. User might not be authenticated.");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${idToken}`,
-    },
-  };
-};
+// Removed getAuthHeaders - now handled by apiClient automatically
 
 export const skillsThunks = {
   fetchSkills: () => async (dispatch: any) => {
@@ -68,10 +58,7 @@ export const skillsThunks = {
     try {
       const skills = import.meta.env.VITE_DEV === "true"
         ? []
-        : (await axios.get(
-            `${import.meta.env.VITE_API_URL}/skills`,
-            getAuthHeaders()
-          )).data;
+        : (await apiClient.get('/skills')).data;
       dispatch(skillsActions.setSkills(skills));
     } catch (error) {
       dispatch(skillsActions.setError((error as Error).message));
@@ -83,11 +70,7 @@ export const skillsThunks = {
   },
   addSkill: (newSkill: skill) => async (dispatch: any) => {
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/skills`,
-        newSkill,
-        getAuthHeaders()
-      );
+      await apiClient.post('/skills', newSkill);
       dispatch(skillsThunks.fetchSkills());
     } catch (error) {
       console.error("Failed to add skill:", error);
@@ -95,10 +78,7 @@ export const skillsThunks = {
   },
   deleteSkill: (id: string) => async (dispatch: any) => {
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/skills/${id}`,
-        getAuthHeaders()
-      );
+      await apiClient.delete(`/skills/${id}`);
       dispatch(skillsThunks.fetchSkills());
     } catch (error) {
       console.error("Failed to delete skill:", error);
@@ -116,11 +96,7 @@ export const skillsThunks = {
           dispatch(skillsThunks.fetchSkills());
         }
       } else {
-        await axios.patch(
-          `${import.meta.env.VITE_API_URL}/skills/${id}`,
-          updatedSkill,
-          getAuthHeaders()
-        );
+        await apiClient.patch(`/skills/${id}`, updatedSkill);
         dispatch(skillsThunks.fetchSkills());
       }
     } catch (error) {

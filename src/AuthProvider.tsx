@@ -13,6 +13,7 @@ interface AuthContextProps {
   user: User | null;
   idToken: string | null;
   storeToken: (user: User | null) => Promise<void>;
+  refreshToken: () => Promise<string | null>;
 }
 
 interface AuthProviderProps {
@@ -40,6 +41,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } else {
       setIdToken(null);
       localStorage.removeItem("idToken");
+    }
+  };
+
+  const refreshToken = async (): Promise<string | null> => {
+    if (offlineMode) {
+      return 'offline-token';
+    }
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      return null;
+    }
+
+    try {
+      const newToken = await currentUser.getIdToken(true); // Force refresh
+      setIdToken(newToken);
+      localStorage.setItem("idToken", newToken);
+      return newToken;
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      setIdToken(null);
+      localStorage.removeItem("idToken");
+      return null;
     }
   };
 
@@ -72,7 +96,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [offlineMode]);
 
   return (
-    <AuthContext.Provider value={{ user, idToken, storeToken }}>
+    <AuthContext.Provider value={{ user, idToken, storeToken, refreshToken }}>
       {children}
     </AuthContext.Provider>
   );

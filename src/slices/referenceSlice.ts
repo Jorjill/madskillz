@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
-import axios from "axios";
+import { apiClient } from "../utils/apiClient";
 
 interface RootState {
   reference: ReferenceState;
@@ -99,25 +99,12 @@ export const {
   unsetEditReferenceMode,
 } = referenceSlice.actions;
 
-const getAuthHeaders = () => {
-  const idToken = localStorage.getItem("idToken");
-  if (!idToken) {
-    throw new Error("No token found. User might not be authenticated.");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${idToken}`,
-    },
-  };
-};
+// Removed getAuthHeaders - now handled by apiClient automatically
 
 export const referenceThunks = {
   fetchReferences: () => async (dispatch: any) => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/references`,
-        getAuthHeaders()
-      );
+      const response = await apiClient.get('/references');
       dispatch(addReferences(response.data));
     } catch (error) {
       console.error("Failed to fetch references:", error);
@@ -127,16 +114,12 @@ export const referenceThunks = {
     console.log("Adding topic:", topic);
 
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/topics`,
-        {
-          title: topic.title,
-          content: topic.content,
-          skill: skill,
-          datetime: topic.datetime,
-        },
-        getAuthHeaders()
-      );
+      await apiClient.post('/topics', {
+        title: topic.title,
+        content: topic.content,
+        skill: skill,
+        datetime: topic.datetime,
+      });
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
       console.error("Failed to add topic:", error);
@@ -144,13 +127,9 @@ export const referenceThunks = {
   },
   addReference: (reference: Reference) => async (dispatch: any) => {
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/references`,
-        {
-          skill: reference.skill,
-        },
-        getAuthHeaders()
-      );
+      await apiClient.post('/references', {
+        skill: reference.skill,
+      });
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
       console.error("Failed to add reference:", error);
@@ -158,10 +137,7 @@ export const referenceThunks = {
   },
   deleteTopic: (id: number) => async (dispatch: any) => {
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/topics/${id}`,
-        getAuthHeaders()
-      );
+      await apiClient.delete(`/topics/${id}`);
       dispatch(referenceThunks.fetchReferences());
     } catch (error) {
       console.error("Failed to delete topic:", error);
@@ -171,16 +147,12 @@ export const referenceThunks = {
     (id: number, title: string, content: string, skill: string, datetime: string) =>
     async (dispatch: any) => {
       try {
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/topics/${id}`,
-          {
-            title: title,
-            content: content,
-            skill: skill,
-            datetime: datetime,
-          },
-          getAuthHeaders()
-        );
+        await apiClient.put(`/topics/${id}`, {
+          title: title,
+          content: content,
+          skill: skill,
+          datetime: datetime,
+        });
         dispatch(referenceThunks.fetchReferences());
       } catch (error) {
         console.error("Failed to update topic:", error);

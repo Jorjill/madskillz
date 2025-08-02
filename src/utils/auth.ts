@@ -1,3 +1,5 @@
+// DEPRECATED: Use apiClient instead of getAuthHeaders
+// This function is kept for backward compatibility but should be replaced with apiClient
 export const getAuthHeaders = () => {
   const idToken = localStorage.getItem("idToken");
   if (!idToken) {
@@ -9,3 +11,6 @@ export const getAuthHeaders = () => {
     },
   };
 };
+
+// Export the new apiClient for modern usage
+export { apiClient } from './apiClient';

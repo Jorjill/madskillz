@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { getAuthHeaders } from "../utils/auth";
+import { apiClient } from "../utils/apiClient";
 
 export interface AnswerResult {
   reason: string;
@@ -59,10 +58,7 @@ export const quizResultsThunks = {
   fetchResults: () => async (dispatch: any) => {
     try {
       dispatch(setLoading(true));
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/quiz-results`,
-        getAuthHeaders()
-      );
+      const response = await apiClient.get('/quiz-results');
       
       const results = response.data?.raw_results || [];
       dispatch(setResults(results));

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { apiClient } from "../utils/apiClient";
 
 interface Question {
   question: String;
@@ -77,58 +77,32 @@ export const selectRandomPastQuestion = (state: any) =>
 export const selectRandomTestQuestion = (state: any) =>
   getRandomItem(state.practice.testQuestions);
 
-const getAuthHeaders = () => {
-  const idToken = localStorage.getItem("idToken");
-  if (!idToken) {
-    throw new Error("No token found. User might not be authenticated.");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${idToken}`,
-    },
-  };
-};
+// Removed getAuthHeaders - now handled by apiClient automatically
 
 export const practiceThunks = {
   fetchQuestions: () => async (dispatch: any) => {
-    const generalresponse = await axios.get(
-      `${import.meta.env.VITE_API_URL}/general-question`,
-      getAuthHeaders()
-    );
+    const generalresponse = await apiClient.get('/general-question');
     dispatch(practiceSlice.actions.addGeneralQuestions(generalresponse.data));
-    const specificresponse = await axios.get(
-      `${import.meta.env.VITE_API_URL}/specific-question`,
-      getAuthHeaders()
-    );
+    const specificresponse = await apiClient.get('/specific-question');
     dispatch(practiceSlice.actions.addSpecificQuestions(specificresponse.data));
-    const pastresponse = await axios.get(
-      `${import.meta.env.VITE_API_URL}/experience-question`,
-      getAuthHeaders()
-    );
+    const pastresponse = await apiClient.get('/experience-question');
     dispatch(practiceSlice.actions.addPastQuestions(pastresponse.data));
   },
   deleteGeneralQuestion: (question: any) => async (dispatch: any) => {
-    await axios.delete(
-      `${import.meta.env.VITE_API_URL}/general-question/${question.id}`,
-      getAuthHeaders()
-    );
+    await apiClient.delete(`/general-question/${question.id}`);
     dispatch(practiceThunks.fetchQuestions());
   },
   deleteSpecificQuestion: (question: any) => async (dispatch: any) => { 
-    await axios.delete(
-      `${import.meta.env.VITE_API_URL}/specific-question/${question.id}`,
-      getAuthHeaders()
-    );
+    await apiClient.delete(`/specific-question/${question.id}`);
     dispatch(practiceThunks.fetchQuestions());
   },
   createGeneralQuestion:
     (question: string, answer: string, skill: string) =>
     async (dispatch: any) => {
       try {
-        await axios.post(
-          `${import.meta.env.VITE_API_URL}/general-question`,
-          { question: question, answer: answer, skill: skill },
-          getAuthHeaders()
+        await apiClient.post(
+          '/general-question',
+          { question: question, answer: answer, skill: skill }
         );
         dispatch(practiceThunks.fetchQuestions());
       } catch (error) {
@@ -139,10 +113,9 @@ export const practiceThunks = {
     (question: string, answer: string, skill: string) =>
     async (dispatch: any) => {
       try {
-        await axios.post(
-          `${import.meta.env.VITE_API_URL}/specific-question`,
-          { question: question, answer: answer, skill: skill },
-          getAuthHeaders()
+        await apiClient.post(
+          '/specific-question',
+          { question: question, answer: answer, skill: skill }
         );
         dispatch(practiceThunks.fetchQuestions());
       } catch (error) {

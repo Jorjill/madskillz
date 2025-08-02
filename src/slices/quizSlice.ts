@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { getAuthHeaders } from "../utils/auth";
+import { apiClient } from "../utils/apiClient";
 
 export interface Question {
   id: string;
@@ -83,10 +82,7 @@ export const quizThunks = {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           }]
-        : (await axios.get(
-            `${import.meta.env.VITE_API_URL}/quizzes/${skillName}`,
-            getAuthHeaders()
-          )).data;
+        : (await apiClient.get(`/quizzes/${skillName}`)).data;
 
       dispatch(quizActions.setQuizzes(quizzes));
       
@@ -114,11 +110,7 @@ export const quizThunks = {
         };
         dispatch(quizActions.setQuizzes([mockQuiz]));
       } else {
-        await axios.post(
-          `${import.meta.env.VITE_API_URL}/quizzes`,
-          newQuiz,
-          getAuthHeaders()
-        );
+        await apiClient.post('/quizzes', newQuiz);
         // Refresh quizzes after creation
         dispatch(quizThunks.fetchQuizzes(newQuiz.skill));
       }
@@ -134,11 +126,7 @@ export const quizThunks = {
         // Mock update in dev mode
         console.log("Updating quiz:", { quizId, updatedQuiz });
       } else {
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/quizzes/${quizId}`,
-          updatedQuiz,
-          getAuthHeaders()
-        );
+        await apiClient.put(`/quizzes/${quizId}`, updatedQuiz);
         // Refresh quizzes after update
         if (updatedQuiz.skill) {
           dispatch(quizThunks.fetchQuizzes(updatedQuiz.skill));
@@ -155,10 +143,7 @@ export const quizThunks = {
       if (import.meta.env.VITE_DEV === "true") {
         console.log("Deleting quiz:", quizId);
       } else {
-        await axios.delete(
-          `${import.meta.env.VITE_API_URL}/quizzes/${quizId}`,
-          getAuthHeaders()
-        );
+        await apiClient.delete(`/quizzes/${quizId}`);
         // Refresh quizzes after deletion
         dispatch(quizThunks.fetchQuizzes(skillName));
       }
@@ -182,19 +167,18 @@ export const quizThunks = {
         console.log("Created question:", mockQuestion);
       } else {
         // Create the question
-        const createResponse = await axios.post(
-          `${import.meta.env.VITE_API_URL}/quizzes/${params.quizId}/questions`,
+        const createResponse = await apiClient.post(
+          `/quizzes/${params.quizId}/questions`,
           {
             text: params.text,
             answer: params.answer
-          },
-          getAuthHeaders()
+          }
         );
         console.log("Question created:", createResponse.data);
         
         // Get the updated quiz
-        // const quizResponse = await axios.get(
-        //   `${import.meta.env.VITE_API_URL}/quizzes/${params.quizId}`,
+        const quizResponse = await apiClient.get(`/quizzes/${params.quizId}`);
+        console.log("Updated quiz:", quizResponse.data);
         //   getAuthHeaders()
         // );
         // console.log("Updated quiz:", quizResponse.data);
@@ -222,20 +206,16 @@ export const quizThunks = {
       if (import.meta.env.VITE_DEV === "true") {
         console.log("Updating question:", params);
       } else {
-        await axios.put(
-          `${import.meta.env.VITE_API_URL}/quizzes/${params.quizId}/questions/${params.questionId}`,
+        await apiClient.put(
+          `/quizzes/${params.quizId}/questions/${params.questionId}`,
           {
             text: params.text,
             answer: params.answer
-          },
-          getAuthHeaders()
+          }
         );
       }
       // Refresh the quiz to get updated questions
-      await axios.get(
-        `${import.meta.env.VITE_API_URL}/quizzes/${params.quizId}`,
-        getAuthHeaders()
-      );
+      await apiClient.get(`/quizzes/${params.quizId}`);
       // dispatch(quizActions.selectQuiz(response.data));
     } catch (error) {
       dispatch(quizActions.setError(error instanceof Error ? error.message : "Failed to update question"));
@@ -248,9 +228,8 @@ export const quizThunks = {
       if (import.meta.env.VITE_DEV === "true") {
         console.log("Deleting question:", params.questionId);
       } else {
-        await axios.delete(
-          `${import.meta.env.VITE_API_URL}/quizzes/${params.quizId}/questions/${params.questionId}`,
-          getAuthHeaders()
+        await apiClient.delete(
+          `/quizzes/${params.quizId}/questions/${params.questionId}`
         );
       }
       // Refresh the quiz to get updated questions
@@ -280,8 +259,8 @@ export const quizThunks = {
     answerResults: Array<{ result: string; reason: string }>;
   }) => async () => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/quiz-results`,
+      const response = await apiClient.post(
+        '/quiz-results',
         {
           quiz_name,
           skill,
@@ -289,8 +268,7 @@ export const quizThunks = {
           correct_answers,
           total_questions,
           answerResults,
-        },
-        getAuthHeaders()
+        }
       );
       return response.data;
     } catch (error) {
@@ -311,15 +289,14 @@ export const quizThunks = {
     providedAnswer: string;
   }) => async () => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/general-question/answer`,
+      const response = await apiClient.post(
+        '/general-question/answer',
         {
           id,
           question,
           answer,
           providedAnswer,
-        },
-        getAuthHeaders()
+        }
       );
       return response.data;
     } catch (error) {

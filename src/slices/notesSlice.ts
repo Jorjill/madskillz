@@ -1,5 +1,5 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { apiClient } from "../utils/apiClient";
 
 export interface note {
   id?: string;
@@ -102,27 +102,12 @@ export const {
   deselectEditNoteMode,
 } = notesSlice.actions;
 
-const getAuthHeaders = () => {
-  const idToken = localStorage.getItem("idToken");
-  if (!idToken) {
-    throw new Error("No token found. User might not be authenticated.");
-  }
-  return {
-    headers: {
-      Authorization: `Bearer ${idToken}`,
-    },
-  };
-};
+// Removed getAuthHeaders - now handled by apiClient automatically
 
 export const notesThunks = {
-  // @ts-ignore
   fetchNotes: () => async (dispatch: any) => {
     try {
-      // @ts-ignore
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/notes`,
-        getAuthHeaders()
-      );
+      const response = await apiClient.get('/notes');
       dispatch(addNotes(response.data));
     } catch (error) {
       console.error("Failed to fetch notes:", error);
@@ -130,11 +115,7 @@ export const notesThunks = {
   },
   createNote: (newNote: note) => async (dispatch: any) => {
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/notes`,
-        newNote,
-        getAuthHeaders()
-      );
+      await apiClient.post('/notes', newNote);
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to create note:", error);
@@ -142,10 +123,7 @@ export const notesThunks = {
   },
   deleteNote: (id: string | undefined) => async (dispatch: any) => {
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/notes/${id}`,
-        getAuthHeaders()
-      );
+      await apiClient.delete(`/notes/${id}`);
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to delete note:", error);
@@ -153,11 +131,7 @@ export const notesThunks = {
   },
   updateNote: (updatedNote: note) => async (dispatch: any) => {
     try {
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/notes/${updatedNote.id}`,
-        updatedNote,
-        getAuthHeaders()
-      );
+      await apiClient.put(`/notes/${updatedNote.id}`, updatedNote);
       dispatch(notesThunks.fetchNotes());
     } catch (error) {
       console.error("Failed to update note:", error);
