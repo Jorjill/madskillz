@@ -9,16 +9,19 @@
   }
 }
 
+
+
 .note-component {
+  flex: 1;
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   color: #ffffff;
   width: 100%;
-  animation: fadeInUp 0.5s ease-out;
-  padding-top: 5%;
+  box-sizing: border-box;
+  padding-top: 30px;
 
   pre {
     background-color: black;
@@ -43,52 +46,23 @@
   }
 
   .note-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: block;
     width: 100%;
     margin-bottom: 20px;
-    position: relative;
-
-    .back-button {
-      position: sticky;
-      top: 20px;
-      align-self: flex-start;
-      background: rgba(101, 135, 122, 0.2);
-      border: 1px solid rgba(101, 135, 122, 0.3);
-      color: #ffffff;
-      padding: 10px 16px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 20px;
-      transition: all 0.3s ease;
-      z-index: 1000;
-
-      &:hover {
-        background: rgba(101, 135, 122, 0.3);
-        transform: translateY(-2px);
-      }
-
-      &:active {
-        transform: translateY(1px);
-      }
-
-      i {
-        font-size: 16px;
-      }
-    }
+    text-align: center;
   }
 
   h1 {
     font-size: 36px;
     font-weight: bold;
     margin-bottom: 50px;
-    margin-top: 0;
+    margin-top: 20px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    line-height: 1.2;
+    display: block;
   }
 
   .note-content {
