@@ -10,6 +10,7 @@ import { choosePage } from "../../slices/pageSlice";
 import Notes from "../../components/notes/Notes";
 import Reference from "../../components/reference/reference";
 import Quiz from "../../components/quiz/quiz";
+import Summary from "../../components/summary/Summary";
 import { useEffect } from "react";
 import { LoadingScreen } from "../../components/loading/loading";
 import {
@@ -85,6 +86,21 @@ export const SkillScreen = () => {
                   Quiz
                 </button>
               </li>
+              <li>
+                <button
+                  className="nav-button"
+                  onClick={() => {
+                    dispatch(choosePage("summary"));
+                    dispatch(deselectNote());
+                    dispatch(deselectAddNoteMode());
+                    dispatch(deselectEditNoteMode());
+                    dispatch(unsetAddReferenceMode());
+                    dispatch(unsetEditReferenceMode());
+                  }}
+                >
+                  Summary
+                </button>
+              </li>
             </ul>
           </nav>
         </header>
@@ -95,6 +111,8 @@ export const SkillScreen = () => {
             <Reference />
           ) : currentComponent === "quiz" ? (
             <Quiz />
+          ) : currentComponent === "summary" ? (
+            <Summary />
           ) : currentComponent === "loading" ? (
             <LoadingScreen />
           ) : null}
