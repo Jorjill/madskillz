@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useAuth } from '../../AuthProvider';
+import { apiClient } from '../../utils/apiClient';
 import './Summary.less';
 
 interface SummaryData {
@@ -16,11 +16,10 @@ export const Summary: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   const selectedSkill = useSelector((state: any) => state.skills.selectedSkill);
-  const { user } = useAuth();
 
   const fetchSummary = async () => {
-    if (!user || !selectedSkill?.title) {
-      setError('User not authenticated or no skill selected');
+    if (!selectedSkill?.title) {
+      setError('No skill selected');
       return;
     }
 
@@ -28,23 +27,8 @@ export const Summary: React.FC = () => {
     setError(null);
 
     try {
-      // Get Firebase ID token
-      const idToken = await user.getIdToken();
-      
-      const response = await fetch(`http://localhost:3000/notes/summary/${selectedSkill.title}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${idToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setSummaryData(data);
+      const response = await apiClient.get(`/notes/summary/${selectedSkill.title}`);
+      setSummaryData(response.data);
     } catch (err) {
       console.error('Error fetching summary:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch summary');
@@ -55,7 +39,7 @@ export const Summary: React.FC = () => {
 
   useEffect(() => {
     fetchSummary();
-  }, [selectedSkill?.title, user]);
+  }, [selectedSkill?.title]);
 
   if (loading) {
     return (
