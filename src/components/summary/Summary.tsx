@@ -14,10 +14,12 @@ export const Summary: React.FC = () => {
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState<number>(0);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   
   const selectedSkill = useSelector((state: any) => state.skills.selectedSkill);
 
-  const fetchSummary = async () => {
+  const fetchSummary = async (isRetry = false) => {
     if (!selectedSkill?.title) {
       setError('No skill selected');
       return;
@@ -25,16 +27,58 @@ export const Summary: React.FC = () => {
 
     setLoading(true);
     setError(null);
+    
+    if (!isRetry) {
+      setRetryCount(0);
+      setIsGenerating(true);
+    }
 
     try {
-      const response = await apiClient.get(`/notes/summary/${selectedSkill.title}`);
+      // Create a timeout promise for long-running requests
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout - Summary generation is taking longer than expected')), 120000); // 2 minutes
+      });
+
+      const fetchPromise = apiClient.get(`/notes/summary/${selectedSkill.title}`);
+      
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as any;
       setSummaryData(response.data);
+      setIsGenerating(false);
     } catch (err) {
       console.error('Error fetching summary:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch summary');
+      
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch summary';
+      
+      // Check if it's a timeout or network error that might benefit from retry
+      const isRetryableError = errorMessage.includes('timeout') || 
+                              errorMessage.includes('network') || 
+                              errorMessage.includes('fetch') ||
+                              errorMessage.includes('500') ||
+                              errorMessage.includes('502') ||
+                              errorMessage.includes('503') ||
+                              errorMessage.includes('504');
+      
+      if (isRetryableError && retryCount < 3) {
+        setRetryCount(prev => prev + 1);
+        setError(`Attempt ${retryCount + 1} failed. Retrying... (${errorMessage})`);
+        
+        // Retry with exponential backoff
+        setTimeout(() => {
+          fetchSummary(true);
+        }, Math.pow(2, retryCount) * 1000); // 1s, 2s, 4s delays
+        
+        return;
+      }
+      
+      setError(errorMessage);
+      setIsGenerating(false);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    fetchSummary();
   };
 
   useEffect(() => {
@@ -42,12 +86,25 @@ export const Summary: React.FC = () => {
   }, [selectedSkill?.title]);
 
   if (loading) {
+    const loadingMessage = isGenerating 
+      ? `Generating summary for ${selectedSkill?.title}... This may take up to 2 minutes for first-time generation.`
+      : retryCount > 0 
+        ? `Retrying... (Attempt ${retryCount + 1}/4)`
+        : 'Loading summary...';
+        
     return (
       <div className="summary-container">
         <div className="summary-header">
           <h2>Summary for {selectedSkill?.title}</h2>
         </div>
-        <div className="loading-message">Loading summary...</div>
+        <div className="loading-message">
+          <p>{loadingMessage}</p>
+          {isGenerating && (
+            <p style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '1rem' }}>
+              💡 First-time summary generation uses AI and takes longer. Subsequent loads will be much faster.
+            </p>
+          )}
+        </div>
       </div>
     );
   }
@@ -107,7 +164,7 @@ export const Summary: React.FC = () => {
       ) : (
         <div className="no-data-message">
           <p>No summary data available for {selectedSkill?.title}</p>
-          <button onClick={fetchSummary}>Load Summary</button>
+          <button onClick={handleRetry}>Load Summary</button>
         </div>
       )}
     </div>
