@@ -83,11 +83,28 @@
       min-height: 100%;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden; // Prevent horizontal overflow
+
+      // Image constraints to prevent overflow
+      img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+        display: block;
+      }
+
+      // Handle images in various contexts
+      * img {
+        max-width: 100% !important;
+        height: auto !important;
+        width: auto !important;
+      }
 
       pre {
         white-space: pre-wrap;
         word-wrap: break-word;
         max-width: 100%;
+        overflow-x: auto; // Allow horizontal scroll for code blocks if needed
       }
       
       code {
