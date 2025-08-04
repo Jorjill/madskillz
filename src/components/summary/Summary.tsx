@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { apiClient } from '../../utils/apiClient';
-import { selectNotesBySkill } from '../../slices/notesSlice';
+import { summaryEvents } from '../../utils/summaryEvents';
 import './Summary.less';
 
 interface SummaryData {
@@ -19,8 +19,6 @@ export const Summary: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   
   const selectedSkill = useSelector((state: any) => state.skills.selectedSkill);
-  const notesForSkill = useSelector((state) => selectNotesBySkill(state, selectedSkill?.title || ''));
-  const prevNotesCountRef = useRef<number>(0);
 
   const fetchSummary = async (isRetry = false) => {
     if (!selectedSkill?.title) {
@@ -88,23 +86,21 @@ export const Summary: React.FC = () => {
     fetchSummary();
   }, [selectedSkill?.title]);
 
-  // Monitor notes changes to trigger summary updates
+  // Listen for summary refresh events (e.g., when notes are deleted)
   useEffect(() => {
-    const currentNotesCount = notesForSkill.length;
-    const prevNotesCount = prevNotesCountRef.current;
-    
-    // Only trigger update if:
-    // 1. We have a previous count (not initial load)
-    // 2. The count has changed (note added/deleted)
-    // 3. We have summary data already (don't interfere with initial load)
-    if (prevNotesCount > 0 && currentNotesCount !== prevNotesCount && summaryData) {
-      console.log(`Notes count changed from ${prevNotesCount} to ${currentNotesCount}. Updating summary...`);
+    console.log('Summary component: Setting up event listener');
+    const unsubscribe = summaryEvents.subscribe(() => {
+      console.log('Summary component: Received summary refresh event - calling fetchSummary()');
       fetchSummary();
-    }
-    
-    // Update the ref with current count
-    prevNotesCountRef.current = currentNotesCount;
-  }, [notesForSkill.length, summaryData]);
+    });
+
+    return () => {
+      console.log('Summary component: Cleaning up event listener');
+      unsubscribe();
+    };
+  }, []);
+
+
 
   if (loading) {
     const loadingMessage = isGenerating 

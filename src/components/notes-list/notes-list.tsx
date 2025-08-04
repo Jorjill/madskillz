@@ -9,6 +9,7 @@ import {
 } from "../../slices/notesSlice";
 import { useState, useEffect, useRef } from "react";
 import { DeleteModal } from "../modal/delete-modal";
+import { summaryEvents } from "../../utils/summaryEvents";
 
 export const NotesList: React.FC = () => {
   const dispatch = useDispatch();
@@ -153,8 +154,13 @@ export const NotesList: React.FC = () => {
           noteTitle={noteToDelete}
           onClose={handleCloseDeleteConfirmation}
           onConfirm={() => {
+            console.log('Notes-list: Delete confirmed, dispatching deleteNote and triggering summary refresh');
             dispatch<any>(notesThunks.deleteNote(deleteNoteId));
             handleCloseDeleteConfirmation();
+            // Trigger summary refresh after note deletion
+            console.log('Notes-list: About to call summaryEvents.triggerRefresh()');
+            summaryEvents.triggerRefresh();
+            console.log('Notes-list: summaryEvents.triggerRefresh() called');
           }}
         />
       )}
