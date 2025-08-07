@@ -1,16 +1,21 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { HomeScreen } from "../screens/home/home.screen";
-import { SkillScreen } from "../screens/skill/skill.screen";
+import { Suspense, lazy } from "react";
 import ProtectedRoute from "../protectedRoute";
-import Login from "../screens/login/login";
-import Dashboard from "../screens/dashboard/dashboard";
-import Profile from "../screens/profile/profile";
-import Settings from "../screens/settings/settings";
-import Layout from "../components/Layout";
-import Landing from "../screens/landing/Landing";
+import { LoadingScreen } from "../components/loading/loading";
+
+// Route-based code splitting
+const Landing = lazy(() => import("../screens/landing/Landing"));
+const Login = lazy(() => import("../screens/login/login"));
+const Dashboard = lazy(() => import("../screens/dashboard/dashboard"));
+const Profile = lazy(() => import("../screens/profile/profile"));
+const Settings = lazy(() => import("../screens/settings/settings"));
+const Layout = lazy(() => import("../components/Layout"));
+const HomeScreen = lazy(() => import("../screens/home/home.screen").then(m => ({ default: m.HomeScreen })));
+const SkillScreen = lazy(() => import("../screens/skill/skill.screen").then(m => ({ default: m.SkillScreen })));
 export const AppRouter = () => {
   return (
     <Router>
+      <Suspense fallback={<LoadingScreen />}> 
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -65,6 +70,7 @@ export const AppRouter = () => {
             }
           />
         </Routes>
+      </Suspense>
     </Router>
   );
 };

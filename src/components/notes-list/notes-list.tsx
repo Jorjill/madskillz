@@ -7,13 +7,14 @@ import {
   selectNote,
   selectNotesBySkill,
 } from "../../slices/notesSlice";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { DeleteModal } from "../modal/delete-modal";
 import { summaryEvents } from "../../utils/summaryEvents";
 
-export const NotesList: React.FC = () => {
+export const NotesList: React.FC = React.memo(() => {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const selectedSkill = useSelector(
     (state: any) => state.skills.selectedSkill.title
   );
@@ -29,6 +30,12 @@ export const NotesList: React.FC = () => {
     useState<boolean>(false);
   const [noteToDelete, setNoteToDelete] = useState<string>("");
   const [deleteNoteId, setDeleteNoteId] = useState<string | undefined>("");
+
+  // Debounce search input to avoid filtering on every keystroke
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebouncedSearch(searchTerm.trim()), 200);
+    return () => window.clearTimeout(id);
+  }, [searchTerm]);
 
   // Store scroll position when a note is selected
   useEffect(() => {
@@ -52,37 +59,121 @@ export const NotesList: React.FC = () => {
     }
   }, [isNoteSelected, selectedSkill]);
 
-  const handleCloseDeleteConfirmation = () => {
+  const handleCloseDeleteConfirmation = useCallback(() => {
     setShowDeleteConfirmation(false);
-  };
+  }, []);
 
-  const handleShowDeleteConfirmation = (title: string, id: string | undefined) => {
+  const handleShowDeleteConfirmation = useCallback((title: string, id: string | undefined) => {
     setShowDeleteConfirmation(true);
     setNoteToDelete(title);
     setDeleteNoteId(id);
-  };
+  }, []);
 
-  const extractTextFromHTML = (htmlString: any) => {
-    const tempDiv = document.createElement("div");
+  // Cache extracted text to avoid repeated heavy processing
+  const textCache = useMemo(() => new Map<string, string>(), []);
+  const extractTextFromHTML = useCallback((htmlString: string) => {
+    // Return early for empty input
+    if (!htmlString) return "";
+
+    const cached = textCache.get(htmlString);
+    if (cached) return cached;
+
+    // Lightweight HTML to text conversion without creating DOM nodes
     const processedString = htmlString
       .replace(/<br\s*[\/]?>/gi, " ")
       .replace(/<\/p>/gi, " ")
       .replace(/<\/li>/gi, " ")
-      .replace(/<li>/gi, " - ");
-    tempDiv.innerHTML = processedString;
-    return tempDiv.textContent || tempDiv.innerText || "";
-  };
+      .replace(/<li>/gi, " - ")
+      .replace(/<[^>]*>/g, " ") // strip remaining tags
+      .replace(/\s+/g, " ") // collapse whitespace
+      .trim();
 
-  const filteredNotes = reactNotes.filter(
-    (item) =>
-      item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.notes_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.tags.includes(searchTerm.toLowerCase())
-  );
+    textCache.set(htmlString, processedString);
+    return processedString;
+  }, [textCache]);
 
-  const filteredAndSortedNotes = filteredNotes.sort(
-    (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
-  );
+  // Memoize filtering and sorting to avoid O(n log n) work every render
+  const filteredAndSortedNotes = useMemo(() => {
+    const term = debouncedSearch.toLowerCase();
+    const filtered = reactNotes.filter((item: any) => {
+      if (!term) return true;
+      return (
+        item.content?.toLowerCase().includes(term) ||
+        item.notes_title?.toLowerCase().includes(term) ||
+        (Array.isArray(item.tags) && item.tags.some((t: string) => t?.toLowerCase().includes(term)))
+      );
+    });
+
+    return filtered.sort(
+      (a: any, b: any) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+    );
+  }, [reactNotes, debouncedSearch]);
+
+  // Handlers
+  const handleCreateNote = useCallback(() => {
+    dispatch(selectAddNoteMode());
+  }, [dispatch]);
+
+  // Stable callbacks for list item interactions
+  const handleSelectItem = useCallback((title: string) => {
+    // Store current scroll position before selecting note
+    if (scrollContainerRef.current) {
+      const scrollPosition = scrollContainerRef.current.scrollTop;
+      sessionStorage.setItem(`notesListScrollPosition_${selectedSkill}`, scrollPosition.toString());
+    }
+    dispatch(selectNote(title));
+  }, [dispatch, selectedSkill]);
+
+  const handleEditItem = useCallback((title: string) => {
+    dispatch(selectNote(title));
+    dispatch(selectEditNoteMode());
+  }, [dispatch]);
+
+  const handleDeleteItem = useCallback((title: string, id?: string) => {
+    handleShowDeleteConfirmation(title, id);
+  }, [handleShowDeleteConfirmation]);
+
+  // Memoized list item to minimize re-renders
+  const NoteListItem: React.FC<{
+    id?: string;
+    title: string;
+    content: string;
+    tags?: string[];
+    onSelect: (title: string) => void;
+    onEdit: (title: string) => void;
+    onDelete: (title: string, id?: string) => void;
+  }> = React.memo(({ id, title, content, tags, onSelect, onEdit, onDelete }) => {
+    const preview = useMemo(() => extractTextFromHTML(content).slice(0, 300), [content, extractTextFromHTML]);
+    return (
+      <div className="list-box" onClick={() => onSelect(title)}>
+        <div className="title-icons">
+          <h3>{title}</h3>
+          <i
+            className="ri-edit-line"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(title);
+            }}
+          ></i>
+          <i
+            className="ri-delete-bin-7-line"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(title, id);
+            }}
+          ></i>
+        </div>
+        <p>{preview}</p>
+        <div className="tags">
+          {tags?.map((tag, index) => (
+            <div key={index} className="tag">
+              {tag}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  });
 
   return (
     <div className="notes-component">
@@ -95,9 +186,7 @@ export const NotesList: React.FC = () => {
         <div className="add-button">
           <div
             className="button"
-            onClick={() => {
-              dispatch(selectAddNoteMode());
-            }}
+            onClick={handleCreateNote}
           >
             Create Note
           </div>
@@ -105,46 +194,17 @@ export const NotesList: React.FC = () => {
       </div>
       <div className="items-list-container" ref={scrollContainerRef}>
         <div className="items-list">
-          {filteredAndSortedNotes.map((item, index) => (
-            <div
-              className="list-box"
-              key={index}
-              onClick={() => {
-                // Store current scroll position before selecting note
-                if (scrollContainerRef.current) {
-                  const scrollPosition = scrollContainerRef.current.scrollTop;
-                  sessionStorage.setItem(`notesListScrollPosition_${selectedSkill}`, scrollPosition.toString());
-                }
-                dispatch(selectNote(item.notes_title));
-              }}
-            >
-              <div className="title-icons">
-                <h3>{item.notes_title}</h3>
-                <i
-                  className="ri-edit-line"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    dispatch(selectNote(item.notes_title));
-                    dispatch(selectEditNoteMode());
-                  }}
-                ></i>
-                <i
-                  className="ri-delete-bin-7-line"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleShowDeleteConfirmation(item.notes_title, item.id);
-                  }}
-                ></i>
-              </div>
-              <p>{extractTextFromHTML(item.content).slice(0, 1000)}</p>
-              <div className="tags">
-                {item.tags?.map((tag, index) => (
-                  <div key={index} className="tag">
-                    {tag}
-                  </div>
-                ))}
-              </div>
-            </div>
+          {filteredAndSortedNotes.map((item: any, index: number) => (
+            <NoteListItem
+              key={item.id || item.notes_title || index}
+              id={item.id}
+              title={item.notes_title}
+              content={item.content}
+              tags={item.tags}
+              onSelect={handleSelectItem}
+              onEdit={handleEditItem}
+              onDelete={handleDeleteItem}
+            />
           ))}
         </div>
       </div>
@@ -166,4 +226,4 @@ export const NotesList: React.FC = () => {
       )}
     </div>
   );
-};
+});
