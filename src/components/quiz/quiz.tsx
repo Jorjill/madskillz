@@ -5,6 +5,7 @@ import { quizThunks, quizActions } from "../../slices/quizSlice";
 import { AppDispatch, RootState } from "../../state/store";
 import "./quiz.less";
 import Editor from "@monaco-editor/react";
+import TypingPractice from "../typing-practice/TypingPractice";
 
 // Types and Interfaces
 interface Question {
@@ -97,6 +98,8 @@ const Quiz: React.FC = () => {
   const [questionMenuAnchorEl, setQuestionMenuAnchorEl] =
     useState<HTMLElement | null>(null);
   const [isCodeMode, setIsCodeMode] = useState(false);
+  const [showTypingPractice, setShowTypingPractice] = useState(false);
+  const [typingPracticeCode, setTypingPracticeCode] = useState("");
 
   // Refs for DOM elements
   const newQuizRef = useRef<HTMLDivElement>(null);
@@ -830,7 +833,32 @@ const Quiz: React.FC = () => {
             <button className="quit-button" onClick={handleQuitQuiz}>
               Exit to Quiz Selection
             </button>
+            <button 
+              className="typing-practice-button" 
+              onClick={() => {
+                // Find the first code answer for typing practice
+                const codeAnswer = quizQuestions.find(q => 
+                  q.answer.includes('{') || q.answer.includes('function') || 
+                  q.answer.includes('const') || q.answer.includes('let') ||
+                  q.answer.includes('var') || q.answer.includes('class') ||
+                  q.answer.includes('import') || q.answer.includes('export')
+                )?.answer || quizQuestions[0]?.answer || '';
+                setTypingPracticeCode(codeAnswer);
+                setShowTypingPractice(true);
+              }}
+            >
+              🚀 Practice Typing Code
+            </button>
           </div>
+
+          {showTypingPractice && (
+            <TypingPractice 
+              codeText={typingPracticeCode}
+              onComplete={() => {
+                console.log('Typing practice completed!');
+              }}
+            />
+          )}
         </div>
       );
     }

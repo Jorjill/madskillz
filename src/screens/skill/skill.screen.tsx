@@ -11,6 +11,7 @@ import Notes from "../../components/notes/Notes";
 import Reference from "../../components/reference/reference";
 import Quiz from "../../components/quiz/quiz";
 import Summary from "../../components/summary/Summary";
+import TypingPractice from "../../components/typing-practice/TypingPractice";
 import { useEffect } from "react";
 import { LoadingScreen } from "../../components/loading/loading";
 import {
@@ -101,6 +102,21 @@ export const SkillScreen = () => {
                   Summary
                 </button>
               </li>
+              <li>
+                <button
+                  className="nav-button"
+                  onClick={() => {
+                    dispatch(choosePage("typing"));
+                    dispatch(deselectNote());
+                    dispatch(deselectAddNoteMode());
+                    dispatch(deselectEditNoteMode());
+                    dispatch(unsetAddReferenceMode());
+                    dispatch(unsetEditReferenceMode());
+                  }}
+                >
+                  Typing Practice
+                </button>
+              </li>
             </ul>
           </nav>
         </header>
@@ -113,6 +129,28 @@ export const SkillScreen = () => {
             <Quiz />
           ) : currentComponent === "summary" ? (
             <Summary />
+          ) : currentComponent === "typing" ? (
+            <TypingPractice 
+              codeText={`// Welcome to Typing Practice!
+// Practice typing code to improve your speed and accuracy
+
+function greetUser(name) {
+  console.log("Hello, " + name + "!");
+  return "Welcome to MadSkillz!";
+}
+
+const user = "Developer";
+const message = greetUser(user);
+
+// Try typing this code exactly as shown
+// The cursor will guide you letter by letter
+for (let i = 0; i < 3; i++) {
+  console.log(\`Iteration \${i + 1}: \${message}\`);
+}`}
+              onComplete={() => {
+                console.log('Typing practice completed!');
+              }}
+            />
           ) : currentComponent === "loading" ? (
             <LoadingScreen />
           ) : null}
