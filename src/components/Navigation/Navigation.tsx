@@ -97,12 +97,23 @@ const Navigation: React.FC = React.memo(() => {
             color="inherit"
             aria-label="home"
             onClick={handleHome}
-            sx={{ mr: 2 }}
+            sx={{ 
+              mr: { xs: 1, sm: 2 }, // Responsive margin
+              p: { xs: 1, sm: 1.5 } // Responsive padding
+            }}
           >
             <HomeIcon />
           </IconButton>
 
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography 
+            variant="h6" 
+            component="div" 
+            sx={{ 
+              flexGrow: 1,
+              fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' }, // Responsive font size
+              fontWeight: 600
+            }}
+          >
             MadSkillz
           </Typography>
 

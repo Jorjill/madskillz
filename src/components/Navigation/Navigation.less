@@ -9,6 +9,17 @@
 
   .MuiToolbar-root {
     padding: 0.1rem 1rem;
+    
+    // Mobile responsive padding
+    @media (max-width: 768px) {
+      padding: 0.1rem 0.5rem;
+      min-height: 56px;
+    }
+    
+    @media (max-width: 480px) {
+      padding: 0.1rem 0.25rem;
+      min-height: 56px;
+    }
   }
 
   .MuiIconButton-root {

@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { xs: 1, sm: 2, md: 3 }, // Responsive padding
           mt: 8, // Add margin top to account for the fixed AppBar
           width: '100%',
           backgroundColor: '#07203d',

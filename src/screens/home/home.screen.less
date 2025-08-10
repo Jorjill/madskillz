@@ -9,6 +9,16 @@
   justify-content: center;
   background-color: #07203d;
   min-height: 100vh;
+  padding: 0 1rem; // Add horizontal padding for mobile
+  
+  // Mobile responsive adjustments
+  @media (max-width: 768px) {
+    padding: 0 0.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0 0.25rem;
+  }
 
   .input-box-container {
     display: flex;
@@ -24,6 +34,23 @@
       background: rgb(255, 255, 255);
       border: none;
       margin-bottom: 8%;
+      
+      // Mobile responsive width and sizing
+      @media (max-width: 768px) {
+        width: 60%;
+        height: 2.25rem;
+      }
+      
+      @media (max-width: 480px) {
+        width: 80%;
+        height: 2rem;
+        margin-top: 10%;
+      }
+      
+      @media (max-width: 360px) {
+        width: 90%;
+        height: 1.875rem;
+      }
     }
 
     .input-box::placeholder {
