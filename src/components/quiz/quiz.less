@@ -42,6 +42,13 @@
   display: flex;
   height: 100%;
   position: relative;
+  
+  // Mobile responsive layout
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
 }
 
 // Menu Dropdown Styles (Portal)
@@ -110,6 +117,23 @@
   overflow-y: auto;
   position: relative;
   z-index: 10;
+  
+  // Mobile responsive sidebar
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid @border-color;
+    padding: 15px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px;
+    max-height: 35vh;
+  }
 
   // Back Button
   .back-button {
@@ -400,12 +424,42 @@
   }
 }
 
+// Quiz Content Right Area
+.quiz-content-right {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  
+  // Mobile responsive content area
+  @media (max-width: 768px) {
+    padding: 15px;
+    height: auto;
+    min-height: 60vh;
+    overflow-y: visible;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px;
+    min-height: 65vh;
+  }
+}
+
 // Quiz Start Screen Styles
 .quiz-start-container {
   text-align: center;
   padding: 40px;
   max-width: 600px;
   margin: 0 auto;
+  
+  // Mobile responsive quiz start
+  @media (max-width: 768px) {
+    padding: 20px;
+    max-width: 100%;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 15px;
+  }
 
   h2 {
     font-size: 28px;
@@ -442,6 +496,13 @@
       background-repeat: no-repeat;
       background-position: right 12px top 50%;
       background-size: 12px auto;
+      
+      // Mobile responsive select
+      @media (max-width: 480px) {
+        min-width: 150px;
+        width: 100%;
+        max-width: 200px;
+      }
       
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
@@ -491,12 +552,32 @@
   display: flex;
   flex-direction: column;
   gap: 30px;
+  
+  // Mobile responsive quiz active container
+  @media (max-width: 768px) {
+    padding: 20px;
+    gap: 20px;
+    max-width: 100%;
+    min-height: auto;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 15px;
+    gap: 15px;
+  }
 
   .quiz-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    
+    // Mobile responsive header
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+    }
 
     h2 {
       font-size: 18px;
@@ -535,6 +616,18 @@
       padding: 30px;
       border-radius: 8px;
       margin-bottom: 30px;
+      
+      // Mobile responsive question text
+      @media (max-width: 768px) {
+        font-size: 20px;
+        padding: 20px;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 18px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
     }
   }
 
