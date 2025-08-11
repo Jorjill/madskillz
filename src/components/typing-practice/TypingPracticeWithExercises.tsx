@@ -3,7 +3,6 @@ import TypingPractice from './TypingPractice';
 import './TypingPracticeWithExercises.less';
 import { apiClient } from '../../utils/apiClient';
 import { useSelector } from 'react-redux';
-import { selectSkills } from '../../slices/skillsSlice';
 
 interface Exercise {
   id: number;
@@ -39,9 +38,8 @@ const TypingPracticeWithExercises: React.FC = () => {
   });
 
   // Get current skill from Redux store
-  const skills = useSelector(selectSkills);
-  const selectedSkill = skills.find(skill => skill.title) || { title: 'JavaScript' };
-  const currentSkill = selectedSkill.title;
+  const selectedSkill = useSelector((state: any) => state.skills.selectedSkill);
+  const currentSkill = selectedSkill?.title || 'JavaScript';
 
   // Load exercises from backend API on component mount
   useEffect(() => {
