@@ -6,10 +6,19 @@
 
 .homescreen {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   background-color: #07203d;
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   padding: 0 1rem; // Add horizontal padding for mobile
+
+  .homebox-homescreen {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+  }
   
   // Mobile responsive adjustments
   @media (max-width: 768px) {

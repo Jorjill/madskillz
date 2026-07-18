@@ -1,3 +1,10 @@
+html,
 body {
-    background-color: #2e2e2e; /* Example color */
+    height: 100%;
+    overflow: hidden;
+    background-color: #2e2e2e;
+  }
+
+#root {
+    height: 100%;
   }
