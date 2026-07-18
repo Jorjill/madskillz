@@ -6,6 +6,7 @@ export interface skill {
   id?: string;
   title: string;
   imageurl: string;
+  position?: number;
 }
 
 export interface skillsState {
@@ -44,11 +45,14 @@ const skillsSlice = createSlice({
     deselectSkill: (state) => {
       state.selectedSkill = initialState.selectedSkill;
     },
+    setSkillsOrder: (state, action) => {
+      state.skills = action.payload;
+    },
   },
 });
 
 export const skillsActions = skillsSlice.actions;
-export const { setSkills, setLoading, setError, selectSkill, deselectSkill } = skillsSlice.actions;
+export const { setSkills, setLoading, setError, selectSkill, deselectSkill, setSkillsOrder } = skillsSlice.actions;
 
 // Removed getAuthHeaders - now handled by apiClient automatically
 
@@ -82,6 +86,16 @@ export const skillsThunks = {
       dispatch(skillsThunks.fetchSkills());
     } catch (error) {
       console.error("Failed to delete skill:", error);
+    }
+  },
+  reorderSkills: (orderedSkills: skill[]) => async (dispatch: any) => {
+    dispatch(skillsActions.setSkillsOrder(orderedSkills));
+    try {
+      await apiClient.patch('/skills/reorder', {
+        skills: orderedSkills.map((s, idx) => ({ id: s.id, position: idx }))
+      });
+    } catch (error) {
+      console.error("Failed to reorder skills:", error);
     }
   },
   updateSkill: (id: string, updatedSkill: Partial<skill>) => async (dispatch: any) => {
