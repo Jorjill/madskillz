@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from "react-router-dom";
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {
   DndContext,
   closestCenter,
@@ -28,10 +30,12 @@ interface SortableSkillItemProps {
   item: skill;
   index: number;
   onSelect: (skill: skill) => void;
+  onEdit: (skill: skill) => void;
+  onDelete: (skill: skill) => void;
   defaultImage: string;
 }
 
-const SortableSkillItem: React.FC<SortableSkillItemProps> = ({ item, index, onSelect, defaultImage }) => {
+const SortableSkillItem: React.FC<SortableSkillItemProps> = ({ item, index, onSelect, onEdit, onDelete, defaultImage }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id! });
 
   const style: React.CSSProperties = {
@@ -39,11 +43,28 @@ const SortableSkillItem: React.FC<SortableSkillItemProps> = ({ item, index, onSe
     transition,
     opacity: isDragging ? 0.4 : 1,
     zIndex: isDragging ? 999 : 'auto',
-    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} className="sortable-wrapper" {...attributes} {...listeners}>
+      <div className="box-actions">
+        <button
+          className="action-btn edit-btn"
+          title="Edit skill"
+          onPointerDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); e.preventDefault(); onEdit(item); }}
+        >
+          <EditOutlinedIcon style={{ fontSize: 14 }} />
+        </button>
+        <button
+          className="action-btn delete-btn"
+          title="Delete skill"
+          onPointerDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); e.preventDefault(); onDelete(item); }}
+        >
+          <DeleteOutlineIcon style={{ fontSize: 14 }} />
+        </button>
+      </div>
       <Link to="/skills" draggable={false} onClick={() => onSelect(item)}>
         <div
           className="box"
@@ -81,6 +102,11 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
   const [addSkillModal, setAddSkillModal] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
   const [newSkillImage, setNewSkillImage] = useState("");
+  const [editingSkill, setEditingSkill] = useState<skill | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editImage, setEditImage] = useState("");
+  const [editImagePreview, setEditImagePreview] = useState("");
+  const [deletingSkill, setDeletingSkill] = useState<skill | null>(null);
 
   useEffect(() => {
     setItems(itemList);
@@ -133,6 +159,47 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
   // Memoize modal handlers
   const openModal = useCallback(() => setAddSkillModal(true), []);
   const closeModal = useCallback(() => setAddSkillModal(false), []);
+
+  const handleEditOpen = useCallback((skill: skill) => {
+    setEditingSkill(skill);
+    setEditTitle(skill.title);
+    setEditImage(skill.imageurl);
+    setEditImagePreview("");
+  }, []);
+
+  const handleEditFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setEditImage(result);
+        setEditImagePreview(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  const handleSaveEdit = useCallback(() => {
+    if (editingSkill?.id && editTitle.trim()) {
+      dispatch(skillsThunks.updateSkill(editingSkill.id, {
+        title: editTitle.trim(),
+        imageurl: editImage,
+      }));
+      setEditingSkill(null);
+    }
+  }, [dispatch, editingSkill, editTitle, editImage]);
+
+  const handleDeleteOpen = useCallback((skill: skill) => {
+    setDeletingSkill(skill);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (deletingSkill?.id) {
+      dispatch(skillsThunks.deleteSkill(deletingSkill.id));
+      setDeletingSkill(null);
+    }
+  }, [dispatch, deletingSkill]);
 
   // Memoize default image to prevent re-creation
   const defaultImage = useMemo(() => 
@@ -192,6 +259,8 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
                   item={item}
                   index={index}
                   onSelect={handleSkillSelect}
+                  onEdit={handleEditOpen}
+                  onDelete={handleDeleteOpen}
                   defaultImage={defaultImage}
                 />
               ))}
@@ -208,14 +277,9 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
           </SortableContext>
         </DndContext>
         {addSkillModal && (
-          <div className="modal">
-            <div className="modal-content">
-              <span
-                className="close-button"
-                onClick={closeModal}
-              >
-                &times;
-              </span>
+          <div className="modal" onClick={closeModal}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <span className="close-button" onClick={closeModal}>&times;</span>
               <h2>Add New Skill</h2>
               <input
                 type="text"
@@ -225,6 +289,52 @@ const BoxGrid: React.FC<BoxGridProps> = ({ itemList = [] }) => {
               />
               <input type="file" onChange={handleFileChange} accept="image/*" />
               <button onClick={handleAddSkill}>Add Skill</button>
+            </div>
+          </div>
+        )}
+
+        {editingSkill && (
+          <div className="modal" onClick={() => setEditingSkill(null)}>
+            <div className="modal-content modal-content--edit" onClick={e => e.stopPropagation()}>
+              <span className="close-button" onClick={() => setEditingSkill(null)}>&times;</span>
+              <h2>Edit Skill</h2>
+              <div className="edit-image-preview">
+                <img
+                  src={editImagePreview || editingSkill.imageurl}
+                  alt={editingSkill.title}
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Skill Name"
+                value={editTitle}
+                onChange={e => setEditTitle(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSaveEdit()}
+              />
+              <label className="file-label">
+                <span>Change Image</span>
+                <input type="file" onChange={handleEditFileChange} accept="image/*" />
+              </label>
+              <button onClick={handleSaveEdit} disabled={!editTitle.trim()}>Save Changes</button>
+            </div>
+          </div>
+        )}
+
+        {deletingSkill && (
+          <div className="modal" onClick={() => setDeletingSkill(null)}>
+            <div className="modal-content modal-content--delete" onClick={e => e.stopPropagation()}>
+              <div className="delete-icon-circle">
+                <DeleteOutlineIcon style={{ fontSize: 28 }} />
+              </div>
+              <h2>Delete Skill?</h2>
+              <p className="delete-subtitle">
+                <span>"{deletingSkill.title}"</span> will be permanently removed.
+              </p>
+              <div className="modal-actions">
+                <button className="btn-cancel" onClick={() => setDeletingSkill(null)}>Cancel</button>
+                <button className="btn-delete" onClick={handleConfirmDelete}>Delete</button>
+              </div>
             </div>
           </div>
         )}
