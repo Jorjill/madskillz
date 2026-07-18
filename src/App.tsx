@@ -3,7 +3,7 @@ import { AppRouter } from "./routers/AppRouter";
 
 function App() {
   return (
-    <div style={{ height: '100%' }}>
+    <div>
       <AuthProvider>
         <AppRouter />
       </AuthProvider>

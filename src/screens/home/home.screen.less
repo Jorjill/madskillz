@@ -7,17 +7,16 @@
 .homescreen {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   background-color: #07203d;
-  height: 100%;
+  height: calc(100vh - 64px);
   overflow: hidden;
   padding: 0 1rem; // Add horizontal padding for mobile
 
   .homebox-homescreen {
     flex: 1;
+    min-height: 0; // Critical: allows flex child to shrink and enable overflow scroll
     overflow-y: auto;
     overflow-x: hidden;
-    height: 100%;
   }
   
   // Mobile responsive adjustments

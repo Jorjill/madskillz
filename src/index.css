@@ -1,10 +1,4 @@
-html,
 body {
-    height: 100%;
     overflow: hidden;
     background-color: #2e2e2e;
-  }
-
-#root {
-    height: 100%;
   }
