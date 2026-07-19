@@ -1,3 +1,5 @@
+@import "../../styles/variables.less";
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -69,41 +71,18 @@
         .skip-submit-buttons {
           display: flex;
           flex-direction: row;
+          gap: 10px;
           margin-left: auto;
           margin-top: 10px;
 
           .skip-button {
-            background-color: #eeeeee;
-            border-radius: 5px;
-            color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: auto;
-            font-size: 15px;
-            padding: 10px;
-          }
-
-          .skip-button:hover {
-            background-color: #c9c9c9;
-            cursor: pointer;
+            .btn-ghost();
+            font-size: 14px;
           }
 
           .submit-button {
-            background-color: #eeeeee;
-            border-radius: 5px;
-            color: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-            font-size: 15px;
-            padding: 10px;
-          }
-
-          .submit-button:hover {
-            background-color: #c9c9c9;
-            cursor: pointer;
+            .btn-primary();
+            font-size: 14px;
           }
         }
       }

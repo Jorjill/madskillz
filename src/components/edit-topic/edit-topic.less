@@ -1,62 +1,48 @@
+@import "../../styles/variables.less";
+
 .edit-topic-component {
   display: flex;
   flex-direction: column;
-  color: #65877a;
+  color: @text-primary;
   width: 100%;
-}
-
-.addnote {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.ql-toolbar.ql-snow {
-  background-color: #eeeeee;
+  padding: 1.5rem;
+  gap: 14px;
+  box-sizing: border-box;
 }
 
 .input-and-close {
   display: flex;
   width: 100%;
   flex-direction: row;
+  align-items: center;
+  gap: 10px;
 
   .topic-title-input {
-    width: 400px;
-    height: 40px;
-    border-radius: 10px;
-    border: 0.5px solid #65877a;
-    background-color: #eeeeee;
-    margin-bottom: 10px;
-    margin-left: auto;
+    .input-dark();
+    max-width: 480px;
+    height: 42px;
+    margin: 0;
   }
 
   .ri-close-line {
     cursor: pointer;
-    color: #ffffff;
+    color: @text-muted;
+    font-size: 20px;
     margin-left: auto;
+    transition: color 0.2s ease;
+    &:hover { color: @text-primary; }
   }
 }
 
 #editor {
-  height: 40vh;
-  margin-top: 50px;
-  width: 40vw;
-  background-color: #ffffff;
+  width: 100%;
+  max-width: 900px;
   border-radius: 10px;
+  overflow: hidden;
 }
 
 .create-note-button {
-  background-color: #eeeeee;
-  width: 5vw;
-  border-radius: 10px;
-  font-weight: bold;
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.create-note-button:hover {
-  background-color: #c9c9c9;
-  cursor: pointer;
+  .btn-primary();
+  margin-top: 8px;
+  align-self: flex-end;
 }

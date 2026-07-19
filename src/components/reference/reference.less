@@ -1,3 +1,5 @@
+@import "../../styles/variables.less";
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -29,8 +31,8 @@
     width: 250px;
     min-width: 250px;
     padding: 20px;
-    border-right: 0.5px solid #eeeeee;
-    color: #eeeeee;
+    border-right: 1px solid @border;
+    color: @text-secondary;
     height: 100%;
     overflow-y: auto;
     
@@ -41,7 +43,7 @@
       height: auto;
       max-height: 40vh;
       border-right: none;
-      border-bottom: 0.5px solid #eeeeee;
+      border-bottom: 1px solid @border;
       padding: 15px;
       overflow-y: auto;
       flex-shrink: 0;
@@ -76,26 +78,16 @@
       padding: 20px 0;
 
       .add-topic-button {
-        display: flex;
-        justify-content: center;
-        border: solid 1px #eeeeee;
-        background-color: #eeeeee;
-        color: #585858;
-        padding: 10px;
+        .btn-primary();
         width: 80%;
         min-width: 150px;
-        border-radius: 8px;
-
-        &:hover {
-          cursor: pointer;
-        }
       }
     }
   }
 
   .reference-content-right {
     flex: 1;
-    color: #eeeeee;
+    color: @text-secondary;
     display: flex;
     justify-content: center;
     height: 100%;

@@ -1,52 +1,39 @@
+@import "../../styles/variables.less";
+
 .add-reference-container {
   display: flex;
   flex-direction: column;
-  color: #474747;
+  color: @text-primary;
   align-items: center;
   justify-content: center;
+  padding: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
 
   .addreference {
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    .ql-toolbar.ql-snow {
-      background-color: #eeeeee;
-    }
+    gap: 14px;
+    width: 100%;
+    max-width: 700px;
 
     input {
-      width: 80%;
-      max-width: 400px;
-      height: 40px;
-      border-radius: 10px;
-      border: 0.5px solid #ffffff;
-      background-color: #eeeeee;
-      margin-bottom: 20px;
+      .input-dark();
+      max-width: 480px;
+      height: 42px;
     }
 
     #editor {
-      height: 40vh;
-      margin-top: 50px;
-      width: 35vw;
-      background-color: #ffffff;
+      width: 100%;
       border-radius: 10px;
+      overflow: hidden;
     }
 
     .create-reference-button {
-      display: flex;
-      justify-content: center;
-      background-color: #eeeeee;
-      padding: 15px;
-      margin-top: 15px;
-      border-radius: 10px;
-      font-weight: bold;
-      margin-left: auto;
-      color: #7a7a7a;
-    }
-
-    .create-reference-button:hover {
-      background-color: #c9c9c9;
-      cursor: pointer;
+      .btn-primary();
+      margin-top: 8px;
+      align-self: flex-end;
     }
   }
 }

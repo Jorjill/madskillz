@@ -1,30 +1,37 @@
+@import "../../styles/variables.less";
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideIn {
+  from { transform: translateY(-16px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0)     scale(1);    opacity: 1; }
+}
+
 .delete-modal {
   position: fixed;
   z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   animation: fadeIn 0.2s ease-in-out;
 }
 
 .modal-content {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  .card-glass();
   width: 90%;
   max-width: 480px;
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.25s ease-out;
   overflow: hidden;
 }
 
 .modal-header {
   padding: 20px 24px;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid @border;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,18 +39,18 @@
 
 .modal-title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: @text-primary;
 }
 
 .close-button {
   background: none;
   border: none;
-  padding: 8px;
+  padding: 6px;
   cursor: pointer;
-  color: #666;
-  font-size: 24px;
+  color: @text-muted;
+  font-size: 22px;
   line-height: 1;
   border-radius: 50%;
   display: flex;
@@ -52,85 +59,61 @@
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f5f5f5;
-    color: #333;
+    background: rgba(255,255,255,0.08);
+    color: @text-primary;
   }
 }
 
 .modal-body {
   padding: 24px;
-  color: #333;
+  color: @text-secondary;
 
   p {
-    margin: 0 0 16px;
-    font-size: 1rem;
-    line-height: 1.5;
+    margin: 0 0 14px;
+    font-size: 0.95rem;
+    line-height: 1.6;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
+    &:last-child { margin-bottom: 0; }
   }
 
   .warning-text {
-    color: #dc3545;
+    color: @danger;
     font-size: 0.875rem;
   }
 }
 
 .modal-footer {
   padding: 16px 24px;
-  background-color: #f8f9fa;
+  background: rgba(255,255,255,0.03);
+  border-top: 1px solid @border;
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
 }
 
 .modal-button {
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 9px 18px;
+  border-radius: @radius-md;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  border: none;
 
   &.cancel {
-    background-color: #fff;
-    border-color: #ddd;
-    color: #666;
-
-    &:hover {
-      background-color: #f5f5f5;
-      border-color: #ccc;
-    }
+    .btn-ghost();
+    padding: 9px 18px;
   }
 
   &.delete {
-    background-color: #dc3545;
+    background: linear-gradient(135deg, @danger-hover, @danger);
     color: #fff;
+    box-shadow: 0 4px 14px @danger-bg;
 
     &:hover {
-      background-color: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
     }
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
+    &:active { transform: translateY(0); }
   }
 }
