@@ -7,17 +7,18 @@ import {
   notesThunks,
 } from "../../slices/notesSlice";
 import { choosePage } from "../../slices/pageSlice";
-import Notes from "../../components/notes/Notes";
-import Reference from "../../components/reference/reference";
-import Quiz from "../../components/quiz/quiz";
-import Summary from "../../components/summary/Summary";
-import TypingPracticeWithExercises from "../../components/typing-practice/TypingPracticeWithExercises";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { LoadingScreen } from "../../components/loading/loading";
 import {
   unsetAddReferenceMode,
   unsetEditReferenceMode,
 } from "../../slices/referenceSlice";
+
+const Notes = lazy(() => import("../../components/notes/Notes"));
+const Reference = lazy(() => import("../../components/reference/reference"));
+const Quiz = lazy(() => import("../../components/quiz/quiz"));
+const Summary = lazy(() => import("../../components/summary/Summary"));
+const TypingPracticeWithExercises = lazy(() => import("../../components/typing-practice/TypingPracticeWithExercises"));
 
 export const SkillScreen = () => {
   const dispatch = useDispatch();
@@ -121,19 +122,21 @@ export const SkillScreen = () => {
           </nav>
         </header>
         <main id="content">
-          {currentComponent === "notes" ? (
-            <Notes />
-          ) : currentComponent === "reference" ? (
-            <Reference />
-          ) : currentComponent === "quiz" ? (
-            <Quiz />
-          ) : currentComponent === "summary" ? (
-            <Summary />
-          ) : currentComponent === "typing" ? (
-            <TypingPracticeWithExercises />
-          ) : currentComponent === "loading" ? (
-            <LoadingScreen />
-          ) : null}
+          <Suspense fallback={<LoadingScreen />}>
+            {currentComponent === "notes" ? (
+              <Notes />
+            ) : currentComponent === "reference" ? (
+              <Reference />
+            ) : currentComponent === "quiz" ? (
+              <Quiz />
+            ) : currentComponent === "summary" ? (
+              <Summary />
+            ) : currentComponent === "typing" ? (
+              <TypingPracticeWithExercises />
+            ) : currentComponent === "loading" ? (
+              <LoadingScreen />
+            ) : null}
+          </Suspense>
         </main>
         <div className="layout-line"></div>
       </div>

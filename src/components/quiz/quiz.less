@@ -37,6 +37,30 @@
   }
 }
 
+// Code-mode textarea (replaces Monaco editor)
+.code-textarea {
+  .input-base();
+  min-height: 200px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  background: #0d1b2a;
+  color: #e2e8f0;
+  tab-size: 2;
+  white-space: pre;
+  overflow-x: auto;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
 // Global Styles
 .quiz-container {
   display: flex;
@@ -670,13 +694,6 @@
     flex-direction: column;
     gap: 20px;
 
-    .monaco-editor-instance {
-      min-height: 200px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
 
     textarea {
       .input-base();
@@ -713,10 +730,19 @@
         white-space: pre-wrap;
       }
 
-      .monaco-editor {
+      .code-answer-block {
         margin-top: 8px;
+        padding: 14px;
+        background: #0d1b2a;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
+        border-radius: 6px;
+        color: #e2e8f0;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-break: break-word;
+        overflow-x: auto;
       }
     }
 

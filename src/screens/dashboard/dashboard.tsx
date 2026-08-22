@@ -10,12 +10,6 @@ import {
   Tooltip,
   Container
 } from '@mui/material';
-import Timeline from '@mui/lab/Timeline';
-import TimelineItem from '@mui/lab/TimelineItem';
-import TimelineSeparator from '@mui/lab/TimelineSeparator';
-import TimelineDot from '@mui/lab/TimelineDot';
-import TimelineConnector from '@mui/lab/TimelineConnector';
-import TimelineContent from '@mui/lab/TimelineContent';
 import {
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
@@ -31,7 +25,6 @@ import {
   Info as InfoIcon,
   Assessment as AssessmentIcon
 } from '@mui/icons-material';
-import { motion, useAnimation } from 'framer-motion';
 import {
   AreaChart,
   Area,
@@ -51,13 +44,9 @@ import {
 } from 'recharts';
 import { keyframes } from '@emotion/react';
 import { quizResultsThunks } from '../../slices/quizResultsSlice';
-import ReactMarkdown from 'react-markdown';
 import { customColors } from '../../theme/colors';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-
-const MotionBox = motion(Box);
-const MotionPaper = motion(Paper);
 
 const glowAnimation = keyframes`
   0% { box-shadow: 0 0 5px ${customColors.primary}33; }
@@ -132,34 +121,13 @@ const calculatePerformanceTrendsData = (quizResults: any[]) => {
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const controls = useAnimation();
   const quizResults = useSelector((state: RootState) => state.quizResults.results);
   const performanceSummary = useSelector((state: RootState) => state.quizResults.performanceSummary);
   const loading = useSelector((state: RootState) => state.quizResults.loading);
 
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-        staggerChildren: 0.1
-      }
-    }
-  };
-
   useEffect(() => {
     void dispatch(quizResultsThunks.fetchResults());
   }, [dispatch]);
-
-  useEffect(() => {
-    const sequence = async () => {
-      await controls.start("visible");
-    };
-    sequence();
-  }, [controls]);
 
   const { currentStreak, maxStreak } = useMemo(() => 
     calculateStreaks(quizResults), [quizResults]
@@ -413,44 +381,6 @@ const Dashboard: React.FC = () => {
     }));
   }, [quizResults]);
 
-  const cardVariants = {
-    hidden: { 
-      scale: 0.8,
-      opacity: 0,
-      rotateX: -15
-    },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      rotateX: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 12,
-        mass: 0.8
-      }
-    }
-  };
-
-  const chartVariants = {
-    hidden: { 
-      opacity: 0,
-      scale: 0.9,
-      y: 30
-    },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 80,
-        damping: 15,
-        mass: 1
-      }
-    }
-  };
-
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -472,17 +402,10 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container maxWidth="xl" className="dashboard-container">
-      <MotionBox
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
+      <Box className="dash-anim">
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-            >
+            <div className="dash-anim">
               <Typography 
                 variant="h3" 
                 gutterBottom 
@@ -496,12 +419,12 @@ const Dashboard: React.FC = () => {
               >
                 Performance Analytics
               </Typography>
-            </motion.div>
+            </div>
           </Grid>
 
           <Grid item xs={12}>
-            <motion.div variants={cardVariants}>
-              <MotionPaper
+            <div className="dash-anim">
+              <Paper
                 sx={{ 
                   p: 3, 
                   bgcolor: customColors.backgroundLight,
@@ -514,16 +437,10 @@ const Dashboard: React.FC = () => {
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   {achievements.map((achievement, index) => (
-                    <motion.div
+                    <div
                       key={achievement.title}
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ 
-                        delay: index * 0.1,
-                        type: "spring",
-                        stiffness: 260,
-                        damping: 20 
-                      }}
+                      className="dash-anim"
+                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <Tooltip 
                         title={achievement.description}
@@ -577,16 +494,16 @@ const Dashboard: React.FC = () => {
                           </Typography>
                         </Box>
                       </Tooltip>
-                    </motion.div>
+                    </div>
                   ))}
                 </Box>
-              </MotionPaper>
-            </motion.div>
+              </Paper>
+            </div>
           </Grid>
 
           <Grid item xs={12}>
-            <motion.div variants={cardVariants}>
-              <MotionBox
+            <div className="dash-anim">
+              <Box
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -597,11 +514,10 @@ const Dashboard: React.FC = () => {
                   Skills Ranking
                 </Typography>
                 {skillMasteryData.map((skill, index) => (
-                  <motion.div
+                  <div
                     key={skill.skill}
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: index * 0.1 }}
+                    className="dash-anim"
+                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     <Box sx={{ mb: 2.5 }}>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -652,15 +568,15 @@ const Dashboard: React.FC = () => {
                         </Tooltip>
                       </Box>
                     </Box>
-                  </motion.div>
+                  </div>
                 ))}
-              </MotionBox>
-            </motion.div>
+              </Box>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <motion.div variants={cardVariants}>
-              <MotionPaper
+            <div className="dash-anim">
+              <Paper
                 sx={{ 
                   p: 3, 
                   textAlign: 'center',
@@ -668,54 +584,39 @@ const Dashboard: React.FC = () => {
                   borderRadius: 2,
                   position: 'relative',
                   overflow: 'hidden'
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  transition: { type: "spring", stiffness: 400, damping: 10 }
-                }}
-              >
+                }}              >
                 <LocalFireDepartment sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Current Streak</Typography>
                 <Typography variant="h4" sx={{ color: customColors.primary }}>{currentStreak} days</Typography>
-              </MotionPaper>
-            </motion.div>
+              </Paper>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <motion.div variants={cardVariants}>
-              <MotionPaper
+            <div className="dash-anim">
+              <Paper
                 sx={{ 
                   p: 3, 
                   textAlign: 'center',
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  transition: { type: "spring", stiffness: 400, damping: 10 }
-                }}
-              >
+                }}              >
                 <EmojiEvents sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Best Streak</Typography>
                 <Typography variant="h4" sx={{ color: customColors.primary }}>{maxStreak} days</Typography>
-              </MotionPaper>
-            </motion.div>
+              </Paper>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <motion.div variants={cardVariants}>
-              <MotionPaper
+            <div className="dash-anim">
+              <Paper
                 sx={{ 
                   p: 3, 
                   textAlign: 'center',
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  transition: { type: "spring", stiffness: 400, damping: 10 }
-                }}
-              >
+                }}              >
                 <Speed sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Average Score</Typography>
                 <Box sx={{ width: 100, height: 100, margin: 'auto' }}>
@@ -729,37 +630,32 @@ const Dashboard: React.FC = () => {
                     })}
                   />
                 </Box>
-              </MotionPaper>
-            </motion.div>
+              </Paper>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={3}>
-            <motion.div variants={cardVariants}>
-              <MotionPaper
+            <div className="dash-anim">
+              <Paper
                 sx={{ 
                   p: 3, 
                   textAlign: 'center',
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2
-                }}
-                whileHover={{ 
-                  scale: 1.02,
-                  transition: { type: "spring", stiffness: 400, damping: 10 }
-                }}
-              >
+                }}              >
                 <Grade sx={{ fontSize: 40, color: customColors.primary }} />
                 <Typography variant="h6" sx={{ color: customColors.text }}>Skills Mastered</Typography>
                 <Typography variant="h4" sx={{ color: customColors.primary }}>{skillMasteryData.filter(skill => skill.isMastered).length} / {skillMasteryData.length}</Typography>
                 <Typography variant="caption" sx={{ color: customColors.text, display: 'block', mt: 1 }}>
                   Requires 1000+ correct answers and 80%+ pass rate
                 </Typography>
-              </MotionPaper>
-            </motion.div>
+              </Paper>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <motion.div variants={cardVariants}>
-              <MotionBox
+            <div className="dash-anim">
+              <Box
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -784,13 +680,13 @@ const Dashboard: React.FC = () => {
                 <Typography variant="body2" sx={{ color: customColors.text }}>
                   Your recent performance compared to overall average
                 </Typography>
-              </MotionBox>
-            </motion.div>
+              </Box>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <motion.div variants={cardVariants}>
-              <MotionBox
+            <div className="dash-anim">
+              <Box
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -830,13 +726,13 @@ const Dashboard: React.FC = () => {
                     </AreaChart>
                   </ResponsiveContainer>
                 </Box>
-              </MotionBox>
-            </motion.div>
+              </Box>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <motion.div variants={chartVariants}>
-              <MotionBox
+            <div className="dash-anim">
+              <Box
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -875,25 +771,10 @@ const Dashboard: React.FC = () => {
                       lineHeight: 1.8,
                       mb: 2,
                       letterSpacing: '0.01em',
-                      '& p': {
-                        mb: 2
-                      },
-                      '& p:last-child': {
-                        mb: 0
-                      },
-                      '& ul, & ol': {
-                        mt: 1,
-                        mb: 2,
-                        pl: 3
-                      },
-                      '& li': {
-                        mb: 1
-                      }
+                      whiteSpace: 'pre-wrap'
                     }}
                   >
-                    <ReactMarkdown>
-                      {performanceSummary}
-                    </ReactMarkdown>
+                    {performanceSummary}
                   </Box>
                 ) : (
                   <Box
@@ -916,20 +797,18 @@ const Dashboard: React.FC = () => {
                     </Typography>
                   </Box>
                 )}
-              </MotionBox>
-            </motion.div>
+              </Box>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <motion.div variants={chartVariants}>
-              <MotionBox
+            <div className="dash-anim">
+              <Box
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
                   p: 3
-                }}
-                whileHover={{ scale: 1.01 }}
-              >
+                }}              >
                 <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
                   Skill Mastery Overview
                 </Typography>
@@ -986,20 +865,18 @@ const Dashboard: React.FC = () => {
                     </RadarChart>
                   </ResponsiveContainer>
                 </Box>
-              </MotionBox>
-            </motion.div>
+              </Box>
+            </div>
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <motion.div variants={chartVariants}>
-              <MotionBox
+            <div className="dash-anim">
+              <Box
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
                   p: 3
-                }}
-                whileHover={{ scale: 1.01 }}
-              >
+                }}              >
                 <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
                   Performance Trends
                 </Typography>
@@ -1045,13 +922,13 @@ const Dashboard: React.FC = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 </Box>
-              </MotionBox>
-            </motion.div>
+              </Box>
+            </div>
           </Grid>
 
           <Grid item xs={12}>
-            <motion.div variants={cardVariants}>
-              <MotionBox
+            <div className="dash-anim">
+              <Box
                 sx={{ 
                   bgcolor: customColors.backgroundLight,
                   borderRadius: 2,
@@ -1061,78 +938,75 @@ const Dashboard: React.FC = () => {
                 <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
                   Recent Activity
                 </Typography>
-                <Timeline>
+                <Box>
                   {(Array.isArray(quizResults) ? quizResults.slice(0, 5) : []).map((result, index) => (
-                    <motion.div
+                    <div
                       key={result.id}
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: index * 0.1 }}
+                      className="dash-anim"
+                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
-                      <TimelineItem>
-                        <TimelineSeparator>
-                          <motion.div
-                            whileHover={{ scale: 1.2 }}
-                            whileTap={{ scale: 0.9 }}
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <Box
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              borderRadius: '50%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#fff',
+                              flexShrink: 0,
+                              bgcolor: result.status === 'PASS'
+                                ? customColors.success
+                                : customColors.danger
+                            }}
                           >
-                            <TimelineDot 
-                              sx={{ 
-                                bgcolor: result.status === 'PASS' 
-                                  ? customColors.success 
-                                  : customColors.danger
-                              }}
-                            >
-                              {result.status === 'PASS' ? <CheckCircleIcon /> : <CancelIcon />}
-                            </TimelineDot>
-                          </motion.div>
+                            {result.status === 'PASS' ? <CheckCircleIcon /> : <CancelIcon />}
+                          </Box>
                           {index < 4 && (
-                            <TimelineConnector sx={{ bgcolor: customColors.border }} />
+                            <Box sx={{ width: '2px', flex: 1, bgcolor: customColors.border, my: 0.5 }} />
                           )}
-                        </TimelineSeparator>
-                        <TimelineContent>
-                          <motion.div
-                            whileHover={{ x: 5 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        </Box>
+                        <Box sx={{ flex: 1, pb: 3 }}>
+                          <Typography variant="h6" component="span" sx={{ color: customColors.text }}>
+                            {result.quiz_name}
+                          </Typography>
+                          <Typography sx={{ color: customColors.textSecondary }}>
+                            {result.skill} - {result.correct_answers}/{result.total_questions} correct
+                          </Typography>
+                          <Box sx={{ mt: 1 }}>
+                            <LinearProgress
+                              variant="determinate"
+                              value={(result.correct_answers / result.total_questions) * 100}
+                              sx={{
+                                bgcolor: customColors.border,
+                                '& .MuiLinearProgress-bar': {
+                                  bgcolor: result.status === 'PASS' 
+                                    ? customColors.primary 
+                                    : customColors.danger
+                                }
+                              }}
+                            />
+                          </Box>
+                          <Typography 
+                            variant="caption" 
+                            display="block" 
+                            sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 1 }}
                           >
-                            <Typography variant="h6" component="span" sx={{ color: customColors.text }}>
-                              {result.quiz_name}
-                            </Typography>
-                            <Typography sx={{ color: customColors.textSecondary }}>
-                              {result.skill} - {result.correct_answers}/{result.total_questions} correct
-                            </Typography>
-                            <Box sx={{ mt: 1 }}>
-                              <LinearProgress
-                                variant="determinate"
-                                value={(result.correct_answers / result.total_questions) * 100}
-                                sx={{
-                                  bgcolor: customColors.border,
-                                  '& .MuiLinearProgress-bar': {
-                                    bgcolor: result.status === 'PASS' 
-                                      ? customColors.primary 
-                                      : customColors.danger
-                                  }
-                                }}
-                              />
-                            </Box>
-                            <Typography 
-                              variant="caption" 
-                              display="block" 
-                              sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 1 }}
-                            >
-                              {new Date(result.created_at).toLocaleDateString()} at{' '}
-                              {new Date(result.created_at).toLocaleTimeString()}
-                            </Typography>
-                          </motion.div>
-                        </TimelineContent>
-                      </TimelineItem>
-                    </motion.div>
+                            {new Date(result.created_at).toLocaleDateString()} at{' '}
+                            {new Date(result.created_at).toLocaleTimeString()}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </div>
                   ))}
-                </Timeline>
-              </MotionBox>
-            </motion.div>
+                </Box>
+              </Box>
+            </div>
           </Grid>
         </Grid>
-      </MotionBox>
+      </Box>
     </Container>
   );
 };

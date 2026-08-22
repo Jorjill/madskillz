@@ -6,8 +6,6 @@ import skillsReducer from "../slices/skillsSlice";
 import pageReducer from "../slices/pageSlice";
 import referenceReducer from "../slices/referenceSlice";
 import storageSession from "redux-persist/lib/storage/session";
-import practiceReducer from "../slices/practiceSlice";
-import testReducer from "../slices/testSlice";
 import quizReducer from "../slices/quizSlice";
 import quizResultsReducer from "../slices/quizResultsSlice";
 import thunk, { ThunkDispatch } from 'redux-thunk';
@@ -24,8 +22,6 @@ const rootReducer = combineReducers({
   skills: skillsReducer,
   page: pageReducer,
   reference: referenceReducer,
-  practice: practiceReducer,
-  test: testReducer,
   quiz: quizReducer,
   quizResults: quizResultsReducer,
 });

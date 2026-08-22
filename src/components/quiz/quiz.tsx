@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { quizThunks, quizActions } from "../../slices/quizSlice";
 import { AppDispatch, RootState } from "../../state/store";
 import "./quiz.less";
-import Editor from "@monaco-editor/react";
 import TypingPractice from "../typing-practice/TypingPractice";
 
 // Types and Interfaces
@@ -618,16 +617,12 @@ const Quiz: React.FC = () => {
               </label>
             </div>
             {isCodeMode ? (
-              <Editor
-                height="200px"
-                defaultLanguage="javascript"
+              <textarea
+                className="code-textarea"
                 value={editedAnswer}
-                onChange={(value) => setEditedAnswer(value || '')}
-                options={{
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  fontSize: 14,
-                }}
+                onChange={(e) => setEditedAnswer(e.target.value)}
+                placeholder="// Enter your code..."
+                spellCheck={false}
               />
             ) : (
               <textarea
@@ -680,16 +675,12 @@ const Quiz: React.FC = () => {
               </label>
             </div>
             {isCodeMode ? (
-              <Editor
-                height="200px"
-                defaultLanguage="javascript"
+              <textarea
+                className="code-textarea"
                 value={newQuestionAnswer}
-                onChange={(value) => setNewQuestionAnswer(value || '')}
-                options={{
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  fontSize: 14,
-                }}
+                onChange={(e) => setNewQuestionAnswer(e.target.value)}
+                placeholder="// Enter your code..."
+                spellCheck={false}
               />
             ) : (
               <textarea
@@ -895,18 +886,13 @@ const Quiz: React.FC = () => {
 
         <div className="answer-input-container">
           {isCodeMode ? (
-            <Editor
-              height="200px"
-              defaultLanguage="javascript"
+            <textarea
+              className="code-textarea"
               value={userAnswer}
-              onChange={(value) => setUserAnswer(value || '')}
-              options={{
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                fontSize: 14,
-                readOnly: showAnswer
-              }}
-              className="monaco-editor-instance"
+              onChange={(e) => setUserAnswer(e.target.value)}
+              placeholder="// Type your code here..."
+              spellCheck={false}
+              disabled={showAnswer}
             />
           ) : (
             <textarea
@@ -921,17 +907,7 @@ const Quiz: React.FC = () => {
               <div className="correct-answer">
                 <h3>Correct Answer:</h3>
                 {isCodeMode ? (
-                  <Editor
-                    height="200px"
-                    defaultLanguage="javascript"
-                    value={currentQuestion.answer}
-                    options={{
-                      minimap: { enabled: false },
-                      scrollBeyondLastLine: false,
-                      fontSize: 14,
-                      readOnly: true
-                    }}
-                  />
+                  <pre className="code-answer-block">{currentQuestion.answer}</pre>
                 ) : (
                   <p>{currentQuestion.answer}</p>
                 )}
