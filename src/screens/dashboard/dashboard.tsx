@@ -51,6 +51,7 @@ import { quizResultsThunks } from '../../slices/quizResultsSlice';
 import { customColors } from '../../theme/colors';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import './dashboard.less';
 
 const glowAnimation = keyframes`
   0% { box-shadow: 0 0 5px ${customColors.primary}33; }
