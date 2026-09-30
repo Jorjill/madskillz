@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../../state/store';
 import {
@@ -8,7 +8,9 @@ import {
   Paper,
   LinearProgress,
   Tooltip,
-  Container
+  Container,
+  SxProps,
+  Theme
 } from '@mui/material';
 import {
   CheckCircle as CheckCircleIcon,
@@ -22,8 +24,10 @@ import {
   WorkspacePremium,
   MilitaryTech,
   TrendingUp,
+  TrendingDown,
   Info as InfoIcon,
-  Assessment as AssessmentIcon
+  Assessment as AssessmentIcon,
+  Quiz as QuizIcon
 } from '@mui/icons-material';
 import {
   AreaChart,
@@ -54,6 +58,70 @@ const glowAnimation = keyframes`
   100% { box-shadow: 0 0 5px ${customColors.primary}33; }
 `;
 
+const cardSx: SxProps<Theme> = {
+  p: 3,
+  bgcolor: customColors.backgroundLight,
+  border: `1px solid ${customColors.border}`,
+  borderRadius: 2,
+  height: '100%',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)',
+    borderColor: `${customColors.primary}4D`
+  }
+};
+
+const sectionTitleSx: SxProps<Theme> = {
+  color: customColors.text,
+  fontWeight: 600,
+  fontSize: '1.1rem',
+  mb: 3,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 1
+};
+
+const chartTooltipStyle = {
+  backgroundColor: customColors.backgroundDark,
+  border: `1px solid ${customColors.border}`,
+  color: customColors.text
+};
+
+const SectionCard: React.FC<{ title: string; icon?: ReactNode; children: ReactNode }> = ({
+  title,
+  icon,
+  children
+}) => (
+  <Paper sx={cardSx} elevation={0}>
+    <Typography variant="h6" sx={sectionTitleSx}>
+      {icon}
+      {title}
+    </Typography>
+    {children}
+  </Paper>
+);
+
+const StatCard: React.FC<{
+  icon: ReactNode;
+  label: string;
+  children: ReactNode;
+  caption?: string;
+}> = ({ icon, label, children, caption }) => (
+  <Paper sx={{ ...cardSx, textAlign: 'center' }} elevation={0}>
+    <Box sx={{ color: customColors.primary, mb: 1 }}>{icon}</Box>
+    <Typography variant="subtitle2" sx={{ color: customColors.textSecondary, mb: 1 }}>
+      {label}
+    </Typography>
+    {children}
+    {caption && (
+      <Typography variant="caption" sx={{ color: customColors.textSecondary, display: 'block', mt: 1 }}>
+        {caption}
+      </Typography>
+    )}
+  </Paper>
+);
+
 interface Achievement {
   title: string;
   icon: JSX.Element;
@@ -64,29 +132,38 @@ interface Achievement {
 const calculateStreaks = (quizResults: any[]) => {
   if (!Array.isArray(quizResults) || !quizResults?.length) return { currentStreak: 0, maxStreak: 0 };
 
-  const sortedResults = [...quizResults]
-    .sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+  const uniqueDays = [
+    ...new Set(
+      quizResults.map(r => new Date(r.created_at).toDateString())
+    )
+  ]
+    .map(d => new Date(d).getTime())
+    .sort((a, b) => b - a);
 
-  let currentStreak = 1;
+  if (!uniqueDays.length) return { currentStreak: 0, maxStreak: 0 };
+
+  const dayMs = 1000 * 3600 * 24;
+  const today = new Date(new Date().toDateString()).getTime();
+  const isActive = today - uniqueDays[0] <= dayMs;
+
+  // Consecutive-day run ending at the most recent practice day
+  let recentRun = 1;
   let maxStreak = 1;
-  let lastQuizDate = new Date(sortedResults[0].created_at).toDateString();
+  let runLength = 1;
+  let runBroken = false;
 
-  for (let i = 1; i < sortedResults.length; i++) {
-    const dayDiff = Math.abs(
-      (new Date(lastQuizDate).getTime() - new Date(sortedResults[i].created_at).getTime()) 
-      / (1000 * 3600 * 24)
-    );
-    
-    if (dayDiff === 1) {
-      currentStreak++;
-      maxStreak = Math.max(maxStreak, currentStreak);
+  for (let i = 1; i < uniqueDays.length; i++) {
+    if (uniqueDays[i - 1] - uniqueDays[i] === dayMs) {
+      runLength++;
+      maxStreak = Math.max(maxStreak, runLength);
+      if (!runBroken) recentRun = runLength;
     } else {
-      currentStreak = 1;
+      runLength = 1;
+      runBroken = true;
     }
-    lastQuizDate = new Date(sortedResults[i].created_at).toDateString();
   }
+
+  const currentStreak = isActive ? recentRun : 0;
 
   return { currentStreak, maxStreak };
 };
@@ -98,12 +175,14 @@ const calculatePerformanceTrendsData = (quizResults: any[]) => {
     scores: number[];
     passCount: number;
     totalCount: number;
+    timestamp: number;
   }
 
   const trends: Record<string, TrendData> = quizResults.reduce((acc, result) => {
-    const date = new Date(result.created_at).toLocaleDateString();
+    const dateObj = new Date(result.created_at);
+    const date = dateObj.toLocaleDateString();
     if (!acc[date]) {
-      acc[date] = { scores: [], passCount: 0, totalCount: 0 };
+      acc[date] = { scores: [], passCount: 0, totalCount: 0, timestamp: new Date(dateObj.toDateString()).getTime() };
     }
     acc[date].scores.push((result.correct_answers / result.total_questions) * 100);
     acc[date].passCount += result.status === 'PASS' ? 1 : 0;
@@ -111,11 +190,14 @@ const calculatePerformanceTrendsData = (quizResults: any[]) => {
     return acc;
   }, {} as Record<string, TrendData>);
 
-  return Object.entries(trends).map(([date, data]) => ({
-    date,
-    avgScore: data.scores.reduce((a, b) => a + b, 0) / data.scores.length,
-    passRate: (data.passCount / data.totalCount) * 100
-  }));
+  return Object.entries(trends)
+    .map(([date, data]) => ({
+      date,
+      timestamp: data.timestamp,
+      avgScore: data.scores.reduce((a, b) => a + b, 0) / data.scores.length,
+      passRate: (data.passCount / data.totalCount) * 100
+    }))
+    .sort((a, b) => a.timestamp - b.timestamp);
 };
 
 
@@ -129,13 +211,13 @@ const Dashboard: React.FC = () => {
     void dispatch(quizResultsThunks.fetchResults());
   }, [dispatch]);
 
-  const { currentStreak, maxStreak } = useMemo(() => 
+  const { currentStreak, maxStreak } = useMemo(() =>
     calculateStreaks(quizResults), [quizResults]
   );
 
-  const averageScore = useMemo(() => 
+  const averageScore = useMemo(() =>
     quizResults?.length ? Math.round(
-      quizResults.reduce((acc, result) => 
+      quizResults.reduce((acc, result) =>
         acc + (result.correct_answers / result.total_questions) * 100, 0
       ) / quizResults.length
     ) : 0, [quizResults]
@@ -160,7 +242,7 @@ const Dashboard: React.FC = () => {
           passCount: 0
         };
       }
-      
+
       skillStats[result?.skill].correctAnswers += result?.correct_answers;
       skillStats[result?.skill].totalQuestions += result?.total_questions;
       skillStats[result?.skill].attempts += 1;
@@ -173,7 +255,7 @@ const Dashboard: React.FC = () => {
       .map(([skill, data]) => {
         const passRate = (data.passCount / data.attempts) * 100;
         const isMastered = data.correctAnswers >= 1000 && passRate >= 80;
-        
+
         const questionsWeight = Math.min(data.totalQuestions, 1000) / 1000 * 40;
         const passRateWeight = passRate * 0.6;
         const rating = passRateWeight + questionsWeight;
@@ -201,48 +283,48 @@ const Dashboard: React.FC = () => {
     return skillsData;
   }, [quizResults]);
 
-  const performanceTrends = useMemo(() => 
+  const performanceTrends = useMemo(() =>
     calculatePerformanceTrendsData(quizResults), [quizResults]
   );
 
   const achievements: Achievement[] = useMemo(() => {
     const achievements: Achievement[] = [];
-    
+
     if (!Array.isArray(quizResults)) {
       return achievements;
     }
 
     // Streak Achievements
-    if (currentStreak >= 2) achievements.push({ 
-      title: 'Momentum', 
+    if (currentStreak >= 2) achievements.push({
+      title: 'Momentum',
       icon: <LocalFireDepartment sx={{ fontSize: 40 }} />,
       description: '2+ day streak',
       color: '#FF9800'
     });
 
-    if (currentStreak >= 5) achievements.push({ 
-      title: 'On Fire', 
+    if (currentStreak >= 5) achievements.push({
+      title: 'On Fire',
       icon: <Whatshot sx={{ fontSize: 40 }} />,
       description: '5+ day streak',
       color: '#FF5722'
     });
 
-    if (currentStreak >= 10) achievements.push({ 
-      title: 'Unstoppable', 
+    if (currentStreak >= 10) achievements.push({
+      title: 'Unstoppable',
       icon: <WorkspacePremium sx={{ fontSize: 40 }} />,
       description: '10+ day streak',
       color: '#F44336'
     });
 
-    if (currentStreak >= 30) achievements.push({ 
-      title: 'Monthly Master', 
+    if (currentStreak >= 30) achievements.push({
+      title: 'Monthly Master',
       icon: <MilitaryTech sx={{ fontSize: 40 }} />,
       description: '30+ day streak',
       color: '#E91E63'
     });
 
-    if (currentStreak >= 100) achievements.push({ 
-      title: 'Centurion', 
+    if (currentStreak >= 100) achievements.push({
+      title: 'Centurion',
       icon: <EmojiEvents sx={{ fontSize: 40 }} />,
       description: '100+ day streak',
       color: '#9C27B0'
@@ -250,7 +332,7 @@ const Dashboard: React.FC = () => {
 
     // Question Count Achievements
     const totalQuestions = skillMasteryData.reduce((sum, skill) => sum + skill.totalQuestions, 0);
-    
+
     if (totalQuestions >= 100) achievements.push({
       title: 'Century',
       icon: <Psychology sx={{ fontSize: 40 }} />,
@@ -304,7 +386,7 @@ const Dashboard: React.FC = () => {
 
     // Mastery Achievements
     const masteredSkills = skillMasteryData.filter(skill => skill.isMastered).length;
-    
+
     if (masteredSkills >= 1) achievements.push({
       title: 'First Mastery',
       icon: <Grade sx={{ fontSize: 40 }} />,
@@ -329,7 +411,7 @@ const Dashboard: React.FC = () => {
     // Perfect Score Achievements
     const consecutivePerfectScores = quizResults.reduce((acc, curr, i, arr) => {
       if (i === 0 && curr.correct_answers === curr.total_questions) return 1;
-      if (curr.correct_answers === curr.total_questions && 
+      if (curr.correct_answers === curr.total_questions &&
           arr[i-1]?.correct_answers === arr[i-1]?.total_questions) {
         return acc + 1;
       }
@@ -357,7 +439,7 @@ const Dashboard: React.FC = () => {
       .map(q => (q.correct_answers / q.total_questions) * 100);
 
     const averageRecent = recentScores.reduce((a, b) => a + b, 0) / recentScores.length;
-    const averageOverall = quizResults.reduce((acc, q) => 
+    const averageOverall = quizResults.reduce((acc, q) =>
       acc + (q.correct_answers / q.total_questions) * 100, 0) / quizResults.length;
 
     return {
@@ -381,20 +463,58 @@ const Dashboard: React.FC = () => {
     }));
   }, [quizResults]);
 
+  const recentResults = useMemo(() => {
+    if (!Array.isArray(quizResults)) return [];
+    return [...quizResults]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5);
+  }, [quizResults]);
+
+  const masteredCount = skillMasteryData.filter(s => s.isMastered).length;
+  const hasData = Array.isArray(quizResults) && quizResults.length > 0;
+
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ width: '100%', mt: 4 }}>
-          <LinearProgress 
-            sx={{ 
-              height: 8, 
+          <LinearProgress
+            sx={{
+              height: 8,
               borderRadius: 4,
               backgroundColor: 'rgba(0,0,0,0.05)',
               '& .MuiLinearProgress-bar': {
                 borderRadius: 4
               }
-            }} 
+            }}
           />
+        </Box>
+      </Container>
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <Container maxWidth="xl" className="dashboard-container">
+        <Box
+          className="dash-anim"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '60vh',
+            textAlign: 'center',
+            gap: 2
+          }}
+        >
+          <QuizIcon sx={{ fontSize: 72, color: customColors.primary }} />
+          <Typography variant="h4" sx={{ color: customColors.text, fontWeight: 'bold' }}>
+            No activity yet
+          </Typography>
+          <Typography sx={{ color: customColors.textSecondary, maxWidth: 420 }}>
+            Take your first quiz to unlock performance analytics, skill rankings,
+            streaks, and achievements.
+          </Typography>
         </Box>
       </Container>
     );
@@ -403,222 +523,55 @@ const Dashboard: React.FC = () => {
   return (
     <Container maxWidth="xl" className="dashboard-container">
       <Box className="dash-anim">
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Typography
+            variant="h4"
+            sx={{
+              color: customColors.text,
+              fontWeight: 'bold'
+            }}
+          >
+            Dashboard
+          </Typography>
+          <Typography sx={{ color: customColors.textSecondary, mt: 0.5 }}>
+            Track your progress, streaks, and skill mastery
+          </Typography>
+        </Box>
+
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          {/* Key stats */}
+          <Grid item xs={6} md={3}>
             <div className="dash-anim">
-              <Typography 
-                variant="h3" 
-                gutterBottom 
-                sx={{ 
-                  color: customColors.text,
-                  textShadow: `0 0 10px ${customColors.primary}33`,
-                  textAlign: 'center',
-                  fontWeight: 'bold',
-                  mb: 4
-                }}
+              <StatCard
+                icon={<LocalFireDepartment sx={{ fontSize: 40 }} />}
+                label="Current Streak"
               >
-                Performance Analytics
-              </Typography>
-            </div>
-          </Grid>
-
-          <Grid item xs={12}>
-            <div className="dash-anim">
-              <Paper
-                sx={{ 
-                  p: 3, 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  mb: 3
-                }}
-              >
-                <Typography variant="h5" sx={{ color: customColors.text, mb: 2 }}>
-                  Achievements Unlocked
+                <Typography variant="h4" sx={{ color: customColors.primary }}>
+                  {currentStreak} {currentStreak === 1 ? 'day' : 'days'}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                  {achievements.map((achievement, index) => (
-                    <div
-                      key={achievement.title}
-                      className="dash-anim"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <Tooltip 
-                        title={achievement.description}
-                        placement="top"
-                      >
-                        <Box
-                          sx={{
-                            position: 'relative',
-                            width: 80,
-                            height: 80,
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                              transform: 'scale(1.1) rotate(5deg)',
-                            }
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              width: '100%',
-                              height: '100%',
-                              borderRadius: '50%',
-                              bgcolor: `${achievement.color}22`,
-                              border: `2px solid ${achievement.color}`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: achievement.color,
-                              animation: `${glowAnimation} 2s ease-in-out infinite`
-                            }}
-                          >
-                            {achievement.icon}
-                          </Box>
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              position: 'absolute',
-                              bottom: -25,
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              color: achievement.color,
-                              width: '100%',
-                              textAlign: 'center',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {achievement.title}
-                          </Typography>
-                        </Box>
-                      </Tooltip>
-                    </div>
-                  ))}
-                </Box>
-              </Paper>
+              </StatCard>
             </div>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={6} md={3}>
             <div className="dash-anim">
-              <Box
-                sx={{ 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  p: 3
-                }}
+              <StatCard
+                icon={<EmojiEvents sx={{ fontSize: 40 }} />}
+                label="Best Streak"
               >
-                <Typography variant="h5" gutterBottom sx={{ color: customColors.text, mb: 3 }}>
-                  Skills Ranking
+                <Typography variant="h4" sx={{ color: customColors.primary }}>
+                  {maxStreak} {maxStreak === 1 ? 'day' : 'days'}
                 </Typography>
-                {skillMasteryData.map((skill, index) => (
-                  <div
-                    key={skill.skill}
-                    className="dash-anim"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <Box sx={{ mb: 2.5 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="h6" sx={{ color: customColors.text }}>
-                          #{index + 1} {skill.skill}
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: customColors.primary }}>
-                          {skill.rating.toFixed(1)}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ position: 'relative', mb: 1 }}>
-                        <LinearProgress
-                          variant="determinate"
-                          value={skill.rating}
-                          sx={{
-                            height: 10,
-                            borderRadius: 5,
-                            bgcolor: `${customColors.primary}22`,
-                            '& .MuiLinearProgress-bar': {
-                              bgcolor: customColors.primary,
-                              borderRadius: 5,
-                            }
-                          }}
-                        />
-                      </Box>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between',
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        fontSize: '0.875rem'
-                      }}>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Grade sx={{ fontSize: '1rem', color: customColors.primary }} />
-                            <Typography variant="caption">
-                              Pass Rate: {skill.passRate.toFixed(1)}%
-                            </Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <CheckCircleIcon sx={{ fontSize: '1rem', color: customColors.success }} />
-                            <Typography variant="caption">
-                              Questions: {skill.totalQuestions}
-                            </Typography>
-                          </Box>
-                        </Box>
-                        <Tooltip title="Rating = (Pass Rate × 0.6) + (Questions ÷ 1000 × 40)" placement="top">
-                          <InfoIcon sx={{ fontSize: '1rem', color: customColors.text, cursor: 'help' }} />
-                        </Tooltip>
-                      </Box>
-                    </Box>
-                  </div>
-                ))}
-              </Box>
+              </StatCard>
             </div>
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             <div className="dash-anim">
-              <Paper
-                sx={{ 
-                  p: 3, 
-                  textAlign: 'center',
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}              >
-                <LocalFireDepartment sx={{ fontSize: 40, color: customColors.primary }} />
-                <Typography variant="h6" sx={{ color: customColors.text }}>Current Streak</Typography>
-                <Typography variant="h4" sx={{ color: customColors.primary }}>{currentStreak} days</Typography>
-              </Paper>
-            </div>
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <div className="dash-anim">
-              <Paper
-                sx={{ 
-                  p: 3, 
-                  textAlign: 'center',
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2
-                }}              >
-                <EmojiEvents sx={{ fontSize: 40, color: customColors.primary }} />
-                <Typography variant="h6" sx={{ color: customColors.text }}>Best Streak</Typography>
-                <Typography variant="h4" sx={{ color: customColors.primary }}>{maxStreak} days</Typography>
-              </Paper>
-            </div>
-          </Grid>
-
-          <Grid item xs={12} md={3}>
-            <div className="dash-anim">
-              <Paper
-                sx={{ 
-                  p: 3, 
-                  textAlign: 'center',
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2
-                }}              >
-                <Speed sx={{ fontSize: 40, color: customColors.primary }} />
-                <Typography variant="h6" sx={{ color: customColors.text }}>Average Score</Typography>
+              <StatCard
+                icon={<Speed sx={{ fontSize: 40 }} />}
+                label="Average Score"
+              >
                 <Box sx={{ width: 100, height: 100, margin: 'auto' }}>
                   <CircularProgressbar
                     value={averageScore}
@@ -630,276 +583,99 @@ const Dashboard: React.FC = () => {
                     })}
                   />
                 </Box>
-              </Paper>
+              </StatCard>
             </div>
           </Grid>
 
-          <Grid item xs={12} md={3}>
+          <Grid item xs={6} md={3}>
             <div className="dash-anim">
-              <Paper
-                sx={{ 
-                  p: 3, 
-                  textAlign: 'center',
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2
-                }}              >
-                <Grade sx={{ fontSize: 40, color: customColors.primary }} />
-                <Typography variant="h6" sx={{ color: customColors.text }}>Skills Mastered</Typography>
-                <Typography variant="h4" sx={{ color: customColors.primary }}>{skillMasteryData.filter(skill => skill.isMastered).length} / {skillMasteryData.length}</Typography>
-                <Typography variant="caption" sx={{ color: customColors.text, display: 'block', mt: 1 }}>
-                  Requires 1000+ correct answers and 80%+ pass rate
-                </Typography>
-              </Paper>
-            </div>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <div className="dash-anim">
-              <Box
-                sx={{ 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  p: 3
-                }}
+              <StatCard
+                icon={<Grade sx={{ fontSize: 40 }} />}
+                label="Skills Mastered"
+                caption="Requires 1000+ correct answers and 80%+ pass rate"
               >
-                <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
-                  Learning Velocity
+                <Typography variant="h4" sx={{ color: customColors.primary }}>
+                  {masteredCount} / {skillMasteryData.length}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <TrendingUp sx={{ 
-                    color: learningVelocity.trend === 'improving' ? customColors.primary : customColors.danger,
-                    mr: 1,
-                    fontSize: '2rem'
-                  }} />
-                  <Typography variant="h4" sx={{ 
-                    color: learningVelocity.trend === 'improving' ? customColors.primary : customColors.danger 
-                  }}>
-                    {learningVelocity.velocity > 0 ? '+' : ''}{learningVelocity.velocity.toFixed(1)}%
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ color: customColors.text }}>
-                  Your recent performance compared to overall average
-                </Typography>
-              </Box>
+              </StatCard>
             </div>
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <div className="dash-anim">
-              <Box
-                sx={{ 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  p: 3
-                }}
-              >
-                <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
-                  Study Pattern Analysis
-                </Typography>
-                <Box height={200}>
-                  <ResponsiveContainer>
-                    <AreaChart data={studyPatterns}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={customColors.border} />
-                      <XAxis 
-                        dataKey="hour" 
-                        stroke={customColors.text}
-                        tick={{ fill: customColors.textSecondary }}
-                      />
-                      <YAxis 
-                        stroke={customColors.text}
-                        tick={{ fill: customColors.textSecondary }}
-                      />
-                      <RechartsTooltip 
-                        contentStyle={{ 
-                          backgroundColor: customColors.backgroundDark,
-                          border: `1px solid ${customColors.border}`,
-                          color: customColors.text
-                        }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="count"
-                        stroke={customColors.primary}
-                        fill={customColors.primary}
-                        fillOpacity={0.3}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </Box>
-              </Box>
-            </div>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <div className="dash-anim">
-              <Box
-                sx={{ 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  p: 3,
-                  border: `1px solid ${customColors.border}`,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.3)',
-                    borderColor: `${customColors.primary}4D`
-                  }
-                }}
-              >
-                <Typography 
-                  variant="h6" 
-                  gutterBottom 
-                  sx={{ 
-                    color: customColors.text,
-                    fontWeight: 600,
-                    fontSize: '1.1rem',
-                    mb: 3,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1
-                  }}
-                >
-                  <AssessmentIcon sx={{ color: customColors.primary }} />
-                  Performance Summary
-                </Typography>
+          {/* Summary + velocity */}
+          <Grid item xs={12} md={8}>
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard title="Performance Summary" icon={<AssessmentIcon sx={{ color: customColors.primary }} />}>
                 {performanceSummary ? (
-                  <Box
+                  <Typography
                     sx={{
                       color: customColors.text,
                       fontSize: '0.875rem',
-                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
                       lineHeight: 1.8,
-                      mb: 2,
                       letterSpacing: '0.01em',
                       whiteSpace: 'pre-wrap'
                     }}
                   >
                     {performanceSummary}
-                  </Box>
+                  </Typography>
                 ) : (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      color: customColors.text,
-                      fontSize: '0.875rem',
-                      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif'
-                    }}
-                  >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <InfoIcon sx={{ color: customColors.primary, fontSize: '1.1rem' }} />
-                    <Typography sx={{ 
-                      fontSize: '0.875rem',
-                      lineHeight: 1.8,
-                      letterSpacing: '0.01em'
-                    }}>
+                    <Typography sx={{ color: customColors.textSecondary, fontSize: '0.875rem', lineHeight: 1.8 }}>
                       No performance summary available yet. Take more quizzes to get detailed insights!
                     </Typography>
                   </Box>
                 )}
-              </Box>
+              </SectionCard>
             </div>
           </Grid>
 
-          <Grid item xs={12} md={6}>
-            <div className="dash-anim">
-              <Box
-                sx={{ 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  p: 3
-                }}              >
-                <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
-                  Skill Mastery Overview
-                </Typography>
-                <Box height={300}>
-                  <ResponsiveContainer>
-                    <RadarChart data={skillMasteryData}>
-                      <PolarGrid stroke={customColors.border} />
-                      <PolarAngleAxis 
-                        dataKey="skill" 
-                        tick={{ fill: customColors.text }}
-                      />
-                      <PolarRadiusAxis 
-                        tick={{ fill: customColors.text }}
-                      />
-                      <Radar
-                        name="Mastery Progress"
-                        dataKey="masteryLevel"
-                        stroke={customColors.primary}
-                        fill={customColors.primary}
-                        fillOpacity={0.6}
-                      />
-                      <RechartsTooltip 
-                        content={({ active, payload }) => {
-                          if (active && payload && payload.length) {
-                            const data = payload[0].payload;
-                            return (
-                              <Box sx={{ 
-                                bgcolor: customColors.backgroundDark,
-                                p: 2,
-                                border: `1px solid ${customColors.border}`,
-                                borderRadius: 1
-                              }}>
-                                <Typography sx={{ color: customColors.text }}>
-                                  {data.skill}
-                                </Typography>
-                                <Typography sx={{ color: customColors.text }}>
-                                  Correct Answers: {data.correctAnswers}/1000
-                                </Typography>
-                                <Typography sx={{ color: customColors.text }}>
-                                  Pass Rate: {data.passRate.toFixed(1)}%
-                                </Typography>
-                                <Typography sx={{ 
-                                  color: data.isMastered ? customColors.success : customColors.text,
-                                  fontWeight: 'bold'
-                                }}>
-                                  {data.isMastered ? 'MASTERED' : 'IN PROGRESS'}
-                                </Typography>
-                              </Box>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                    </RadarChart>
-                  </ResponsiveContainer>
+          <Grid item xs={12} md={4}>
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard title="Learning Velocity">
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  {learningVelocity.trend === 'improving' ? (
+                    <TrendingUp sx={{ color: customColors.primary, mr: 1, fontSize: '2rem' }} />
+                  ) : (
+                    <TrendingDown sx={{ color: customColors.danger, mr: 1, fontSize: '2rem' }} />
+                  )}
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      color: learningVelocity.trend === 'improving'
+                        ? customColors.primary
+                        : learningVelocity.trend === 'neutral'
+                          ? customColors.text
+                          : customColors.danger
+                    }}
+                  >
+                    {learningVelocity.velocity > 0 ? '+' : ''}{learningVelocity.velocity.toFixed(1)}%
+                  </Typography>
                 </Box>
-              </Box>
+                <Typography variant="body2" sx={{ color: customColors.textSecondary }}>
+                  Recent performance vs. your overall average
+                </Typography>
+              </SectionCard>
             </div>
           </Grid>
 
+          {/* Charts */}
           <Grid item xs={12} md={6}>
-            <div className="dash-anim">
-              <Box
-                sx={{ 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  p: 3
-                }}              >
-                <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
-                  Performance Trends
-                </Typography>
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard title="Performance Trends">
                 <Box height={300}>
                   <ResponsiveContainer>
                     <LineChart data={performanceTrends}>
                       <CartesianGrid strokeDasharray="3 3" stroke={customColors.border} />
-                      <XAxis 
-                        dataKey="date" 
+                      <XAxis
+                        dataKey="date"
                         stroke={customColors.text}
                         tick={{ fill: customColors.textSecondary }}
                       />
-                      <YAxis 
+                      <YAxis
                         stroke={customColors.text}
                         tick={{ fill: customColors.textSecondary }}
                       />
-                      <RechartsTooltip 
-                        contentStyle={{ 
-                          backgroundColor: customColors.backgroundDark,
-                          border: `1px solid ${customColors.border}`,
-                          color: customColors.text
-                        }}
-                      />
+                      <RechartsTooltip contentStyle={chartTooltipStyle} />
                       <Legend wrapperStyle={{ color: customColors.text }} />
                       <Line
                         type="monotone"
@@ -922,24 +698,253 @@ const Dashboard: React.FC = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 </Box>
-              </Box>
+              </SectionCard>
+            </div>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard title="Skill Mastery Overview">
+                <Box height={300}>
+                  <ResponsiveContainer>
+                    <RadarChart data={skillMasteryData}>
+                      <PolarGrid stroke={customColors.border} />
+                      <PolarAngleAxis
+                        dataKey="skill"
+                        tick={{ fill: customColors.text }}
+                      />
+                      <PolarRadiusAxis
+                        tick={{ fill: customColors.text }}
+                      />
+                      <Radar
+                        name="Mastery Progress"
+                        dataKey="masteryLevel"
+                        stroke={customColors.primary}
+                        fill={customColors.primary}
+                        fillOpacity={0.6}
+                      />
+                      <RechartsTooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <Box sx={{
+                                bgcolor: customColors.backgroundDark,
+                                p: 2,
+                                border: `1px solid ${customColors.border}`,
+                                borderRadius: 1
+                              }}>
+                                <Typography sx={{ color: customColors.text }}>
+                                  {data.skill}
+                                </Typography>
+                                <Typography sx={{ color: customColors.textSecondary }}>
+                                  Correct Answers: {data.correctAnswers}/1000
+                                </Typography>
+                                <Typography sx={{ color: customColors.textSecondary }}>
+                                  Pass Rate: {data.passRate.toFixed(1)}%
+                                </Typography>
+                                <Typography sx={{
+                                  color: data.isMastered ? customColors.success : customColors.textSecondary,
+                                  fontWeight: 'bold'
+                                }}>
+                                  {data.isMastered ? 'MASTERED' : 'IN PROGRESS'}
+                                </Typography>
+                              </Box>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </Box>
+              </SectionCard>
             </div>
           </Grid>
 
           <Grid item xs={12}>
-            <div className="dash-anim">
-              <Box
-                sx={{ 
-                  bgcolor: customColors.backgroundLight,
-                  borderRadius: 2,
-                  p: 3
-                }}
-              >
-                <Typography variant="h6" gutterBottom sx={{ color: customColors.text }}>
-                  Recent Activity
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard title="Study Pattern">
+                <Box height={200}>
+                  <ResponsiveContainer>
+                    <AreaChart data={studyPatterns}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={customColors.border} />
+                      <XAxis
+                        dataKey="hour"
+                        stroke={customColors.text}
+                        tick={{ fill: customColors.textSecondary }}
+                      />
+                      <YAxis
+                        stroke={customColors.text}
+                        tick={{ fill: customColors.textSecondary }}
+                        allowDecimals={false}
+                      />
+                      <RechartsTooltip contentStyle={chartTooltipStyle} />
+                      <Area
+                        type="monotone"
+                        dataKey="count"
+                        name="Quizzes"
+                        stroke={customColors.primary}
+                        fill={customColors.primary}
+                        fillOpacity={0.3}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </Box>
+                <Typography variant="caption" sx={{ color: customColors.textSecondary }}>
+                  Times of day when you usually take quizzes
                 </Typography>
+              </SectionCard>
+            </div>
+          </Grid>
+
+          {/* Skills ranking */}
+          <Grid item xs={12} md={7}>
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard
+                title="Skills Ranking"
+                icon={
+                  <Tooltip title="Rating = (Pass Rate × 0.6) + (Questions ÷ 1000 × 40)" placement="top">
+                    <InfoIcon sx={{ fontSize: '1rem', color: customColors.textSecondary, cursor: 'help' }} />
+                  </Tooltip>
+                }
+              >
+                {skillMasteryData.map((skill, index) => (
+                  <Box key={skill.skill} sx={{ mb: 2.5 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" sx={{ color: customColors.textSecondary, minWidth: 28 }}>
+                          #{index + 1}
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: customColors.text }}>
+                          {skill.skill}
+                        </Typography>
+                        {skill.isMastered && (
+                          <Tooltip title="Mastered" placement="top">
+                            <WorkspacePremium sx={{ color: '#FFC107', fontSize: '1.2rem' }} />
+                          </Tooltip>
+                        )}
+                      </Box>
+                      <Typography variant="h6" sx={{ color: customColors.primary }}>
+                        {skill.rating.toFixed(1)}
+                      </Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={skill.rating}
+                      sx={{
+                        height: 10,
+                        borderRadius: 5,
+                        bgcolor: `${customColors.primary}22`,
+                        mb: 1,
+                        '& .MuiLinearProgress-bar': {
+                          bgcolor: customColors.primary,
+                          borderRadius: 5,
+                        }
+                      }}
+                    />
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Grade sx={{ fontSize: '1rem', color: customColors.primary }} />
+                        <Typography variant="caption" sx={{ color: customColors.textSecondary }}>
+                          Pass Rate: {skill.passRate.toFixed(1)}%
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <CheckCircleIcon sx={{ fontSize: '1rem', color: customColors.success }} />
+                        <Typography variant="caption" sx={{ color: customColors.textSecondary }}>
+                          Questions: {skill.totalQuestions}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                ))}
+              </SectionCard>
+            </div>
+          </Grid>
+
+          {/* Achievements */}
+          <Grid item xs={12} md={5}>
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard title={`Achievements (${achievements.length})`} icon={<EmojiEvents sx={{ color: customColors.primary }} />}>
+                {achievements.length ? (
+                  <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+                    {achievements.map((achievement, index) => (
+                      <div
+                        key={achievement.title}
+                        className="dash-anim"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <Tooltip
+                          title={achievement.description}
+                          placement="top"
+                        >
+                          <Box
+                            sx={{
+                              position: 'relative',
+                              width: 80,
+                              height: 80,
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease',
+                              '&:hover': {
+                                transform: 'scale(1.1) rotate(5deg)',
+                              }
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                borderRadius: '50%',
+                                bgcolor: `${achievement.color}22`,
+                                border: `2px solid ${achievement.color}`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: achievement.color,
+                                animation: `${glowAnimation} 2s ease-in-out infinite`
+                              }}
+                            >
+                              {achievement.icon}
+                            </Box>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                position: 'absolute',
+                                bottom: -25,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                color: achievement.color,
+                                width: '100%',
+                                textAlign: 'center',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              {achievement.title}
+                            </Typography>
+                          </Box>
+                        </Tooltip>
+                      </div>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography sx={{ color: customColors.textSecondary, fontSize: '0.875rem' }}>
+                    Keep practicing to unlock your first achievement — maintain a 2-day streak or answer 100 questions.
+                  </Typography>
+                )}
+              </SectionCard>
+            </div>
+          </Grid>
+
+          {/* Recent activity */}
+          <Grid item xs={12}>
+            <div className="dash-anim" style={{ height: '100%' }}>
+              <SectionCard title="Recent Activity">
                 <Box>
-                  {(Array.isArray(quizResults) ? quizResults.slice(0, 5) : []).map((result, index) => (
+                  {recentResults.map((result, index) => (
                     <div
                       key={result.id}
                       className="dash-anim"
@@ -964,45 +969,46 @@ const Dashboard: React.FC = () => {
                           >
                             {result.status === 'PASS' ? <CheckCircleIcon /> : <CancelIcon />}
                           </Box>
-                          {index < 4 && (
+                          {index < recentResults.length - 1 && (
                             <Box sx={{ width: '2px', flex: 1, bgcolor: customColors.border, my: 0.5 }} />
                           )}
                         </Box>
                         <Box sx={{ flex: 1, pb: 3 }}>
-                          <Typography variant="h6" component="span" sx={{ color: customColors.text }}>
-                            {result.quiz_name}
-                          </Typography>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 1 }}>
+                            <Typography variant="h6" component="span" sx={{ color: customColors.text }}>
+                              {result.quiz_name}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: customColors.textSecondary }}>
+                              {new Date(result.created_at).toLocaleDateString()} at{' '}
+                              {new Date(result.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </Typography>
+                          </Box>
                           <Typography sx={{ color: customColors.textSecondary }}>
-                            {result.skill} - {result.correct_answers}/{result.total_questions} correct
+                            {result.skill} — {result.correct_answers}/{result.total_questions} correct
                           </Typography>
                           <Box sx={{ mt: 1 }}>
                             <LinearProgress
                               variant="determinate"
                               value={(result.correct_answers / result.total_questions) * 100}
                               sx={{
+                                height: 8,
+                                borderRadius: 4,
                                 bgcolor: customColors.border,
                                 '& .MuiLinearProgress-bar': {
-                                  bgcolor: result.status === 'PASS' 
-                                    ? customColors.primary 
+                                  borderRadius: 4,
+                                  bgcolor: result.status === 'PASS'
+                                    ? customColors.primary
                                     : customColors.danger
                                 }
                               }}
                             />
                           </Box>
-                          <Typography 
-                            variant="caption" 
-                            display="block" 
-                            sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 1 }}
-                          >
-                            {new Date(result.created_at).toLocaleDateString()} at{' '}
-                            {new Date(result.created_at).toLocaleTimeString()}
-                          </Typography>
                         </Box>
                       </Box>
                     </div>
                   ))}
                 </Box>
-              </Box>
+              </SectionCard>
             </div>
           </Grid>
         </Grid>
