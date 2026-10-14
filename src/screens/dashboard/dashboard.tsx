@@ -73,6 +73,7 @@ const cardSx: SxProps<Theme> = {
   }
 };
 
+
 const sectionTitleSx: SxProps<Theme> = {
   color: customColors.text,
   fontWeight: 600,
